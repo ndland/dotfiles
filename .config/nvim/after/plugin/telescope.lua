@@ -12,25 +12,17 @@ telescope.setup {
 	defaults = {
 		prompt_prefix = " ",
 		selection_caret = " ",
-		path_display = { shorten = { len = 2 } },
-		vimgrep_arguments = {
-			"rg",
-			"--hidden",
-			"--color=never",
-			"--no-heading",
-			"--with-filename",
-			"--line-number",
-			"--column",
-			"--smart-case"
-		},
+		path_display = { shorten = { len = 3 } },
 	}
 }
 
-vim.keymap.set('n', '<leader>gf', builtin.git_files, {})
+vim.keymap.set('n', '<leader>G', builtin.git_files, {})
 vim.keymap.set('n', '<leader>b', builtin.buffers, {})
-vim.keymap.set('n', '<leader>fb', "<cmd>Telescope file_browser<cr>", {})
-vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
-vim.keymap.set('n', '<leader>p', ":lua require'telescope'.extensions.projects.projects{}<cr>", {})
-vim.keymap.set('n', '<leader>ss', function()
+vim.keymap.set('n', '<leader>F', "<cmd>Telescope file_browser<cr>", {})
+vim.keymap.set('n', '<leader>f', builtin.find_files, {})
+vim.keymap.set('n', '<leader>p', function ()
+    telescope.extensions.projects.projects()
+end, {})
+vim.keymap.set('n', '<leader>s', function()
 	builtin.grep_string({ search = vim.fn.input("Grep > ") });
 end)

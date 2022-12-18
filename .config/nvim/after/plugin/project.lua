@@ -24,17 +24,19 @@ project_nvim.setup({
 		".svn",
 		"Makefile",
 		"package.json",
-		"Library/Mobile Documents/iCloud~com~logseq~logseq/",
-		"init.lua",
+		"~/Library/Mobile Documents/iCloud~com~logseq~logseq/",
+		"~/.config/nvim/init.lua"
 	},
 
 	-- Table of lsp clients to ignore by name
 	-- eg: { "efm", ... }
-	ignore_lsp = {},
+	ignore_lsp = { "sumneko_lua" },
 
 	-- Don't calculate root dir on specific directories
 	-- Ex: { "~/.cargo/*", ... }
-	exclude_dirs = {},
+	exclude_dirs = {
+        ".git",
+        "node_modules", ".cache", "~/.config/nvim/lua/", "~/Library/Mobile Documents/iCloud~com~logseq~logseq/Documents/", "~/.config/nvim/lua/ndland/" },
 
 	-- Show hidden files in telescope
 	show_hidden = true,
@@ -48,7 +50,6 @@ project_nvim.setup({
 	datapath = vim.fn.stdpath("data"),
 
 	-- project settings nvim-tree
-	sync_root_with_cwd = true,
 	respect_buf_cwd = true,
 	update_cwd = true,
 	update_focused_file = {
