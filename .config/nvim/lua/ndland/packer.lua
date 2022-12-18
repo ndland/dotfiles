@@ -44,4 +44,5 @@ return require('packer').startup(function(use)
 	}
 	use('mbbill/undotree')
 	use("github/copilot.vim")
+	use("jose-elias-alvarez/null-ls.nvim")
 end)
