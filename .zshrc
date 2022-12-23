@@ -29,8 +29,6 @@ bindkey '^[[B' history-substring-search-down
 
 eval $(thefuck --alias)
 
-# source /usr/local/share/zsh-you-should-use/you-should-use.plugin.zsh
-
 # Aliases
 alias zl="source ~/.zshrc"
 
@@ -52,3 +50,5 @@ eval "$(starship init zsh)"
 
 # homebrew
 export PATH="/usr/local/sbin:$PATH"
+
+export PATH="$HOME/.local/bin:$PATH"
