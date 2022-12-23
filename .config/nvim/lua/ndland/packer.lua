@@ -47,5 +47,17 @@ return require("packer").startup(function(use)
 	use("github/copilot.vim")
 	use("lewis6991/gitsigns.nvim")
 	use("wakatime/vim-wakatime")
-	use("jose-elias-alvarez/null-ls.nvim")
+	use({
+		"jose-elias-alvarez/null-ls.nvim",
+		requires = {
+			{ "nvim-lua/plenary.nvim" },
+		},
+	})
+
+	use({
+		"windwp/nvim-autopairs",
+		config = function()
+			require("nvim-autopairs").setup()
+		end,
+	})
 end)

@@ -4,6 +4,8 @@ if not status_ok then
 end
 
 null_ls.setup({
+	debug = true,
+	on_attach = null_ls.on_attach,
 	sources = {
 		null_ls.builtins.diagnostics.eslint,
 		null_ls.builtins.formatting.prettier,
