@@ -9,20 +9,21 @@ telescope.load_extension('projects')
 telescope.load_extension('file_browser')
 
 telescope.setup {
+    pickers = {
+        find_files = {
+            find_command = { 'rg', '--files', '--hidden', '--follow', '--glob', '!.git' },
+        },
+    },
 	defaults = {
 		prompt_prefix = " ",
 		selection_caret = " ",
-		path_display = { shorten = { len = 3 } },
+		path_display = { shorten = { len = 5 } },
 	}
 }
 
 vim.keymap.set('n', '<leader>G', builtin.git_files, {})
 vim.keymap.set('n', '<leader>b', builtin.buffers, {})
-vim.keymap.set('n', '<leader>F', "<cmd>Telescope file_browser<cr>", {})
+vim.keymap.set('n', '<leader>F', ":Telescope file_browser <cr>", {})
 vim.keymap.set('n', '<leader>f', builtin.find_files, {})
-vim.keymap.set('n', '<leader>p', function ()
-    telescope.extensions.projects.projects()
-end, {})
-vim.keymap.set('n', '<leader>s', function()
-	builtin.grep_string({ search = vim.fn.input("Grep > ") });
-end)
+vim.keymap.set('n', '<leader>p', telescope.extensions.projects.projects, {})
+vim.keymap.set('n', '<leader>s', function() builtin.grep_string({ search = vim.fn.input("Grep > ") }); end)
