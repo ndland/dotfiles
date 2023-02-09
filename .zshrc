@@ -1,8 +1,15 @@
 zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
+
+if type brew &>/dev/null; then
+  FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
+  FPATH=$(brew --prefix)/share/zsh/site-functions:$FPATH
+fi
+
 autoload -Uz compinit
 compinit
 
-source ~/.zplug/init.zsh
+export ZPLUG_HOME=/opt/homebrew/opt/zplug
+source $ZPLUG_HOME/init.zsh
 
 zplug "zsh-users/zsh-completions",                defer:0
 zplug "zsh-users/zsh-autosuggestions",            defer:1
@@ -14,6 +21,7 @@ zplug "chrissicool/zsh-256color"
 zplug "changyuheng/fz"
 zplug "rupa/z", use:z.sh
 zplug "zplug/zplug", hook-build:'zplug --self-manage'
+
 
 if ! zplug check --verbose; then
   printf "Install? [y/N]: "
@@ -38,6 +46,8 @@ alias ll="exa -la"
 
 alias vim="nvim"
 
+alias buku="buku --suggest"
+
 # Dotfiles managment
 alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 
@@ -52,3 +62,14 @@ eval "$(starship init zsh)"
 export PATH="/usr/local/sbin:$PATH"
 
 export PATH="$HOME/.local/bin:$PATH"
+
+export BAT_THEME="Dracula"
+
+# Syntax highlight man pages with bat
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+
+# Syntax highlight help messages with bat
+alias bathelp='bat --plain --language=help'
+help() {
+    "$@" --help 2>&1 | bathelp
+}
