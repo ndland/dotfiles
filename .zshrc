@@ -8,7 +8,7 @@ fi
 autoload -Uz compinit
 compinit
 
-export ZPLUG_HOME=/opt/homebrew/opt/zplug
+export ZPLUG_HOME=$(brew --prefix)/opt/zplug
 source $ZPLUG_HOME/init.zsh
 
 zplug "zsh-users/zsh-completions",                defer:0
