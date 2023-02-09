@@ -12,7 +12,7 @@ telescope.setup {
     pickers = {
         find_files = {
             find_command = { 'rg', '--files', '--hidden', '--follow', '--glob', '!.git' },
-        },
+        }
     },
 	defaults = {
 		prompt_prefix = " ",
