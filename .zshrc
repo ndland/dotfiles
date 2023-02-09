@@ -16,7 +16,7 @@ zplug "zsh-users/zsh-autosuggestions",            defer:1
 zplug "zsh-users/zsh-syntax-highlighting",        defer:2
 zplug "zsh-users/zsh-history-substring-search",   defer:3
 
-zplug "lukechilds/zsh-better-npm-completion",     defer:4
+zplug "lukechilds/zsh-better-npm-completion",     defer:0
 zplug "chrissicool/zsh-256color"
 zplug "changyuheng/fz"
 zplug "rupa/z", use:z.sh
@@ -47,6 +47,7 @@ alias ll="exa -la"
 alias vim="nvim"
 
 alias buku="buku --suggest"
+alias upgrade="brew update && brew upgrade && brew cleanup && mas upgrade"
 
 # Dotfiles managment
 alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
