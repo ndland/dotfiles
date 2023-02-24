@@ -64,7 +64,7 @@ alias ll="exa -la"
 
 alias vim="nvim"
 
-alias buku="buku --suggest"
+alias b="buku --suggest"
 alias upgrade="brew update && brew upgrade && brew cleanup && mas upgrade"
 
 # Dotfiles managment
