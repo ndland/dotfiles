@@ -13,12 +13,12 @@ return require("packer").startup(function(use)
 		requires = {
 			{ "nvim-lua/plenary.nvim" },
 			{ "nvim-telescope/telescope-file-browser.nvim" },
-			{ "ahmedkhalf/project.nvim" },
 		},
 	})
 
 	use("tpope/vim-fugitive")
 	use("projekt0n/github-nvim-theme")
+	use("dracula/vim")
 	use("nvim-treesitter/nvim-treesitter", { run = ":TSUpdate" })
 	use("nvim-treesitter/playground")
 
@@ -44,7 +44,6 @@ return require("packer").startup(function(use)
 		},
 	})
 	use("mbbill/undotree")
-	use("github/copilot.vim")
 	use("lewis6991/gitsigns.nvim")
 	use("wakatime/vim-wakatime")
 	use({

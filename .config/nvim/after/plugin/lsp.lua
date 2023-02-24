@@ -3,14 +3,13 @@ local lsp = require("lsp-zero")
 lsp.preset("recommended")
 
 lsp.ensure_installed({
-	"sumneko_lua",
+	"lua_ls",
 	"tsserver",
 	"eslint",
 	"marksman",
 })
 
-lsp.configure("sumneko_lua", {
-	cmd = { "lua-language-server" },
+lsp.configure("lua-language-server", {
 	settings = {
 		Lua = {
 			diagnostics = {

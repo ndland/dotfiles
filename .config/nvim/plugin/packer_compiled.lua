@@ -104,11 +104,6 @@ _G.packer_plugins = {
     path = "/Users/tz4m2z/.local/share/nvim/site/pack/packer/start/cmp_luasnip",
     url = "https://github.com/saadparwaiz1/cmp_luasnip"
   },
-  ["copilot.vim"] = {
-    loaded = true,
-    path = "/Users/tz4m2z/.local/share/nvim/site/pack/packer/start/copilot.vim",
-    url = "https://github.com/github/copilot.vim"
-  },
   ["friendly-snippets"] = {
     loaded = true,
     path = "/Users/tz4m2z/.local/share/nvim/site/pack/packer/start/friendly-snippets",
@@ -180,11 +175,6 @@ _G.packer_plugins = {
     path = "/Users/tz4m2z/.local/share/nvim/site/pack/packer/start/plenary.nvim",
     url = "https://github.com/nvim-lua/plenary.nvim"
   },
-  ["project.nvim"] = {
-    loaded = true,
-    path = "/Users/tz4m2z/.local/share/nvim/site/pack/packer/start/project.nvim",
-    url = "https://github.com/ahmedkhalf/project.nvim"
-  },
   ["telescope-file-browser.nvim"] = {
     loaded = true,
     path = "/Users/tz4m2z/.local/share/nvim/site/pack/packer/start/telescope-file-browser.nvim",
@@ -199,6 +189,11 @@ _G.packer_plugins = {
     loaded = true,
     path = "/Users/tz4m2z/.local/share/nvim/site/pack/packer/start/undotree",
     url = "https://github.com/mbbill/undotree"
+  },
+  vim = {
+    loaded = true,
+    path = "/Users/tz4m2z/.local/share/nvim/site/pack/packer/start/vim",
+    url = "https://github.com/dracula/vim"
   },
   ["vim-fugitive"] = {
     loaded = true,
