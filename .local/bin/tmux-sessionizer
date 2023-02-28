@@ -3,8 +3,7 @@
 if [[ $# -eq 1 ]]; then
     selected=$1
 else
-    # selected=$(find ~ ~/Library/Mobile\ Documents/iCloud~com~logseq~logseq ~/code/github.com/ndland ~/code/personal ~/code/work ~/.config/nvim -mindepth 1 -maxdepth 1 -type d 2>/dev/null | fzf)
-    selected=$(fd ~ ~/Library/Mobile\ Documents/iCloud~com~logseq~logseq ~/code/github.com/ndland ~/code/personal ~/code/work ~/.config/ --exact-depth=1 -t directory --full-path | fzf)
+    selected=$((fd . --exact-depth=1 -t directory --hidden  ~/.config/; fd . --exact-depth=3 -t directory --hidden  ~/code/work/ ~/code/personal/; fd . --exact-depth=1 -t directory --hidden  ~/Library/Mobile\ Documents/iCloud~com~logseq~logseq) 2>/dev/null | fzf)
 fi
 
 if [[ -z $selected ]]; then
