@@ -25,36 +25,26 @@ export SAVEHIST=10000
 setopt appendhistory
 setopt histignorealldups
 
-export ZPLUG_HOME=$(brew --prefix)/opt/zplug
-source $ZPLUG_HOME/init.zsh
+ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
+[ ! -d $ZINIT_HOME ] && mkdir -p "$(dirname $ZINIT_HOME)"
+[ ! -d $ZINIT_HOME/.git ] && git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+source "${ZINIT_HOME}/zinit.zsh"
 
-zplug "zsh-users/zsh-completions",                defer:0
-zplug "zsh-users/zsh-autosuggestions",            defer:1
-zplug "zsh-users/zsh-syntax-highlighting",        defer:2
+autoload -Uz _zinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
 
-zplug "dracula/zsh"
-zplug "Aloxaf/fzf-tab"
-
-zplug "lukechilds/zsh-better-npm-completion",     defer:0
-zplug "chrissicool/zsh-256color"
-zplug "changyuheng/fz"
-zplug "rupa/z", use:z.sh
-zplug "zplug/zplug", hook-build:'zplug --self-manage'
-
-
-if ! zplug check --verbose; then
-  printf "Install? [y/N]: "
-  if read -q; then
-    echo; zplug install
-  fi
-fi
-
-zplug load
+zinit light zsh-users/zsh-completions
+zinit light dracula/zsh
+zinit light Aloxaf/fzf-tab
+zinit light lukechilds/zsh-better-npm-completion
+zinit light chrissicool/zsh-256color
+zinit light changyuheng/fz
+zinit light rupa/z
+zinit light zsh-users/zsh-syntax-highlighting
+zinit light zsh-users/zsh-autosuggestions
 
 # bindkey '^[[A' history-substring-search-up
 # bindkey '^[[B' history-substring-search-down
-
-eval $(thefuck --alias)
 
 # Aliases
 alias zl="source ~/.zshrc"

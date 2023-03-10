@@ -1,5 +1,7 @@
 # Set PATH, MANPATH, etc., for Homebrew.
-eval "$(/opt/homebrew/bin/brew shellenv)"
+eval "$($(brew --prefix)/bin/brew shellenv)"
+
+eval $(thefuck --alias)
 
 #in ZSH, add to ~/.zprofile
 # Where should I put you?
