@@ -61,10 +61,14 @@ alias upgrade="brew update && brew upgrade && brew cleanup && mas upgrade"
 # Dotfiles managment
 alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 
+alias k=kubectl
+
 # fnm
 export PATH="$HOME/Library/Application Support/fnm:$PATH"
 eval "`fnm env`"
 eval "$(fnm env --use-on-cd)"
+
+export PATH="$HOME/.rd/bin:$PATH"
 
 # homebrew
 export PATH="/usr/local/sbin:$PATH"
@@ -84,4 +88,13 @@ help() {
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
+
 eval "$(starship init zsh)"
+
+# ZSH auto-completion for kubernetes.
+if [ $commands[kubectl] ]; then
+     source <(kubectl completion zsh)
+fi
+
+#THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
+[[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
