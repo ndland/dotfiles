@@ -20,7 +20,6 @@ system_type=$(uname -s)
 
 if [ "$system_type" = "Darwin" ]; then
 
-
   # possibly add something here to ensure iTerm2 is installed using Homebrew
   # cask like in the previous example
 
@@ -42,7 +41,6 @@ if [ "$system_type" = "Darwin" ]; then
     brew bundle --global
   fi
 
+  # Allow repeating key in VSCode (for VIM)
+  defaults write com.microsoft.VSCode ApplePressAndHoldEnabled -bool false
 fi
-
-# Allow repeating key in VSCode (for VIM)
-defaults write com.microsoft.VSCode ApplePressAndHoldEnabled -bool false
