@@ -29,6 +29,7 @@ brew "openssl@3"
 brew "pinentry-mac"
 brew "ripgrep"
 brew "thefuck"
+brew "wget"
 brew "zsh-completions"
 # brew "watch"
 
