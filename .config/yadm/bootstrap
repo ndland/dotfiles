@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# Install oh-my-zsh
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+fi
+
+# Install p10k
+if [ ! -d "$HOME/.oh-my-zsh/custom/themes/powerlevel10k" ]; then
+  git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+fi
+
+# Install zsh-syntax-higlighting
+if [ ! -d "$HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting" ]; then
+  git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+fi
+
+# Install brew deps from ~/.Brewfile
+system_type=$(uname -s)
+
+if [ "$system_type" = "Darwin" ]; then
+
+  # install homebrew if it's missing
+  if ! command -v brew >/dev/null 2>&1; then
+    echo "Installing homebrew"
+    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  fi
+
+  if [ -f "$HOME/.Brewfile" ]; then
+    echo "Updating homebrew bundle"
+    brew bundle --global
+  fi
+
+fi
+
+# Allow repeating key in VSCode (for VIM)
+defaults write com.microsoft.VSCode ApplePressAndHoldEnabled -bool false
