@@ -32,6 +32,7 @@ brew "wget"
 brew "yadm"
 brew "zsh-completions"
 brew "zsh"
+brew "zoxide"
 # brew "watch"
 
 cask "bitwarden"
