@@ -2,6 +2,7 @@ tap "homebrew/bundle"
 tap "homebrew/cask-fonts"
 tap "homebrew/cask-versions"
 
+brew "bat-extras"
 brew "bat"
 brew "bitwarden-cli"
 brew "buku"
@@ -21,47 +22,57 @@ brew "go"
 brew "gpg"
 brew "jq"
 brew "mas"
-# brew "maven"
-# brew "neovim"
+brew "neovim"
 brew "openssl@3"
 brew "pinentry-mac"
 brew "ripgrep"
 brew "thefuck"
+brew "tldr"
 brew "wget"
+brew "yadm"
 brew "zsh-completions"
+brew "zsh"
 # brew "watch"
 
 cask "bitwarden"
-cask "blender"
-cask "calibre"
 # cask "firefox-developer-edition"
 # cask "firefox"
+cask "dracula-insomnia"
 cask "font-caskaydia-cove-nerd-font"
-cask "forklift"
-cask "freecad"
+cask "font-anonymice-nerd-font"
 cask "gitkraken"
 cask "google-chrome-canary"
 cask "google-chrome-dev"
 cask "google-chrome"
-cask "guitar-pro"
-# cask "inkscape"
 cask "insomnia"
 cask "iterm2"
 cask "jetbrains-toolbox"
-cask "librecad"
 # cask "logseq"
 cask "microsoft-excel"
 cask "obsidian"
 # cask "rancher"
 cask "qcad"
 cask "raycast"
-cask "thunderbird"
 cask "thingsmacsandboxhelper"
 # cask "tuxguitar"
 cask "visual-studio-code"
 
-# Install apps from the app store
-mas "Day One", id: 1055511498
-mas "Omnivore", id: 1564031042
-mas "Things 3", id: 904280696
-mas "Xcode", id: 497799835
+if 'GMMACANCN6345JM' == `scutil --get HostName`.strip
+  brew "maven"
+  brew "dracula/install/dracula-git"
+else
+  cask "blender"
+  cask "calibre"
+  cask "forklift"
+  cask "freecad"
+  cask "guitar-pro"
+  cask "inkscape"
+  cask "librecad"
+  cask "thunderbird"
+
+  # Install apps from the app store
+  mas "Day One", id: 1055511498
+  mas "Omnivore", id: 1564031042
+  mas "Things 3", id: 904280696
+  mas "Xcode", id: 497799835
+end
