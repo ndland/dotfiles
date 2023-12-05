@@ -35,6 +35,17 @@ local cmp_mappings = lsp.defaults.cmp_mappings({
 	["<C-Space>"] = cmp.mapping.complete(),
 })
 
+cmp.setup({
+    formatting = {
+        fields = { 'abbr', 'kind', 'menu' },
+        format = require('lspkind').cmp_format({
+            mode = 'symbol', -- Show only symbol annotations
+            maxwidth = 50, -- prevent the popup from showing more than provided characters
+            ellipsis_char = '...', -- when popup menu exceeds maxwidth, the truncated part would show ellipsis_char instead
+        })
+    }
+})
+
 -- disable completion with tab
 -- this helps with copilot setup
 cmp_mappings["<Tab>"] = nil
