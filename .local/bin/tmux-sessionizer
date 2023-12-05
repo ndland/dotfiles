@@ -3,7 +3,17 @@
 if [[ $# -eq 1 ]]; then
     selected=$1
 else
-    selected=$((fd . --exact-depth=1 -t directory --hidden  ~/.config/; fd . --exact-depth=3 -t directory --hidden  ~/code/work/ ~/code/personal/; fd . --exact-depth=1 -t directory --hidden  ~/Library/Mobile\ Documents/iCloud~com~logseq~logseq) 2>/dev/null | fzf)
+    directories=$(fd . --exact-depth=1 -t d --hidden ~/.config/; fd . --exact-depth=3 -t d --hidden ~/code/work/ ~/code/personal/)
+    files=(
+        "$HOME/.zshrc"
+        "$HOME/.p10k.zsh"
+        "$HOME/.zprofile"
+    )
+    # Concatenate directories and files into one list
+    all_items=("$directories" "${files[@]}")
+
+    # Prompt user to select items
+    selected=$(printf "%s\n" "${all_items[@]}" | fzf)
 fi
 
 if [[ -z $selected ]]; then
@@ -14,12 +24,12 @@ selected_name=$(basename "$selected" | tr . _)
 tmux_running=$(pgrep tmux)
 
 if [[ -z $TMUX ]] && [[ -z $tmux_running ]]; then
-    tmux new-session -s $selected_name -c $selected
+    tmux new-session -s $selected_name -c $selected 'nvim'
     exit 0
 fi
 
 if ! tmux has-session -t=$selected_name 2> /dev/null; then
-    tmux new-session -ds $selected_name -c $selected
+    tmux new-session -ds $selected_name -c $selected "nvim"
 fi
 
 tmux switch-client -t $selected_name
