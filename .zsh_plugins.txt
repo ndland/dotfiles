@@ -1,0 +1,17 @@
+# .zsh_plugins.txt
+
+# comments are supported like this
+zsh-users/zsh-completions
+
+z-shell/F-Sy-H branch:main
+zsh-users/zsh-autosuggestions
+
+joshskidmore/zsh-fzf-history-search
+buonomo/yarn-completion
+
+# frameworks like oh-my-zsh are supported
+ohmyzsh/ohmyzsh path:plugins/colored-man-pages
+# ohmyzsh/ohmyzsh path:plugins/magic-enter
+
+# popular fish-like plugins
+# mattmc3/zfunctions
