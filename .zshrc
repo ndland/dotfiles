@@ -42,3 +42,8 @@ fi
 antidote load
 
 eval "$(starship init zsh)"
+
+# fnm
+export PATH="/home/nland/.local/share/fnm:$PATH"
+eval "`fnm env`"
+eval "$(fnm env --use-on-cd)"
