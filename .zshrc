@@ -31,6 +31,8 @@ bindkey '^[3;5~' delete-char
 
 alias ls="exa --icons"
 
+export BAT_THEME="OneHalfDark"
+
 if [[ "$(uname)" == "Darwin" ]]; then
   source /opt/homebrew/opt/antidote/share/antidote/antidote.zsh
 else
@@ -41,9 +43,10 @@ fi
 
 antidote load
 
-eval "$(starship init zsh)"
-
 # fnm
 export PATH="/home/nland/.local/share/fnm:$PATH"
 eval "`fnm env`"
 eval "$(fnm env --use-on-cd)"
+
+eval "$(zoxide init zsh)"
+eval "$(starship init zsh)"
