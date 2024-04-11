@@ -2,26 +2,45 @@
 (setq auto-save-default nil)
 (setq make-backup-files nil)
 (setq create-lockfiles nil)
+(setq display-line-numbers-type 'relative)
+(add-hook 'prog-mode-hook #'display-line-numbers-mode)
 
-;; Set up package.el to work with MELPA
+(set-frame-font "MonaspiceAr Nerd Font-13")
+
+;; Set up proxy server settings
+(when (string= system-name "GMMACANCN6345JM")
+  (setq my-proxy (getenv "HTTP_PROXY"))
+  (setq url-proxy-services
+	`(("no_proxy" . "^\\(localhost\\|10.*\\)")
+          ("http" . ,my-proxy)
+          ("https" . ,my-proxy))))
+
+;; Set up package management
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
-;; Install 'use-package' if not already installed
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name
+        "straight/repos/straight.el/bootstrap.el"
+        (or (bound-and-true-p straight-base-dir)
+            user-emacs-directory)))
+      (bootstrap-version 7))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
-;; Install and configure the Dracula theme
-(use-package dracula-theme
-  :ensure t
-  :config
-  (load-theme 'dracula t))
+(straight-use-package 'use-package)
 
 ;; Set up Evil mode
 (use-package evil
-  :ensure t
+  :straight t
   :init
   (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
   (setq evil-want-keybinding nil)
@@ -30,138 +49,172 @@
 
 (use-package evil-collection
   :after evil
-  :ensure t
+  :straight t
   :config
   (evil-collection-init))
 
+(use-package restart-emacs
+  :straight t
+  :config
+  (global-set-key (kbd "C-x r") 'restart-emacs))
+
 (use-package helpful
-  :ensure t
-  :commands (helpful-callable helpful-variable helpful-command helpful-key)
-  :bind
-  (("C-h f" . helpful-callable)
-   ("C-h v" . helpful-variable)
-   ("C-h k" . helpful-key)
-   ("C-h ." . helpful-at-point)))
+  :straight t
+  :config
+    ;; Note that the built-in `describe-function' includes both functions
+    ;; and macros. `helpful-function' is functions only, so we provide
+    ;; `helpful-callable' as a drop-in replacement.
+    (global-set-key (kbd "C-h f") #'helpful-callable)
+
+    (global-set-key (kbd "C-h v") #'helpful-variable)
+    (global-set-key (kbd "C-h k") #'helpful-key)
+    (global-set-key (kbd "C-h x") #'helpful-command)
+
+    ;; Lookup the current symbol at point. C-c C-d is a common keybinding
+    ;; for this in lisp modes.
+    (global-set-key (kbd "C-c C-d") #'helpful-at-point)
+
+    ;; Look up *F*unctions (excludes macros).
+    ;;
+    ;; By default, C-h F is bound to `Info-goto-emacs-command-node'. Helpful
+    ;; already links to the manual, if a function is referenced there.
+    (global-set-key (kbd "C-h F") #'helpful-function))
+
+(use-package dracula-theme
+  :straight t
+  :config
+  (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
+  (load-theme 'dracula t))
+
+(use-package org
+  :straight t
+  :after evil
+  :bind ("C-x a" . org-agenda)
+  :config
+  ;; When a TODO is set to a done state, record a timestamp
+  (setq org-log-done 'time)
+
+  (setq org-capture-templates
+	'(("t" "Todo" entry (file+headline "~/org/inbox.org" "Tasks")
+         "* TODO %?\n  %i\n  %a")))
+
+  ;; Make the indentation look nicer
+  (add-hook 'org-mode-hook 'org-indent-mode)
+
+  ;; Wrap the lines in org mode so that tjngs are easier to read
+  (add-hook 'org-mode-hook 'visual-line-mode)
+
+  ;; Customize the Tab key for Org mode headings in Evil mode
+  (evil-define-key 'normal org-mode-map (kbd "<tab>") 'org-cycle)
+  (evil-define-key 'visual org-mode-map (kbd "<tab>") 'org-cycle)
+  (evil-define-key 'insert org-mode-map (kbd "<tab>") 'org-cycle)
+  (evil-define-key 'normal org-agenda-mode-map (kbd "<tab>") 'org-agenda-fold-toggle)
+  (evil-define-key 'visual org-agenda-mode-map (kbd "<tab>") 'org-agenda-fold-toggle)
+  (evil-define-key 'insert org-agenda-mode-map (kbd "<tab>") 'org-agenda-fold-toggle)
+
+  (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
+  (setq org-agenda-files '("~/org")))
+
+(use-package org-roam
+  :straight t
+  :config
+  (setq org-roam-directory "~/org/roam")
+
+  ;; From https://www.orgroam.com/manual.html#Setting-up-Org_002droam
+  (org-roam-db-autosync-mode)
+  
+  (global-set-key (kbd "C-c n r") 'org-roam)
+  (global-set-key (kbd "C-c n f") 'org-roam-node-find)
+  (global-set-key (kbd "C-c n g") 'org-roam-graph)
+  (global-set-key (kbd "C-c n i") 'org-roam-node-insert)
+  (global-set-key (kbd "C-c n t") 'org-roam-dailies-goto-today)
+  (org-roam-mode))
+
+(use-package org-bullets
+  :straight t
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 (use-package magit
-  :ensure t
+  :straight t
   :bind ("C-x g" . magit-status))
 
-(use-package projectile
-  :ensure t
-  :config
-  (projectile-mode +1)
-  :custom
-  (projectile-completion-system 'default)
-  (projectile-enable-caching t)
-  (projectile-indexing-method 'hybrid)
-  :bind-keymap
-  ("C-c p" . projectile-command-map))
-
 (use-package vertico
-  :ensure t
+  :straight t
   :init
   (vertico-mode)
   :custom
   (completion-styles '(orderless)))
 
 (use-package orderless
-  :ensure t)
+  :straight t)
 
 (use-package consult
-  :ensure t
+  :straight t
   :bind (("C-x C-r" . consult-find)))
 
-(use-package magit
-  :ensure t
-  :bind ("C-x g" . magit-status))
+;; Enable rich annotations using the Marginalia package
+(use-package marginalia
+  :straight t
+  ;; Bind `marginalia-cycle' locally in the minibuffer.  To make the binding
+  ;; available in the *Completions* buffer, add it to the
+  ;; `completion-list-mode-map'.
+  :bind (:map minibuffer-local-map
+         ("M-A" . marginalia-cycle))
 
-(use-package projectile
-  :ensure t
+  ;; The :init section is always executed.
+  :init
+
+  ;; Marginalia must be activated in the :init section of use-package such that
+  ;; the mode gets enabled right away. Note that this forces loading the
+  ;; package.
+  (marginalia-mode))
+
+(use-package company
+  :straight t
   :config
-  (projectile-mode +1)
-  :custom
-  (projectile-completion-system 'default)
-  (projectile-enable-caching t)
-  (projectile-indexing-method 'hybrid)
-  :bind-keymap
-  ("C-c p" . projectile-command-map))
+  ;; No delay in showing suggestions.
+  (setq company-idle-delay 0)
 
-(use-package tree-sitter
-  :ensure t
+  ;; Show suggestions after entering one character.
+  (setq company-minimum-prefix-length 1)
+
+  ;; Wrap around the list of suggestions.
+  (setq company-selection-wrap-around t)
+
+  ;; Use Tab key to cycle through suggestions (tab-and-go).
+  (company-tng-configure-default)
+
+  ;; Enable Company Mode globally.
+  (add-hook 'after-init-hook 'global-company-mode))
+
+(use-package lsp-mode
+  :straight t
+  :init
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  (setq lsp-keymap-prefix "C-c l")
+  :hook (((c-mode lisp-mode) . lsp-deferred)
+         ;; if you want which-key integration
+         (lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp
   :config
-  (global-tree-sitter-mode))
+  (add-hook 'lisp-mode-hook #'lsp-lisp-alive-start-ls))
 
-(use-package tree-sitter-langs
-  :ensure t
-  :after tree-sitter
+;; optionally
+(use-package lsp-ui
+  :straight t
+  :commands lsp-ui-mode)
+
+;; optional if you want which-key integration
+(use-package which-key
+  :straight t
   :config
-  (tree-sitter-require 'elisp))
+  (which-key-mode))
 
-;; Additional languages can be added similarly
-;; (tree-sitter-require 'javascript)
-
-(use-package org
-  :ensure t)
-
-(use-package org-roam
-  :ensure t
-  :config
-  (org-roam-mode))
-
-(setq org-roam-directory "~/org/roam")
-
-;; Set up Org mode
-(require 'org)
-
-;; org-mode is 80 characters until line break
-(add-hook 'org-mode-hook
-          (lambda ()
-            (setq fill-column 80)
-            (turn-on-auto-fill)))
-
-;; Enable flyspell in Org mode
-(add-hook 'org-mode-hook #'turn-on-flyspell)
-
-(add-hook 'org-mode-hook 'variable-pitch-mode)
-
-;; Set the flyspell language to American English
-(setq ispell-dictionary "american")
-
-(setq org-directory "~/org")
-
-(global-set-key (kbd "C-c n r") 'org-roam)
-(global-set-key (kbd "C-c n f") 'org-roam-node-find)
-(global-set-key (kbd "C-c n g") 'org-roam-graph)
-(global-set-key (kbd "C-c n i") 'org-roam-node-insert)
-(global-set-key (kbd "C-c n t") 'org-roam-dailies-goto-today)
-
-;; Customize the Tab key for Org mode headings in Evil mode
-(evil-define-key 'normal org-mode-map (kbd "<tab>") 'org-cycle)
-(evil-define-key 'visual org-mode-map (kbd "<tab>") 'org-cycle)
-(evil-define-key 'insert org-mode-map (kbd "<tab>") 'org-cycle)
-(evil-define-key 'normal org-agenda-mode-map (kbd "<tab>") 'org-agenda-fold-toggle)
-(evil-define-key 'visual org-agenda-mode-map (kbd "<tab>") 'org-agenda-fold-toggle)
-(evil-define-key 'insert org-agenda-mode-map (kbd "<tab>") 'org-agenda-fold-toggle)
-
-;; Set up variable pitch font for Org mode
-(custom-theme-set-faces
- 'user
- '(variable-pitch ((t (:family "Iosevka Etoile"))))
- '(fixed-pitch ((t (:weight normal :height 1.2 :family "Iosevka Nerd Font Mono")))))
-
-;; Set the default font to Iosevka Nerd Font Mono
-(set-frame-font "Iosevka Nerd Font Mono-12" nil t)
-
-;; Additional configuration for Org mode
-(setq org-startup-indented t
-      org-hide-emphasis-markers t
-      org-src-fontify-natively t
-      org-fontify-whole-heading-line t
-      org-fontify-done-headline t
-      org-fontify-quote-and-verse-blocks t)
-
-;; Customize other variables as needed
+(defun insert-now-time ()
+  "Insert the current time (hh:mm) in Org Mode."
+  (interactive)
+  (insert (format-time-string "%H:%M" (current-time))))
 
 ;; Save and load the customizations
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
