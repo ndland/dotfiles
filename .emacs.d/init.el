@@ -5,6 +5,11 @@
 (setq display-line-numbers-type 'relative)
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
 
+;; Start the server if it's not already started
+(load "server")
+(unless (server-running-p)
+  (server-start))
+
 (set-frame-font "MonaspiceAr Nerd Font-13")
 
 ;; Set up proxy server settings
@@ -210,6 +215,14 @@
   :straight t
   :config
   (which-key-mode))
+
+(use-package emacs-everywhere
+  :straight t)
+
+(use-package undo-tree
+  :straight t
+  :config
+  (global-undo-tree-mode))
 
 (defun insert-now-time ()
   "Insert the current time (hh:mm) in Org Mode."
