@@ -61,7 +61,7 @@
 (use-package restart-emacs
   :straight t
   :config
-  (global-set-key (kbd "C-x r") 'restart-emacs))
+  (global-set-key (kbd "M-r") 'restart-emacs))
 
 (use-package helpful
   :straight t
@@ -98,6 +98,8 @@
   :config
   ;; When a TODO is set to a done state, record a timestamp
   (setq org-log-done 'time)
+
+  (setq org-startup-with-inline-images t)
 
   (setq org-capture-templates
 	'(("t" "Todo" entry (file+headline "~/org/inbox.org" "Tasks")
@@ -219,10 +221,36 @@
 (use-package emacs-everywhere
   :straight t)
 
-(use-package undo-tree
+(use-package evil-goggles
   :straight t
   :config
-  (global-undo-tree-mode))
+  (evil-goggles-mode)
+  (evil-goggles-use-diff-faces))
+
+(use-package org-download
+  :straight t
+  :after org)
+
+(use-package magit-lfs
+  :straight t)
+
+(use-package vundo
+  :straight t
+  :bind
+  ("C-c v" . vundo)
+  :config
+  (setq vundo-compact-display t))
+
+(use-package deft
+  :straight t
+  :after org
+  :bind
+  ("C-c n d" . deft)
+  :custom
+  (deft-recursive t)
+  (deft-use-filter-string-for-filename t)
+  (deft-default-extension "org")
+  (deft-directory org-roam-directory))
 
 (defun insert-now-time ()
   "Insert the current time (hh:mm) in Org Mode."
