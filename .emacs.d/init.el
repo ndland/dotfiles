@@ -306,6 +306,21 @@
 (use-package pocket-reader
   :straight t)
 
+(use-package tramp
+  :straight t
+  :config
+  (add-to-list 'tramp-methods
+	       '("yadm"
+		 (tramp-login-program "yadm")
+		 (tramp-login-args (("enter")))
+		 (tramp-login-env (("SHELL") ("/bin/sh")))
+		 (tramp-remote-shell "/bin/sh")
+		 (tramp-remote-shell-args ("-c")))))
+
+(defun yadm ()
+  (interactive)
+  (magit-status "/yadm::"))
+
 (defun insert-now-time ()
   "Insert the current time (hh:mm) in Org Mode."
   (interactive)

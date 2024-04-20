@@ -7,7 +7,3 @@
   ("--ff-only")
   ("--rebase"))
  (magit-push nil))
- (magit-push nil)
- (magit-rebase
-  ("--autostash"))
- (magit-revision-history "ORIG_HEAD"))
