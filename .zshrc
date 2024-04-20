@@ -116,7 +116,6 @@ export ZVM_VI_INSERT_ESCAPE_BINDKEY=jj
 
 eval $(thefuck --alias)
 
-eval "$(starship init zsh)"
 # fnm
 export PATH="/home/nland/.local/share/fnm:$PATH"
 eval "`fnm env`"
