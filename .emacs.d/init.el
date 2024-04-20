@@ -241,6 +241,8 @@
   :config
   (which-key-mode)
 
+  (global-set-key (kbd "C-x y") 'yadm)
+
   ;; Define your prefix key
   (global-set-key (kbd "C-x a") (make-sparse-keymap))
 
