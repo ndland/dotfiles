@@ -94,10 +94,33 @@
 (use-package org
   :straight t
   :after evil
+  :hook (org-mode . (lambda ()
+		       (setq fill-column 80)
+		       (auto-fill-mode 1)))
   :bind ("C-x a" . org-agenda)
   :config
+
+  (defun my-org-archive-done-tasks ()
+    "Automatically archive tasks that are marked 'DONE'"
+    (when (string= (org-get-todo-state) "DONE")
+      (org-archive-subtree)))
+
+  (add-hook 'org-after-todo-state-change-hook 'my-org-archive-done-tasks)
+
+  (setq org-agenda-custom-commands
+	'(("A" "Archived tasks from the last week"
+	   agenda ""
+	   ((org-agenda-start-day "-7d")  ; start 7 days ago
+	    (org-agenda-span 7)           ; for the next 7 days
+	    (org-agenda-show-log t)       ; display logged tasks
+	    (org-agenda-log-mode-items '(closed)) ; only show closed tasks
+	    (org-agenda-archives-mode t)  ; include archive files
+	    (org-agenda-files (org-agenda-files nil 'archives)))))) ; only archive files
+
   ;; When a TODO is set to a done state, record a timestamp
   (setq org-log-done 'time)
+
+  (setq org-refile-targets '((org-agenda-files :maxlevel . 3)))
 
   (setq org-startup-with-inline-images t)
 
@@ -216,7 +239,16 @@
 (use-package which-key
   :straight t
   :config
-  (which-key-mode))
+  (which-key-mode)
+
+  ;; Define your prefix key
+  (global-set-key (kbd "C-x a") (make-sparse-keymap))
+
+  ;; Give a name to your prefix
+  (which-key-add-key-based-replacements "C-x a" "Org Agenda")
+
+  ;; Add bindings under your prefix
+  (define-key (global-key-binding (kbd "C-x a")) (kbd "a") 'org-agenda))
 
 (use-package emacs-everywhere
   :straight t)
@@ -251,6 +283,20 @@
   (deft-use-filter-string-for-filename t)
   (deft-default-extension "org")
   (deft-directory org-roam-directory))
+
+(use-package org-roam-ui
+  :straight
+  (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
+  :after org-roam
+  :hook (after-init . org-roam-ui-mode)
+  :config
+  (setq org-roam-ui-sync-theme t
+	org-roam-ui-follow t
+	org-roam-ui-update-on-save t
+	org-roam-ui-open-on-start t))
+
+(use-package pocket-reader
+  :straight t)
 
 (defun insert-now-time ()
   "Insert the current time (hh:mm) in Org Mode."

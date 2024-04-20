@@ -109,6 +109,7 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+alias vim=nvim
 
 # Exports
 export ZVM_VI_INSERT_ESCAPE_BINDKEY=jj
@@ -119,3 +120,6 @@ eval "$(starship init zsh)"
 # fnm
 export PATH="/home/nland/.local/share/fnm:$PATH"
 eval "`fnm env`"
+eval "$(fnm env --use-on-cd)"
+
+eval "$(starship init zsh)"

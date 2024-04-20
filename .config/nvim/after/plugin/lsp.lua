@@ -2,13 +2,6 @@ local lsp = require("lsp-zero")
 
 lsp.preset("recommended")
 
-lsp.ensure_installed({
-	"lua_ls",
-	"tsserver",
-	"eslint",
-	"marksman",
-})
-
 lsp.configure("lua_ls", {
 	settings = {
 		Lua = {
@@ -28,14 +21,19 @@ lsp.configure("lua_ls", {
 
 local cmp = require("cmp")
 local cmp_select = { behavior = cmp.SelectBehavior.Select }
-local cmp_mappings = lsp.defaults.cmp_mappings({
-	["<C-p>"] = cmp.mapping.select_prev_item(cmp_select),
-	["<C-n>"] = cmp.mapping.select_next_item(cmp_select),
-	["<C-y>"] = cmp.mapping.confirm({ select = true }),
-	["<C-Space>"] = cmp.mapping.complete(),
-})
 
 cmp.setup({
+    mapping = cmp.mapping.preset.insert({
+      ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+      ['<C-f>'] = cmp.mapping.scroll_docs(4),
+      ['<C-Space>'] = cmp.mapping.complete(),
+      ['<C-e>'] = cmp.mapping.abort(),
+      ["<C-p>"] = cmp.mapping.select_prev_item(cmp_select),
+      ["<C-n>"] = cmp.mapping.select_next_item(cmp_select),
+      ["<C-y>"] = cmp.mapping.confirm({ select = true }),
+      ["<Tab>"] = nil,
+      ["<S-Tab>"] = nil
+    }),
     formatting = {
         fields = { 'abbr', 'kind', 'menu' },
         format = require('lspkind').cmp_format({
@@ -44,15 +42,6 @@ cmp.setup({
             ellipsis_char = '...', -- when popup menu exceeds maxwidth, the truncated part would show ellipsis_char instead
         })
     }
-})
-
--- disable completion with tab
--- this helps with copilot setup
-cmp_mappings["<Tab>"] = nil
-cmp_mappings["<S-Tab>"] = nil
-
-lsp.setup_nvim_cmp({
-	mapping = cmp_mappings,
 })
 
 lsp.set_preferences({

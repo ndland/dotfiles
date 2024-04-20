@@ -7,21 +7,25 @@ return require("packer").startup(function(use)
 	-- Packer can manage itself
 	use("wbthomason/packer.nvim")
 
+	-- Telescope and extensions
 	use({
 		"nvim-telescope/telescope.nvim",
-		tag = "0.1.5",
+		tag = "0.1.5", -- pinned version for stability
 		requires = {
 			{ "nvim-lua/plenary.nvim" },
 			{ "nvim-telescope/telescope-file-browser.nvim" },
 		},
 	})
 
-	use("tpope/vim-fugitive")
+	-- Themes
 	use("projekt0n/github-nvim-theme")
 	use("dracula/vim")
+
+	-- Treesitter for syntax highlighting and related tools
 	use("nvim-treesitter/nvim-treesitter", { run = ":TSUpdate" })
 	use("nvim-treesitter/playground")
 
+	-- LSP, Autocompletion, and Snippets
 	use({
 		"VonHeikemen/lsp-zero.nvim",
 		requires = {
@@ -44,9 +48,16 @@ return require("packer").startup(function(use)
 			{ "rafamadriz/friendly-snippets" },
 		},
 	})
-	use("mbbill/undotree")
+
+	-- Git integration and utilities
+	use("tpope/vim-fugitive")
 	use("lewis6991/gitsigns.nvim")
+
+	-- Productivity tools
+	use("mbbill/undotree")
 	use("wakatime/vim-wakatime")
+
+	-- Linting and formatting
 	use({
 		"jose-elias-alvarez/null-ls.nvim",
 		requires = {
@@ -54,10 +65,20 @@ return require("packer").startup(function(use)
 		},
 	})
 
+	-- Auto pairs, integrates with both completion and treesitter
 	use({
 		"windwp/nvim-autopairs",
 		config = function()
 			require("nvim-autopairs").setup()
 		end,
 	})
+
+	-- Project management
+	use({
+		"ahmedkhalf/project.nvim",
+		config = function()
+			require("project_nvim").setup {}
+		end,
+	})
 end)
+
