@@ -248,7 +248,15 @@
   (which-key-add-key-based-replacements "C-x a" "Org Agenda")
 
   ;; Add bindings under your prefix
-  (define-key (global-key-binding (kbd "C-x a")) (kbd "a") 'org-agenda))
+  (define-key (global-key-binding (kbd "C-x a")) (kbd "a") 'org-agenda)
+
+  ;; Org mode specific bindings
+  (with-eval-after-load 'org
+    ;; Bind "C-x a t" to 'insert-now-time in org-mode-map
+    (define-key org-mode-map (kbd "C-c t") 'insert-now-time)
+    
+    ;; Add which-key description for the new binding
+    (which-key-add-key-based-replacements "C-c t" "Insert Now Time")))
 
 (use-package emacs-everywhere
   :straight t)
