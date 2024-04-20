@@ -73,13 +73,13 @@ ZSH_THEME=""
 plugins=(
   brew
   colored-man-pages
-  f-Sy-H
+  F-Sy-H
   git
   gitignore
   zoxide
   zsh-autosuggestions
   zsh-fzf-history-search
-  zsh-vi-mode
+  # zsh-vi-mode
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -116,3 +116,6 @@ export ZVM_VI_INSERT_ESCAPE_BINDKEY=jj
 eval $(thefuck --alias)
 
 eval "$(starship init zsh)"
+# fnm
+export PATH="/home/nland/.local/share/fnm:$PATH"
+eval "`fnm env`"
