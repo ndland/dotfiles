@@ -319,6 +319,16 @@
 		 (tramp-remote-shell "/bin/sh")
 		 (tramp-remote-shell-args ("-c")))))
 
+(use-package langtool
+  :straight t
+  :config
+  (setq langtool-bin "/opt/homebrew/bin/languagetool")
+  (setq langtool-default-language "en-US")
+
+  (add-hook 'org-mode-hook
+	    (lambda ()
+	      (add-hook 'before-save-hook 'langtool-check nil 'local))))
+
 (defun yadm ()
   (interactive)
   (magit-status "/yadm::"))
