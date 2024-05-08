@@ -1,4 +1,4 @@
-;;;; Emacs Bookmark Format Version 1 ;;;; -*- coding: utf-8-emacs -*-
+;;;; Emacs Bookmark Format Version 1;;;; -*- coding: utf-8-emacs; mode: lisp-data -*-
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
@@ -9,9 +9,9 @@
  (position . 524)
  (last-modified 26145 20016 814685 0))
 ("org-capture-last-stored"
- (filename . "~/org/roam/20240418101739-maria.org")
+ (filename . "~/org/roam/20240424112423-video_games.org")
  (front-context-string)
- (rear-context-string . "\n#+title: Maria\n")
- (position . 83)
- (last-modified 26145 11142 562046 0))
+ (rear-context-string . "le: Video Games\n")
+ (position . 89)
+ (last-modified 26153 9257 440239 0))
 )

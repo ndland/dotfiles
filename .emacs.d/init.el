@@ -97,14 +97,42 @@
   (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
   (load-theme 'dracula t))
 
+(defun nl/org-mode-setup ()
+  (org-indent-mode)
+  (variable-pitch-mode 1)
+  (auto-fill-mode 0)
+  (visual-line-mode 1)
+  (setq evil-auto-indent nil))
+
 (use-package org
   :straight t
   :after evil
-  :hook (org-mode . (lambda ()
-		       (setq fill-column 80)
-		       (auto-fill-mode 1)))
+  :hook (org-mode . nl/org-mode-setup)
   :bind ("C-x a" . org-agenda)
   :config
+
+  (dolist (face '((org-level-1 . 1.6)
+		  (org-level-2 . 1.5)
+		  (org-level-3 . 1.4)
+		  (org-level-4 . 1.3)
+		  (org-level-5 . 1.2)
+		  (org-level-6 . 1.1)
+		  (org-level-7 . 1.1)
+		  (org-level-8 . 1.1)))
+    (set-face-attribute (car face) nil :font "ETBembo" :weight 'regular :height (cdr face)))
+
+  ;; Make sure org-indent face is available
+  (require 'org-indent)
+
+  ;; Ensure that anything that should be fixed-pitch in Org files appears that way
+  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-code nil   :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-indent nil :inherit '(org-hide fixed-pitch))
+  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
 
   (defun my-org-archive-done-tasks ()
     "Automatically archive tasks that are marked 'DONE'"
@@ -324,6 +352,16 @@
 		 (tramp-login-env (("SHELL") ("/bin/sh")))
 		 (tramp-remote-shell "/bin/sh")
 		 (tramp-remote-shell-args ("-c")))))
+
+(use-package langtool
+  :straight t
+  :config
+  (setq langtool-bin "/opt/homebrew/bin/languagetool")
+  (setq langtool-default-language "en-US")
+
+  (add-hook 'org-mode-hook
+	    (lambda ()
+	      (add-hook 'before-save-hook 'langtool-check nil 'local))))
 
 (defun yadm ()
   (interactive)
