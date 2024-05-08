@@ -10,7 +10,13 @@
 (unless (server-running-p)
   (server-start))
 
-(set-frame-font "MonaspiceAr Nerd Font-13")
+(cond
+ ((string-equal system-type "windows-nt") ; For Windows
+  (set-frame-font "MonaspiceAr NFM-13" nil t))
+ ((string-equal system-type "darwin") ; For macOS
+  (set-frame-font "MonaspiceAr Nerd Font-13" nil t))
+ ((string-equal system-type "gnu/linux") ; For Linux
+  (set-frame-font "MonaspiceAr Nerd Font-13" nil t)))
 
 ;; Set up proxy server settings
 (when (string= system-name "GMMACANCN6345JM")
