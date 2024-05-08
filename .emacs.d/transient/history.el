@@ -4,6 +4,7 @@
  (magit-diff
   ("--no-ext-diff" "--stat"))
  (magit-dispatch nil)
+ (magit-fetch nil)
  (magit-lfs nil)
  (magit-lfs-install nil)
  (magit-lfs-push nil)
@@ -13,4 +14,5 @@
  (magit-push nil)
  (magit-rebase
   ("--autostash"))
- (magit-revision-history "ORIG_HEAD"))
+ (magit-revision-history "ORIG_HEAD")
+ (magit-stash nil))
