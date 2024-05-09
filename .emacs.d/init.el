@@ -111,18 +111,19 @@
   :bind ("C-x a" . org-agenda)
   :config
 
-  (dolist (face '((org-level-1 . 1.6)
-		  (org-level-2 . 1.5)
-		  (org-level-3 . 1.4)
-		  (org-level-4 . 1.3)
-		  (org-level-5 . 1.2)
-		  (org-level-6 . 1.1)
-		  (org-level-7 . 1.1)
-		  (org-level-8 . 1.1)))
+  (dolist (face '((org-level-1 . 1.7)
+		  (org-level-2 . 1.6)
+		  (org-level-3 . 1.5)
+		  (org-level-4 . 1.4)
+		  (org-level-5 . 1.3)
+		  (org-level-6 . 1.2)
+		  (org-level-7 . 1.2)
+		  (org-level-8 . 1.2)))
     (set-face-attribute (car face) nil :font "ETBembo" :weight 'regular :height (cdr face)))
 
   ;; Make sure org-indent face is available
   (require 'org-indent)
+  (require 'org-protocol)
 
   ;; Ensure that anything that should be fixed-pitch in Org files appears that way
   (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
@@ -134,12 +135,12 @@
   (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
   (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
 
-  (defun my-org-archive-done-tasks ()
-    "Automatically archive tasks that are marked 'DONE'"
-    (when (string= (org-get-todo-state) "DONE")
-      (org-archive-subtree)))
+  ;; (defun my-org-archive-done-tasks ()
+  ;;   "Automatically archive tasks that are marked 'DONE'"
+  ;;   (when (string= (org-get-todo-state) "DONE")
+  ;;     (org-archive-subtree)))
 
-  (add-hook 'org-after-todo-state-change-hook 'my-org-archive-done-tasks)
+  ;; (add-hook 'org-after-todo-state-change-hook 'my-org-archive-done-tasks)
 
   (setq org-agenda-custom-commands
 	'(("A" "Archived tasks from the last week"
@@ -160,7 +161,11 @@
 
   (setq org-capture-templates
 	'(("t" "Todo" entry (file+headline "~/org/inbox.org" "Tasks")
-         "* TODO %?\n  %i\n  %a")))
+           "* TODO %?\n  %i\n  %a")
+          ("w" "Web bookmark" entry
+           (file+headline "~/org/bookmarks.org" "Web Bookmarks")
+           "* %^{Description}\n Source: %^{URL}\n\n  %i"
+           :empty-lines 1)))
 
   ;; Make the indentation look nicer
   (add-hook 'org-mode-hook 'org-indent-mode)
@@ -181,23 +186,49 @@
 
 (use-package org-roam
   :straight t
+  :bind (("C-c n l" . org-roam-buffer-toggle)
+         ("C-c n f" . org-roam-node-find)
+         ("C-c n g" . org-roam-graph)
+         ("C-c n i" . org-roam-node-insert)
+         ("C-c n c" . org-roam-capture)
+         ;; Dailies
+         ("C-c n j" . org-roam-dailies-capture-today))
   :config
   (setq org-roam-directory "~/org/roam")
 
   ;; From https://www.orgroam.com/manual.html#Setting-up-Org_002droam
   (org-roam-db-autosync-mode)
+
+  ;; If using org-roam-protocol
+  (require 'org-roam-protocol)
   
-  (global-set-key (kbd "C-c n r") 'org-roam)
-  (global-set-key (kbd "C-c n f") 'org-roam-node-find)
-  (global-set-key (kbd "C-c n g") 'org-roam-graph)
-  (global-set-key (kbd "C-c n i") 'org-roam-node-insert)
-  (global-set-key (kbd "C-c n t") 'org-roam-dailies-goto-today)
   (org-roam-mode))
+
+(use-package org-contacts
+  :straight t
+  :after org
+  :config
+  (setq org-contacts-files '("~/org/contacts.org")))
 
 (use-package org-bullets
   :straight t
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
+(use-package ob-mermaid
+  :straight t
+  :config
+  (setq ob-mermaid-cli-path "/Users/tz4m2z/Library/Caches/fnm_multishells/85950_1715192108704/bin/mmdc")
+
+  (org-babel-do-load-languages
+    'org-babel-load-languages
+    '((mermaid . t)
+      (scheme . t))))
+
+(use-package mermaid-mode
+  :straight t
+  :config
+  (setq mermaid-mmdc-location "/Users/tz4m2z/Library/Caches/fnm_multishells/85950_1715192108704/bin/mmdc"))
 
 (use-package magit
   :straight t
@@ -276,15 +307,19 @@
   (which-key-mode)
 
   (global-set-key (kbd "C-x y") 'yadm)
+  (global-set-key (kbd "C-x e") 'eval-region)
 
   ;; Define your prefix key
-  (global-set-key (kbd "C-x a") (make-sparse-keymap))
+  (global-set-key (kbd "C-c o") (make-sparse-keymap))
 
   ;; Give a name to your prefix
-  (which-key-add-key-based-replacements "C-x a" "Org Agenda")
+  (which-key-add-key-based-replacements "C-c o" "Org")
 
   ;; Add bindings under your prefix
-  (define-key (global-key-binding (kbd "C-x a")) (kbd "a") 'org-agenda)
+  (define-key (global-key-binding (kbd "C-c o")) (kbd "a") 'org-agenda)
+  (define-key (global-key-binding (kbd "C-c o")) (kbd "s") 'org-search-view)
+  (define-key (global-key-binding (kbd "C-c o")) (kbd "c") 'org-contacts)
+  (define-key (global-key-binding (kbd "C-c o")) (kbd "p") 'org-capture)
 
   ;; Org mode specific bindings
   (with-eval-after-load 'org
