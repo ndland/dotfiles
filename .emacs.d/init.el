@@ -26,8 +26,10 @@
           ("http" . ,my-proxy)
           ("https" . ,my-proxy))))
 
-;; Set up package management
+ ;
+; Set up package management
 (require 'package)
+(add-to-list 'package-archives '("org" . "https://orgmode.org/elpa") t)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (package-initialize)
 
@@ -108,7 +110,6 @@
   :straight t
   :after evil
   :hook (org-mode . nl/org-mode-setup)
-  :bind ("C-x a" . org-agenda)
   :config
 
   (dolist (face '((org-level-1 . 1.7)
@@ -123,7 +124,6 @@
 
   ;; Make sure org-indent face is available
   (require 'org-indent)
-  (require 'org-protocol)
 
   ;; Ensure that anything that should be fixed-pitch in Org files appears that way
   (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
@@ -183,6 +183,11 @@
 
   (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
   (setq org-agenda-files '("~/org")))
+
+(use-package org-contrib
+  :straight t
+  :config
+  (require 'org-checklist))
 
 (use-package org-roam
   :straight t
@@ -397,6 +402,30 @@
   (add-hook 'org-mode-hook
 	    (lambda ()
 	      (add-hook 'before-save-hook 'langtool-check nil 'local))))
+
+;; Ensure projectile is installed and configured using use-package
+(use-package projectile
+  :straight t
+  :init
+  ;; Optional: Enable projectile globally
+  (projectile-mode +1)
+  :config
+  ;; Optional: Set the keymap prefix for Projectile commands
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+
+  ;; Optional: Enable caching
+  (setq projectile-enable-caching t))
+
+(use-package counsel-projectile
+  :after (projectile counsel)
+  :ensure t
+  :config
+  (counsel-projectile-mode))
+
+;; Install and configure ini-mode
+(use-package ini-mode
+  :ensure t
+  :mode ("\\.ini\\'" . ini-mode))
 
 (defun yadm ()
   (interactive)
