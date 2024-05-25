@@ -418,14 +418,26 @@
 
 (use-package counsel-projectile
   :after (projectile counsel)
-  :ensure t
+  :straight t
   :config
   (counsel-projectile-mode))
 
 ;; Install and configure ini-mode
 (use-package ini-mode
-  :ensure t
+  :straight t
   :mode ("\\.ini\\'" . ini-mode))
+
+(use-package devdocs
+  :straight t
+  :config
+  (global-set-key (kbd "C-h D") 'devdocs-lookup))
+
+(use-package nov
+  :straight t)
+
+(use-package doom-modeline
+  :straight t
+  :init (doom-modeline-mode 1))
 
 (defun yadm ()
   (interactive)
