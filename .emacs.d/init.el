@@ -142,15 +142,27 @@
 
   ;; (add-hook 'org-after-todo-state-change-hook 'my-org-archive-done-tasks)
 
+  (defun my/org-agenda-get-archived-files ()
+    "Return a list of archived org files."
+    (let ((archive-files '()))
+      (dolist (file (org-agenda-files t))
+	(let* ((base (file-name-sans-extension file))
+	       (dir (file-name-directory file))
+	       (archives (directory-files dir t (concat base "_archive\\|\\.org_archive\\|\\.org\\'"))))
+	  (dolist (archive archives)
+	    (when (or (string-match "_archive" archive)
+		      (string-match "\\.org_archive\\'" archive))
+	      (push archive archive-files)))))
+      archive-files))
+
   (setq org-agenda-custom-commands
 	'(("A" "Archived tasks from the last week"
-	   agenda ""
-	   ((org-agenda-start-day "-7d")  ; start 7 days ago
-	    (org-agenda-span 7)           ; for the next 7 days
-	    (org-agenda-show-log t)       ; display logged tasks
-	    (org-agenda-log-mode-items '(closed)) ; only show closed tasks
-	    (org-agenda-archives-mode t)  ; include archive files
-	    (org-agenda-files (org-agenda-files nil 'archives)))))) ; only archive files
+           agenda ""
+           ((org-agenda-start-day "-7d")  ; start 7 days ago
+            (org-agenda-span 7)           ; for the next 7 days
+            (org-agenda-show-log t)       ; display logged tasks
+            (org-agenda-log-mode-items '(closed)) ; only show closed tasks
+            (org-agenda-files (my/org-agenda-get-archived-files)))))) ; include archive files
 
   ;; When a TODO is set to a done state, record a timestamp
   (setq org-log-done 'time)
