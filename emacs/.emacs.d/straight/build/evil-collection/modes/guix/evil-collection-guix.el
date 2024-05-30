@@ -1,0 +1,1 @@
+/Users/tz4m2z/.emacs.d/straight/repos/evil-collection/modes/guix/evil-collection-guix.el

@@ -1,0 +1,1 @@
+/Users/tz4m2z/.emacs.d/straight/repos/evil-collection/modes/magit-section/evil-collection-magit-section.el

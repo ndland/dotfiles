@@ -1,0 +1,1 @@
+/Users/tz4m2z/.emacs.d/straight/repos/evil-collection/modes/notmuch/evil-collection-notmuch.el
