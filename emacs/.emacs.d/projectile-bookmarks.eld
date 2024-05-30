@@ -1,1 +1,1 @@
-("~/org/" "~/code/personal/github.com/ndland/dotfiles/" "~/.emacs.d/")
+("~/code/personal/github.com/ndland/dotfiles/" "~/org/" "~/.emacs.d/")

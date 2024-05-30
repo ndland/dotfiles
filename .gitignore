@@ -112,3 +112,6 @@ zsdoc/data
 !/tests/_output/.gitkeep
 
 # End of https://www.toptal.com/developers/gitignore/api/emacs,vim,zsh,homebrew
+/emacs/.emacs.d/projectile.cache
+/emacs/.emacs.d/straight/build-cache.el
+/emacs/.emacs.d/transient/
