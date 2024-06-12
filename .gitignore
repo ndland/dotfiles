@@ -115,3 +115,5 @@ zsdoc/data
 /emacs/.emacs.d/projectile.cache
 /emacs/.emacs.d/straight/build-cache.el
 /emacs/.emacs.d/transient/
+/emacs/.emacs.d/org-roam.db
+/emacs/.emacs.d/projectile-bookmarks.eld

@@ -1,1 +1,0 @@
-("~/code/personal/github.com/ndland/dotfiles/" "~/org/" "~/.emacs.d/")

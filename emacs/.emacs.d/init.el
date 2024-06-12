@@ -122,6 +122,14 @@
 		  (org-level-8 . 1.2)))
     (set-face-attribute (car face) nil :font "ETBembo" :weight 'regular :height (cdr face)))
 
+  (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
+
+  (setq org-todo-keyword-faces
+	'(("TODO" . "orange")
+	  ("WAITING" . "blue")
+	  ("DONE" . "green")
+	  ("CANCELLED" . (:foreground "red" :weight bold))))
+
   ;; Make sure org-indent face is available
   (require 'org-indent)
 
