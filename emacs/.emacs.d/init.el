@@ -102,8 +102,7 @@
 (defun nl/org-mode-setup ()
   (org-indent-mode)
   (variable-pitch-mode 1)
-  (auto-fill-mode 0)
-  (visual-line-mode 1)
+  (auto-fill-mode 1)
   (setq evil-auto-indent nil))
 
 (use-package org
@@ -125,10 +124,10 @@
   (setq org-todo-keywords '((sequence "TODO(t)" "WAITING(w)" "|" "DONE(d)" "CANCELLED(c)")))
 
   (setq org-todo-keyword-faces
-	'(("TODO" . "orange")
-	  ("WAITING" . "blue")
-	  ("DONE" . "green")
-	  ("CANCELLED" . (:foreground "red" :weight bold))))
+	'(("TODO" . "#FFB86C")
+	  ("WAITING" . "#8BE9FD")
+	  ("DONE" . "#50FA7B")
+	  ("CANCELLED" . (:foreground "#FF5555" :weight bold))))
 
   ;; Make sure org-indent face is available
   (require 'org-indent)
