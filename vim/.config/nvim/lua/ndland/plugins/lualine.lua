@@ -1,15 +1,24 @@
 return {
   "nvim-lualine/lualine.nvim",
-  dependencies = { "nvim-tree/nvim-web-devicons" },
+  dependencies = {
+    "nvim-tree/nvim-web-devicons",
+    "RRethy/base16-nvim",
+  },
 
   config = function()
     local lualine = require("lualine")
     local lazy_status = require("lazy.status")
+    local base16_nvim = require("base16-colorscheme")
+
+    base16_nvim.setup()
+
+    -- This line is here because if it's not, the main colorscheme gets
+    -- overridden when lualine loads
+    vim.cmd("colorscheme base16-tokyo-night-storm")
 
     lualine.setup({
       options = {
-        -- TODO: Figure out getting Github Dark theme
-        theme = "codedark",
+        theme = "base16",
       },
       sections = {
         lualine_x = {
@@ -23,5 +32,5 @@ return {
         },
       },
     })
-  end
+  end,
 }

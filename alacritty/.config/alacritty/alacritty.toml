@@ -1,31 +1,3 @@
-[colors.bright]
-black = "0x636e7b"
-blue = "0x6cb6ff"
-cyan = "0x39c5cf"
-green = "0x6bc46d"
-magenta = "0xb083f0"
-red = "0xff938a"
-white = "0x909dab"
-yellow = "0xdaaa3f"
-
-[colors.cursor]
-cursor = "0xadbac7"
-text = "0x22272e"
-
-[colors.normal]
-black = "0x545d68"
-blue = "0x539bf5"
-cyan = "0x39c5cf"
-green = "0x57ab5a"
-magenta = "0xb083f0"
-red = "0xf47067"
-white = "0x909dab"
-yellow = "0xc69026"
-
-[colors.primary]
-background = "0x22272e"
-foreground = "0xadbac7"
-
 [font]
 size = 14
 
@@ -40,6 +12,60 @@ style = "Italic"
 [font.normal]
 family = "IosevkaTerm Nerd Font Mono"
 style = "Medium"
+
+# Colors (Tokyo Night Storm)
+# Source https//github.com/zatchheems/tokyo-night-alacritty-theme
+
+# Default colors
+[colors.primary]
+background = '#24283b'
+foreground = '#a9b1d6'
+
+# Tokyo Night
+# background = '#1a1b26'
+# foreground = '#a9b1d6'
+
+# Normal colors
+[colors.normal]
+black   = '#32344a'
+red     = '#f7768e'
+green   = '#9ece6a'
+yellow  = '#e0af68'
+blue    = '#7aa2f7'
+magenta = '#ad8ee6'
+cyan    = '#449dab'
+white   = '#9699a8'
+
+# Tokyo Night
+# black   = '#32344a'
+# red     = '#f7768e'
+# green   = '#9ece6a'
+# yellow  = '#e0af68'
+# blue    = '#7aa2f7'
+# magenta = '#ad8ee6'
+# cyan    = '#449dab'
+# white   = '#787c99'
+
+# Bright colors
+[colors.bright]
+black   = '#444b6a'
+red     = '#ff7a93'
+green   = '#b9f27c'
+yellow  = '#ff9e64'
+blue    = '#7da6ff'
+magenta = '#bb9af7'
+cyan    = '#0db9d7'
+white   = '#acb0d0'
+
+# Tokyo Night
+# black   = '#444b6a'
+# red     = '#ff7a93'
+# green   = '#b9f27c'
+# yellow  = '#ff9e64'
+# blue    = '#7da6ff'
+# magenta = '#bb9af7'
+# cyan    = '#0db9d7'
+# white   = '#acb0d0'
 
 [window]
 dynamic_padding = true
