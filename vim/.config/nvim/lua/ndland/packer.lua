@@ -10,7 +10,7 @@ return require("packer").startup(function(use)
 	-- Telescope and extensions
 	use({
 		"nvim-telescope/telescope.nvim",
-		tag = "0.1.5", -- pinned version for stability
+		tag = "0.1.8", -- pinned version for stability
 		requires = {
 			{ "nvim-lua/plenary.nvim" },
 			{ "nvim-telescope/telescope-file-browser.nvim" },
@@ -19,7 +19,7 @@ return require("packer").startup(function(use)
 
 	-- Themes
 	use("projekt0n/github-nvim-theme")
-	use("dracula/vim")
+	-- use("dracula/vim")
 
 	-- Treesitter for syntax highlighting and related tools
 	use("nvim-treesitter/nvim-treesitter", { run = ":TSUpdate" })
@@ -28,6 +28,7 @@ return require("packer").startup(function(use)
 	-- LSP, Autocompletion, and Snippets
 	use({
 		"VonHeikemen/lsp-zero.nvim",
+        branch = 'v3.x',
 		requires = {
 			-- LSP Support
 			{ "neovim/nvim-lspconfig" },
