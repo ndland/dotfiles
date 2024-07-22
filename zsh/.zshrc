@@ -75,7 +75,7 @@ plugins=(
   colored-man-pages
   F-Sy-H
   git
-  gitignore
+  # gitignore
   zoxide
   zsh-autosuggestions
   zsh-fzf-history-search
@@ -122,3 +122,5 @@ eval "`fnm env`"
 eval "$(fnm env --use-on-cd)"
 
 eval "$(starship init zsh)"
+
+eval "$(fzf --zsh)"
