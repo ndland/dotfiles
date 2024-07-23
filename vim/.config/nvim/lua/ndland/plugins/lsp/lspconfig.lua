@@ -67,6 +67,13 @@ return {
       end,
     })
 
+    local on_attach = function(client)
+      if client.server_capabilities.colorProvider then
+        -- Attach document colour support
+        require("document-color").buf_attach(bufnr)
+      end
+    end
+
     -- used to enable autocompletion (assign to every lsp server config)
     local capabilities = cmp_nvim_lsp.default_capabilities()
 
@@ -109,7 +116,12 @@ return {
           },
         })
       end,
+      ["tailwindcss"] = function()
+        lspconfig["tailwindcss"].setup({
+          on_attach = on_attach,
+          capabilities = capabilities,
+        })
+      end,
     })
   end,
 }
-
