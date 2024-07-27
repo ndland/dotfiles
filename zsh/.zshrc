@@ -110,6 +110,26 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias vim=nvim
+# Check if eza is installed and set aliases accordingly
+if command -v eza &> /dev/null; then
+  alias ls='eza --icons'
+  alias ll='eza -alF'
+  alias la='eza -a'
+  alias l='eza -CF'
+  alias lla='eza -alF --icons --git'
+  alias lt='eza -T'
+  alias ltt='eza -T --level=2'
+  alias lh='eza -lh'
+  alias lsh='eza -lhS'
+  alias ltr='eza -ltr'
+  alias lts='eza -lt'
+  alias lss='eza -lS'
+  alias lg='eza -l --group-directories-first'
+  alias lc='eza --color=always'
+fi
+
+# Initialize zoxide
+eval "$(zoxide init zsh)"
 
 # Exports
 export ZVM_VI_INSERT_ESCAPE_BINDKEY=jj
