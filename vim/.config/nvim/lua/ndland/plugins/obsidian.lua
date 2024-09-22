@@ -20,7 +20,7 @@ return {
     workspaces = {
       {
         name = "personal",
-        path = "/mnt/c/Users/Nick Land/Documents/GitHub/Second-Brain/",
+        path = "/mnt/hgfs/Second-Brain",
       },
     },
 
