@@ -1,5 +1,7 @@
 [includeIf "gitdir:~/code/personal/"]
   path = ~/.gitconfig-personal
+[includeIf "gitdir:~/org"]
+  path = ~/.gitconfig-personal
 [includeIf "gitdir:~/code/work/"]
   path = ~/.gitconfig-work
 [credential]
