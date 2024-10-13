@@ -44,6 +44,11 @@
 (setq org-roam-directory (file-truename "~/org/roam"))
 (org-roam-db-autosync-mode)
 (after! org
+  (setq org-log-done 'time)
+  (setq org-archive-location "~/org/archive.org::")
+  (add-hook 'org-mode-hook 'visual-line-mode)
+  (add-hook 'org-mode-hook 'org-indent-mode)
+  (setq org-hide-emphasis-markers t)
   (setq org-agenda-files '("~/org" "~/org/roam/daily/" "~/org/roam")))
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
