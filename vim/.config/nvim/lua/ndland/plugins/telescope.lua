@@ -22,6 +22,23 @@ return {
             ["<C-q>"] = actions.send_selected_to_qflist + actions.open_qflist,
           },
         },
+        vimgrep_arguments = {
+          "rg",
+          "--color=never",
+          "--no-heading",
+          "--with-filename",
+          "--line-number",
+          "--column",
+          "--smart-case",
+          "--hidden", -- This makes `live_grep` include hidden files
+          "--glob",
+          "!.git/", -- Excludes .git directory
+        },
+      },
+      pickers = {
+        find_files = {
+          hidden = true, -- Makes find_files include hidden files
+        },
       },
     })
 
