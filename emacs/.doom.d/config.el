@@ -58,6 +58,9 @@
   :config
   (exec-path-from-shell-initialize))
 
+(after! yasnippet
+  (add-to-list 'yas-snippet-dirs "~/.doom.d/snippets"))
+
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
