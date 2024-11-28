@@ -53,6 +53,11 @@
   (setq org-hide-emphasis-markers t)
   (setq org-agenda-files '("~/org" "~/org/roam/daily/" "~/org/roam")))
 
+(use-package! exec-path-from-shell
+  :ensure t
+  :config
+  (exec-path-from-shell-initialize))
+
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
 ;;
