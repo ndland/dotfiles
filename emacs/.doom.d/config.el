@@ -48,6 +48,8 @@
   (setq org-archive-location "~/org/archive.org::")
   (add-hook 'org-mode-hook 'visual-line-mode)
   (add-hook 'org-mode-hook 'org-indent-mode)
+  (add-hook 'org-mode-hook #'auto-fill-mode)
+  (setq-default fill-column 80)
   (setq org-hide-emphasis-markers t)
   (setq org-agenda-files '("~/org" "~/org/roam/daily/" "~/org/roam")))
 
