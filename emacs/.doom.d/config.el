@@ -41,8 +41,7 @@
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
 (setq org-directory "~/org/")
-(setq org-roam-directory (file-truename "~/org/roam"))
-(org-roam-db-autosync-mode)
+
 (after! org
   (setq org-log-done 'time)
   (setq org-archive-location "~/org/archive.org::")
@@ -51,7 +50,16 @@
   (add-hook 'org-mode-hook #'auto-fill-mode)
   (setq-default fill-column 80)
   (setq org-hide-emphasis-markers t)
-  (setq org-agenda-files '("~/org" "~/org/roam/daily/" "~/org/roam")))
+  (setq org-agenda-files
+        (remove "~/org/archive.org"
+                (append (directory-files-recursively "~/org/" "\\.org$"))))
+  (setq org-agenda-include-diary t))
+
+(use-package! org-roam
+  :after org
+  :config
+  (setq org-roam-directory (file-truename "~/org/roam/"))
+  (org-roam-db-autosync-mode))
 
 (use-package! exec-path-from-shell
   :ensure t
