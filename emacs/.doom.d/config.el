@@ -53,6 +53,8 @@
   (setq org-agenda-files
         (remove "~/org/archive.org"
                 (append (directory-files-recursively "~/org/" "\\.org$"))))
+  (setq org-agenda-skip-function-global
+      '(org-agenda-skip-entry-if 'todo 'done))
   (setq org-agenda-include-diary t))
 
 (use-package! org-roam
