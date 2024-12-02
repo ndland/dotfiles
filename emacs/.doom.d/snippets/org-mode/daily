@@ -1,0 +1,20 @@
+# -*- mode: snippet -*-
+# name: daily
+# uuid: daily
+# key: daily
+# condition: t
+# --
+
+* Morning Pages
+  ${1}
+* Tasks
+  ${2}
+* Reflections
+  ${3}
+* Daily Retro
+** What went well?
+   ${4}
+** What could've went better?
+   ${5}
+** What should I start doing?
+   ${6}
