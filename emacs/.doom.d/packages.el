@@ -8,6 +8,7 @@
 
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
 ;; (package! some-package)
+(unpin! org-roam)
 (package! org-roam-ui)
 (package! jest)
 (package! exec-path-from-shell)
