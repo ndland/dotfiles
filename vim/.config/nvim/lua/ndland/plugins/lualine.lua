@@ -14,11 +14,11 @@ return {
 
     -- This line is here because if it's not, the main colorscheme gets
     -- overridden when lualine loads
-    vim.cmd("colorscheme ayu")
+    vim.cmd("colorscheme tokyonight-storm")
 
     lualine.setup({
       options = {
-        theme = "ayu_mirage",
+        theme = "base16",
       },
       sections = {
         lualine_x = {
