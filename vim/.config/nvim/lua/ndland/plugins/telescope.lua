@@ -40,17 +40,29 @@ return {
           hidden = true, -- Makes find_files include hidden files
         },
       },
+      extensions = {
+        media_files = {
+          -- filetypes whitelist
+          -- defaults to {"png", "jpg", "mp4", "webm", "pdf"}
+          filetypes = { "png", "jpg", "mp4", "webm", "pdf", "mkv" },
+
+          find_cmd = "rg", -- find command (defaults to `fd`)
+        },
+      },
     })
 
     telescope.load_extension("fzf")
 
-    -- set keymaps
-    local keymap = vim.keymap -- for conciseness
-
-    keymap.set("n", "<leader>ff", "<cmd>Telescope find_files<cr>", { desc = "Fuzzy find files in cwd" })
-    keymap.set("n", "<leader>fr", "<cmd>Telescope oldfiles<cr>", { desc = "Fuzzy find recent files" })
-    keymap.set("n", "<leader>fs", "<cmd>Telescope live_grep<cr>", { desc = "Find string in cwd" })
-    keymap.set("n", "<leader>fc", "<cmd>Telescope grep_string<cr>", { desc = "Find string under cursor in cwd" })
-    keymap.set("n", "<leader>ft", "<cmd>TodoTelescope<cr>", { desc = "Find todos" })
+    local wk = require("which-key")
+    wk.add({
+      { "<leader>t", group = "telescope" },
+      { "<leader>tf", "<cmd>Telescope find_files<cr>", desc = "Find File" },
+      { "<leader>tr", "<cmd>Telescope oldfiles<cr>", desc = "Recent Files" },
+      { "<leader>ts", "<cmd>Telescope live_grep<cr>", desc = "Search" },
+      { "<leader>tc", "<cmd>Telescope grep_string<cr>", desc = "Search under cursor" },
+      { "<leader>tt", "<cmd>TodoTelescope<cr>", desc = "Todos" },
+      { "<leader>tm", "<cmd>Telescope media_files<cr>", desc = "Media Files" },
+      { "<leader>tb", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
+    })
   end,
 }

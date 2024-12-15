@@ -8,6 +8,11 @@ return {
     -- configure autopairs
     telekasten.setup({
       home = vim.fn.expand("~/code/github.com/ndland/zettle"),
+      dailies = vim.fn.expand("~/code/github.com/ndland/zettle/daily/"), -- path to daily notes
+      weeklies = vim.fn.expand("~/code/github.com/ndland/zettle/weekly/"), -- path to weekly notes
+      templates = vim.fn.expand("~/code/github.com/ndland/zettle/templates/"), -- path to templates
+      extension = ".md",
+      image_subdir = "img",
     })
 
     -- set keymaps
