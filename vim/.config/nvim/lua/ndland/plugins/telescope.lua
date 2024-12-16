@@ -63,6 +63,7 @@ return {
       { "<leader>tt", "<cmd>TodoTelescope<cr>", desc = "Todos" },
       { "<leader>tm", "<cmd>Telescope media_files<cr>", desc = "Media Files" },
       { "<leader>tb", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
+      { "<leader>tp", "<cmd>Telescope projects<cr>", desc = "Projects" },
     })
   end,
 }
