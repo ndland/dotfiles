@@ -15,12 +15,13 @@ return {
       { "<leader>bd", "<cmd>bd<cr>", desc = "delete buffer" },
 
       { "<leader>e", group = "editor" },
-      { "<leader>et", group = "tabs" },
       { "<leader>eh", ":nohl<CR>", desc = "Clear search highlights" },
       { "<leader>ee", "<cmd>NvimTreeToggle<CR>", desc = "Toggle file explorer" },
       { "<leader>ef", "<cmd>NvimTreeFindFileToggle<CR>", desc = "Toggle file explorer on current file" },
       { "<leader>ec", "<cmd>NvimTreeCollapse<CR>", desc = "Collapse file explorer" },
       { "<leader>er", "<cmd>NvimTreeRefresh<CR>", desc = "Refresh file explorer" },
+
+      { "<leader>et", group = "tabs" },
       { "<leader>eto", "<cmd>tabnew<CR>", desc = "Open new tab" },
       { "<leader>etx", "<cmd>tabclose<CR>", desc = "Close current tab" },
       { "<leader>etn", "<cmd>tabn<CR>", desc = "Go to next tab" },

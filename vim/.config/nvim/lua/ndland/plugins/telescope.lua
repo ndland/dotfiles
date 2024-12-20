@@ -22,6 +22,7 @@ return {
             ["<C-q>"] = actions.send_selected_to_qflist + actions.open_qflist,
           },
         },
+        file_ignore_patterns = { ".git/", "node_modules/" },
         vimgrep_arguments = {
           "rg",
           "--color=never",
@@ -32,7 +33,6 @@ return {
           "--smart-case",
           "--hidden", -- This makes `live_grep` include hidden files
           "--glob",
-          "!.git/", -- Excludes .git directory
         },
       },
       pickers = {
