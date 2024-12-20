@@ -14,13 +14,6 @@ return {
       image_subdir = "img",
     })
 
-    local wk = require("which-key")
-    wk.add({
-      { "<leader>n", group = "Telekasten" },
-      { "<leader>np", "<cmd>Telekasten panel<cr>", desc = "Telekasten panel" },
-      { "<leader>ns", "<cmd>Telekasten search_notes<cr>", desc = "Search Notes" },
-    })
-
     vim.api.nvim_create_autocmd("FileType", {
       pattern = "telekasten",
       callback = function()
