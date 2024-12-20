@@ -22,6 +22,9 @@ return {
     })
 
     -- remove trailing whitespace with a keybinding
-    vim.keymap.set("n", "<Leader>t", require("whitespace-nvim").trim)
+    local wk = require("which-key")
+    wk.add({
+      { "<leader>cw", require("whitespace-nvim").trim, desc = "trim whitespace" },
+    })
   end,
 }

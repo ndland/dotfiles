@@ -2,7 +2,7 @@ vim.cmd("let g:netrw_liststyle = 3")
 
 local opt = vim.opt
 
-opt.relativenumber = true
+opt.relativenumber = false
 opt.number = true
 
 -- tabs & indentation
@@ -27,23 +27,4 @@ opt.backspace = "indent,eol,start" -- allow backspace on indent, end of line or 
 -- clipboard
 opt.clipboard:append("unnamedplus") -- use system clipboard as default register
 
--- Enable line wrapping for markdown files
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "markdown",
-  callback = function()
-    vim.opt.wrap = true
-    vim.opt.textwidth = 80
-    vim.opt.linebreak = true -- Ensure wrapped lines break at convenient points end
-  end,
-})
-
-vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
-  pattern = { "*.md" }, -- Adjust pattern if your notes use a different extension
-  callback = function()
-    if vim.bo.filetype == "telekasten" then
-      vim.bo.filetype = "markdown"
-    end
-  end,
-})
-
-vim.g.mapleader = ","
+vim.g.mapleader = " "
