@@ -8,6 +8,7 @@
 
 ;; Hook the setup function to Org mode
 (add-hook 'org-mode-hook #'my-org-mode-setup)
+(add-hook 'org-mode-hook 'org-indent-mode)
 
 (setq org-agenda-files '("~/org/todo.org"))
 
@@ -18,3 +19,6 @@
 	org-roam-db-autosync-mode t)
 
 (setq org-archive-location "~/org/archive.org::* Archive")
+
+;; Ensure only top-level headings are expanded on file open
+(setq org-startup-folded 'content)  ;; Fold everything except top-level headings
