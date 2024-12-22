@@ -22,3 +22,6 @@
 
 ;; Ensure only top-level headings are expanded on file open
 (setq org-startup-folded 'content)  ;; Fold everything except top-level headings
+
+(setq org-todo-keywords
+    '((sequence "TODO(t)" "IN-PROGRESS(i)" "WAITING(w@/!)" "|" "DONE(d!)" "CANCELED(c@)")))
