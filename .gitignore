@@ -117,3 +117,6 @@ zsdoc/data
 /emacs/.emacs.d/transient/
 /emacs/.emacs.d/org-roam.db
 /emacs/.emacs.d/projectile-bookmarks.eld
+/emacs/.emacs.d/elpa/
+/emacs/.emacs.d/straight/
+/emacs/.emacs.d/recentf
