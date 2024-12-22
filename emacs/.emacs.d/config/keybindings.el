@@ -26,6 +26,7 @@
   "f" '(:ignore t :which-key "file")
   "ff" '(find-file :which-key "Find file")
   "fs" '(save-buffer :which-key "Save file")
+  "fr" '(consult-recent-file :which-key "Recent files")
 
   "g" '(:ignore t :which-key "git")
   "gs" '(magit-status :which-key "Git status")
