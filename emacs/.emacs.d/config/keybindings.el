@@ -19,33 +19,43 @@
 ;; ** Global Keybindings
 (my-leader-def
   :keymaps 'normal
-  "b" '(:ignore t :which-key "buffer")
+  "b" '(:ignore t :which-key "Buffers")
   "bb" '(consult-buffer :which-key "Switch buffer")
   "bk" '(kill-this-buffer :which-key "Kill buffer")
 
-  "f" '(:ignore t :which-key "file")
+  "f" '(:ignore t :which-key "Files")
   "ff" '(find-file :which-key "Find file")
   "fs" '(save-buffer :which-key "Save file")
   "fr" '(consult-recent-file :which-key "Recent files")
 
-  "g" '(:ignore t :which-key "git")
+  "g" '(:ignore t :which-key "Git")
   "gs" '(magit-status :which-key "Git status")
 
-  "n" '(:ignore t :which-key "notes")
+  "n" '(:ignore t :which-key "Notes")
   "nf" '(org-roam-node-find :which-key "Find roam node")
   "nd" '(org-roam-dailies-goto-today :which-key "Go to today")
+
+  "p" '(:ignore t :which-key "Projects")
+  "pa" '(projectile-add-known-project :which-key "Add known project")
+  "pf" '(projectile-find-file :which-key "Find file")
+  "ps" '(projectile-switch-project :which-key "Switch projects")
 
   "s" '(:ignore t :which-key "Search")
   "sb" '(consult-line :which-key "Search current buffer")
   "sf" '(consult-line-multi :which-key "Search project files")
   "sr" '(consult-ripgrep :which-key "Ripgrep files")
 
-  "o" '(:ignore t :which-key "org")
+  "o" '(:ignore t :which-key "Org")
   "oa" '(org-agenda :which-key "Org agenda")
   "ot" '(:ignore t :which-key "org timer")
   "ots" '(org-timer-set-timer :which-key "Set timer")
   "otp" '(org-timer-pause-or-continue :which-key "Pause or continue timer")
   "ott" '(org-timer-stop :which-key "Stop timer"))
+
+;; For all local buffers
+(my-local-leader-def
+  :states 'normal
+  "b" '(embark-bindings :which-key "List buffer key bindings"))
 
 ;; Org Mode bindings
 (my-local-leader-def

@@ -249,3 +249,22 @@
   :after org-roam
   :config
   (org-roam-ui-mode))
+
+(use-package helpful
+  :straight t
+  :commands (helpful-callable helpful-function helpful-variable helpful-key)
+  :bind (("C-h f" . helpful-function)
+         ("C-h v" . helpful-variable)
+         ("C-h k" . helpful-key)
+         ("C-h C" . helpful-command))
+  :config
+  (setq helpful-max-buffers 10))  ;; Optional: limit the number of helpful buffers
+
+(use-package projectile
+  :straight t
+  :init
+  (projectile-mode +1))
+
+(use-package doom-modeline
+  :straight t
+  :init (doom-modeline-mode 1))
