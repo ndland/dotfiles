@@ -1,7 +1,5 @@
 [includeIf "gitdir:~/code/personal/"]
   path = ~/.gitconfig-personal
-[includeIf "gitdir:~/org"]
-  path = ~/.gitconfig-personal
 [includeIf "gitdir:~/code/work/"]
   path = ~/.gitconfig-work
 [credential]
@@ -9,6 +7,8 @@
 [core]
 	pager = diff-so-fancy | less --tabs=4 -RF
 	editor = "nvim"
+[commit]
+  template = ~/.gitcommit-template
 [interactive]
 	diffFilter = diff-so-fancy --patch
 [color]
