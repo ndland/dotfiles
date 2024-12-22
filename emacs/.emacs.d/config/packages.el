@@ -7,8 +7,8 @@
   (evil-mode 1)) ;; Enable Evil globally
 
 (use-package evil-collection
-  :after evil
   :straight t
+  :after evil
   :config
   (evil-collection-init))
 
@@ -25,27 +25,16 @@
   :init
   (global-corfu-mode))
 
-;; Add extensions
 (use-package cape
   :straight t
-  ;; Bind prefix keymap providing all Cape commands under a mnemonic key.
-  ;; Press C-c p ? to for help.
-  :bind ("C-c p" . cape-prefix-map) ;; Alternative key: M-<tab>, M-p, M-+
-  ;; Alternatively bind Cape commands individually.
-  ;; :bind (("C-c p d" . cape-dabbrev)
-  ;;        ("C-c p h" . cape-history)
-  ;;        ("C-c p f" . cape-file)
-  ;;        ...)
+  :bind ("C-c p" . cape-prefix-map)
   :init
-  ;; Add to the global default value of `completion-at-point-functions' which is
-  ;; used by `completion-at-point'.  The order of the functions matters, the
-  ;; first function returning a result wins.  Note that the list of buffer-local
-  ;; completion functions takes precedence over the global list.
+  ;; Add Cape completion functions to `completion-at-point-functions`
   (add-hook 'completion-at-point-functions #'cape-dabbrev)
   (add-hook 'completion-at-point-functions #'cape-file)
   (add-hook 'completion-at-point-functions #'cape-elisp-block)
-  ;; (add-hook 'completion-at-point-functions #'cape-history)
-  ;; ...
+  (add-hook 'completion-at-point-functions #'cape-history)  ;; Uncomment if needed
+  (add-hook 'completion-at-point-functions #'cape-symbol)   ;; Add more completion types as needed
 )
 
 (use-package which-key
@@ -63,7 +52,7 @@
   :straight t
   :config
   (setq catppuccin-flavor 'macchiato) ;; or 'latte, 'macchiato, or 'mocha
-  (catppuccin-reload))
+  (load-theme 'catppuccin t))
 
 (use-package vertico
   :straight t
@@ -76,9 +65,8 @@
   ;; Configure a custom style dispatcher (see the Consult wiki)
   ;; (orderless-style-dispatchers '(+orderless-consult-dispatch orderless-affix-dispatch))
   ;; (orderless-component-separator #'orderless-escapable-split-on-space)
-  (completion-styles '(orderless basic))
-  (completion-category-defaults nil)
-  (completion-category-overrides '((file (styles partial-completion)))))
+  (setq completion-styles '(orderless) ;; Enable fuzzy matching
+	completion-category-overrides '((file (styles basic partial-completion))))) ;; File-specific tweaks
 
 ;; Enable rich annotations using the Marginalia package
 (use-package marginalia
