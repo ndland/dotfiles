@@ -1,4 +1,5 @@
-;;
+(setq user-emacs-directory (expand-file-name "~/.config/emacs/"))
+
 (defvar bootstrap-version)
 (let ((bootstrap-file
        (expand-file-name
@@ -15,24 +16,28 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-;; Setup directories
-(defvar my-config-dir (expand-file-name "config/" user-emacs-directory)
+;; Configure straight.el with use-package
+(straight-use-package 'use-package)
+(setq straight-use-package-by-default t)
+
+;; Directory for modular configuration files
+(defvar my-config-dir (expand-file-name "lisp/" user-emacs-directory)
   "Directory for modular configuration files.")
 
+;; Ensure the directory exists
 (unless (file-exists-p my-config-dir)
   (make-directory my-config-dir))
 
-;; Ensure straight.el works with use-package
-(straight-use-package 'use-package)
+;; Add modular configuration directory to load-path
+(add-to-list 'load-path my-config-dir)
 
-;; Configure use-package to use straight.el by default
-(setq straight-use-package-by-default t)
-
-;; Load modular configuration files
-(mapc 'load (directory-files my-config-dir 'full "\\.el$"))
+;; Load all `.el` files in my-config-dir
+(mapc (lambda (file)
+        (load (file-name-sans-extension file)))
+      (directory-files my-config-dir 'full "\\.el$"))
 
 ;; Set custom file
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-(when (not (file-exists-p custom-file))
+(unless (file-exists-p custom-file)
   (write-region "" nil custom-file))
 (load custom-file)

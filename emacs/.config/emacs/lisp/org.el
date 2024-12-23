@@ -1,5 +1,27 @@
 ;; -*- lexical-binding: t; -*-
 
+;; Install Org Mode
+(use-package org
+  :straight t
+  :config
+  (setq org-directory "~/org"))
+
+;; Install Org Roam
+(use-package org-roam
+  :straight t
+  :after org
+  :init
+  (setq org-roam-v2-ack t)
+  :config
+  (setq org-roam-directory (expand-file-name "~/org/roam")))
+
+;; Install Org Roam UI
+(use-package org-roam-ui
+  :straight t
+  :after org-roam
+  :config
+  (org-roam-ui-mode))
+
 ;; Enable auto-fill-mode for Org-mode with a line width of 80 characters
 (defun my-org-mode-setup ()
   "Custom configurations for Org mode."
