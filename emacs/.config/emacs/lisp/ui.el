@@ -2,6 +2,8 @@
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
+(setq ring-bell-function 'ignore)
+(setq visible-bell nil)
 
 (use-package catppuccin-theme
   :straight t
@@ -29,3 +31,16 @@
          ("C-h C" . helpful-command))
   :config
   (setq helpful-max-buffers 10))  ;; Optional: limit the number of helpful buffers
+
+(set-face-attribute 'default nil
+		    :family "Iosevka"
+		    :height 110)
+
+;; Enable ligatures for programming modes
+(when (version<= "27.0" emacs-version)
+  (let ((ligatures '("-->" "<--" "->" "<-" "<->" "=>" "<=" ">=" "==>" "<=="
+                     "===" "!=" "!!" "&&" "||" "::" "..." "??" "##" "###")))
+    (dolist (pat ligatures)
+      (set-char-table-range composition-function-table
+                            (aref pat 0)
+                            `([,(regexp-opt (list pat)) 0 font-shape-gstring])))))

@@ -2,7 +2,6 @@
 (setq inhibit-startup-message t)
 (setq backup-directory-alist `(("." . ,(expand-file-name "backups/" user-emacs-directory))))
 
-
 (setq display-line-numbers t)
 (add-hook 'prog-mode-hook 'display-line-numbers-mode)
 
