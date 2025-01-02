@@ -89,7 +89,9 @@
          "* %?\n  %i\n  %a")))
 
 (setq org-agenda-custom-commands
-      '(("i" "Inbox" tags "inbox")
+      '(("i" "Inbox"
+         ((alltodo ""))  ;; Display all TODO entries in the file
+         ((org-agenda-files '("~/org/inbox.org"))))  ;; Scope to the inbox file
         ("n" "Next Actions" todo "NEXT")
         ("p" "Projects" tags "project")
         ("w" "Waiting For" todo "WAITING")
