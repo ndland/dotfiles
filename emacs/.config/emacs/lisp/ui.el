@@ -34,7 +34,7 @@
 
 (set-face-attribute 'default nil
 		    :family "Iosevka"
-		    :height 110)
+		    :height 130)
 
 ;; Enable ligatures for programming modes
 (when (version<= "27.0" emacs-version)

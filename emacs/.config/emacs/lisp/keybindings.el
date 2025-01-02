@@ -39,7 +39,8 @@
 
     "s" '(:ignore t :which-key "Search")
     "sb" '(consult-line :which-key "Search current buffer")
-    "sf" '(consult-line-multi :which-key "Search project files")
+    "sf" '(consult-line-multi :which-key "Search buffer files")
+    "sg" '(consult-grep :which-key "Grep files")
     "sr" '(consult-ripgrep :which-key "Ripgrep files")
 
     "o" '(:ignore t :which-key "Org")
@@ -55,6 +56,7 @@
     :states 'normal
     :keymaps 'org-mode-map
     "f" '(org-refile :which-key "Org refile")
+    "p" '(org-priority :which-key "Org priority")
     "r" '(:ignore t :which-key "Roam")
     "rf" '(org-roam-node-find :which-key "Find node")
     "ri" '(org-roam-node-insert :which-key "Insert node")
