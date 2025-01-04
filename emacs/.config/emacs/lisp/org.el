@@ -100,7 +100,8 @@
          ((agenda "")
           (tags "project")
           (todo "WAITING")
-          (tags "someday")))))
+          (tags "someday")))
+	("u" "Untagged tasks" tags "-{.+}")))
 
 ;; Log done timestamps into a drawer
 (setq org-log-done 'time)            ; Log a timestamp when marking a task as DONE
