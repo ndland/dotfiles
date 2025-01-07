@@ -133,6 +133,10 @@
   ;; (keymap-set consult-narrow-map (concat consult-narrow-key " ?") #'consult-narrow-help)
 )
 
+(with-eval-after-load 'consult
+  (setq consult-ripgrep-args
+        "rg --hidden --glob '!.git/*' --line-number --smart-case --color=never --no-heading --column"))
+
 (use-package embark
   :straight t
 
