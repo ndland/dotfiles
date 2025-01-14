@@ -53,6 +53,7 @@
                          "~/org/next-actions.org"
                          "~/org/waiting-for.org"
                          "~/org/someday-maybe.org"))
+
 (setq org-refile-targets
       '(("~/org/inbox.org" :maxlevel . 1)
         ("~/org/projects.org" :maxlevel . 2)
