@@ -27,3 +27,6 @@
   :if (memq window-system '(mac ns x))
   :config
   (exec-path-from-shell-initialize))
+
+(setq max-lisp-eval-depth 1000)
+(setq max-specpdl-size 10000)

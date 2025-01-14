@@ -12,9 +12,10 @@
   (my-leader-def
     :states 'normal
     "b" '(:ignore t :which-key "Buffers")
+    "ba" '(embark-act :which-key "Embark act")
     "bb" '(consult-buffer :which-key "Switch buffer")
+    "be" '(eval-buffer :which-key "Eval buffer")
     "bk" '(kill-this-buffer :which-key "Kill buffer")
-    "be" '(embark-act :which-key "Embark act")
 
     "f" '(:ignore t :which-key "Files")
     "ff" '(find-file :which-key "Find file")
@@ -31,6 +32,7 @@
     "nf" '(org-roam-node-find :which-key "Find roam node")
     "nd" '(org-roam-dailies-goto-today :which-key "Go to today")
     "nr" '(org-roam-node-random :which-key "Open random note")
+    "ns" '(org-roam-db-sync :which-key "Org roam db sync")
 
     "p" '(:ignore t :which-key "Projects")
     "pa" '(projectile-add-known-project :which-key "Add known project")
@@ -55,6 +57,10 @@
   (my-local-leader-def
     :states 'normal
     :keymaps 'org-mode-map
+    "c" '(:ignore t :which-key "Org Clock")
+    "ci" '(org-clock-in :which-key "Org clock in")
+    "co" '(org-clock-out :which-key "Org clock out")
+    "e" '(org-export-dispatch :which-key "Org export")
     "f" '(org-refile :which-key "Org refile")
     "p" '(org-priority :which-key "Org priority")
     "r" '(:ignore t :which-key "Roam")

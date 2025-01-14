@@ -13,6 +13,7 @@
   :init
   (setq org-roam-v2-ack t)
   :config
+  (setq org-roam-completion-everywhere t)
   (setq org-roam-directory (expand-file-name "~/org/roam")))
 
 ;; Install Org Roam UI
@@ -30,6 +31,13 @@
 
 (eval-after-load "org"
   '(require 'ox-md nil t))
+
+(use-package org-download
+  :straight t
+  :after org
+  :custom
+  (org-download-image-dir "~/org/images")  ;; Directory to save images
+  :hook (org-mode . org-download-enable))
 
 ;; Enable auto-fill-mode for Org-mode with a line width of 80 characters
 (defun my-org-mode-setup ()
@@ -78,15 +86,15 @@
 
 (setq org-capture-templates
       '(("t" "Todo" entry (file "~/org/inbox.org")
-         "* TODO %?\n  %i\n  %a")
+         "* TODO %?\n  %i\n%a")
         ("p" "Project" entry (file "~/org/projects.org")
-         "* %?\n  %i\n  %a")
+         "* %?\n  %i\n%a")
         ("w" "Waiting For" entry (file "~/org/waiting-for.org")
-         "* WAITING %?\n  %i\n  %a")
+         "* WAITING %?\n  %i\n%a")
         ("s" "Someday/Maybe" entry (file "~/org/someday-maybe.org")
-         "* %?\n  %i\n  %a")
+         "* %?\n  %i\n%a")
         ("r" "Reference" entry (file "~/org/reference.org")
-         "* %?\n  %i\n  %a")))
+         "* %?\n  %i\n%a")))
 
 (setq org-agenda-custom-commands
       '(("i" "Inbox"
@@ -106,3 +114,5 @@
 ;; Log done timestamps into a drawer
 (setq org-log-done 'time)            ; Log a timestamp when marking a task as DONE
 (setq org-log-into-drawer t)         ; Store the log in a drawer
+
+(add-to-list 'lsp-disabled-clients 'org-mode) ;; disable lsp for org-mode, as org-mode does not have an lsp-server
