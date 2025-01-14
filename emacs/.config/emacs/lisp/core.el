@@ -30,3 +30,8 @@
 
 (setq max-lisp-eval-depth 1000)
 (setq max-specpdl-size 10000)
+
+(use-package vundo
+  :straight t
+  :config
+  (setq vundo-glyph-alist vundo-unicode-symbols))
