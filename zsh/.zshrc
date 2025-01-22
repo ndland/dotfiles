@@ -152,6 +152,10 @@ if [[ -f ~/.p10k.zsh ]]; then
 fi
 
 export EDITOR=nvim
-export ZK_NOTEBOOK_DIR="$HOME/code/github.com/ndland/zk/"
+if [[ "$HOST" == "GMMACANCNXYVH42"* ]]; then
+  export ZK_NOTEBOOK_DIR="$HOME/code/personal/github.com/ndland/zk/"
+else
+  export ZK_NOTEBOOK_DIR="$HOME/code/github.com/ndland/zk/"
+fi
 
 eval "$(fnm env --use-on-cd --shell zsh)"
