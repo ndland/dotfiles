@@ -47,6 +47,10 @@ return {
 
           find_cmd = "rg", -- find command (defaults to `fd`)
         },
+        file_browser = {
+          -- disable useless columns
+          hidden = true,
+        },
       },
     })
 
