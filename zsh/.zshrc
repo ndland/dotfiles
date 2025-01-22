@@ -152,10 +152,36 @@ if [[ -f ~/.p10k.zsh ]]; then
 fi
 
 export EDITOR=nvim
+
 if [[ "$HOST" == "GMMACANCNXYVH42"* ]]; then
   export ZK_NOTEBOOK_DIR="$HOME/code/personal/github.com/ndland/zk/"
+  taskCommit='feat: update tasks from work machine'
+  zkCommit='doc: update notes from work machine'
 else
   export ZK_NOTEBOOK_DIR="$HOME/code/github.com/ndland/zk/"
+  taskCommit='feat: update tasks from personal machine'
+  zkCommit='doc: update notes from personal machine'
 fi
+
+# Taskwarrior helper to keep in sync
+function ut {
+  cd ~/.task/
+  if [[ -n $(git status --porcelain) ]]; then
+    git add .
+    git commit -m "$taskCommit"
+  fi
+  git pull
+  git push
+}
+
+function uzk {
+  cd $ZK_NOTEBOOK_DIR
+  if [[ -n $(git status --porcelain) ]]; then
+    git add .
+    git commit -m "$zkCommit"
+  fi
+  git pull
+  git push
+}
 
 eval "$(fnm env --use-on-cd --shell zsh)"
