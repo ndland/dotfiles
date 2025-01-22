@@ -1,146 +1,157 @@
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
+# Fast Zsh Configuration with Fish Features
 
-# Path to your oh-my-zsh installation.
-export ZSH="$HOME/.oh-my-zsh"
-
-# Set name of the theme to load --- if set to "random", it will
-# load a random theme each time oh-my-zsh is loaded, in which case,
-# to know which specific one was loaded, run: echo $RANDOM_THEME
-# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME=""
-
-# Set list of themes to pick from when loading at random
-# Setting this variable when ZSH_THEME=random will cause zsh to load
-# a theme from this variable instead of looking in $ZSH/themes/
-# If set to an empty array, this variable will have no effect.
-# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
-
-# Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
-
-# Uncomment the following line to use hyphen-insensitive completion.
-# Case-sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
-
-# Uncomment one of the following lines to change the auto-update behavior
-# zstyle ':omz:update' mode disabled  # disable automatic updates
-# zstyle ':omz:update' mode auto      # update automatically without asking
-# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
-
-# Uncomment the following line to change how often to auto-update (in days).
-# zstyle ':omz:update' frequency 13
-
-# Uncomment the following line if pasting URLs and other text is messed up.
-# DISABLE_MAGIC_FUNCTIONS="true"
-
-# Uncomment the following line to disable colors in ls.
-# DISABLE_LS_COLORS="true"
-
-# Uncomment the following line to disable auto-setting terminal title.
-# DISABLE_AUTO_TITLE="true"
-
-# Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
-
-# Uncomment the following line to display red dots whilst waiting for completion.
-# You can also set it to another string to have that shown instead of the default red dots.
-# e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
-# Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
-# COMPLETION_WAITING_DOTS="true"
-
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
-# much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
-
-# Uncomment the following line if you want to change the command execution time
-# stamp shown in the history command output.
-# You can set one of the optional three formats:
-# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# or set a custom format using the strftime function format specifications,
-# see 'man strftime' for details.
-# HIST_STAMPS="mm/dd/yyyy"
-
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
-
-# Which plugins would you like to load?
-# Standard plugins can be found in $ZSH/plugins/
-# Custom plugins may be added to $ZSH_CUSTOM/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
-plugins=(
-  brew
-  colored-man-pages
-  F-Sy-H
-  git
-  # gitignore
-  zoxide
-  zsh-autosuggestions
-  zsh-fzf-history-search
-  # zsh-vi-mode
-)
-
-source $ZSH/oh-my-zsh.sh
-
-# User configuration
-
-# export MANPATH="/usr/local/man:$MANPATH"
-
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
-
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
-
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
-
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
-alias vim=nvim
-# Check if eza is installed and set aliases accordingly
-if command -v eza &> /dev/null; then
-  alias ls='eza --icons'
-  alias ll='eza -alF'
-  alias la='eza -a'
-  alias l='eza -CF'
-  alias lla='eza -alF --icons --git'
-  alias lt='eza -T'
-  alias ltt='eza -T --level=2'
-  alias lh='eza -lh'
-  alias lsh='eza -lhS'
-  alias ltr='eza -ltr'
-  alias lts='eza -lt'
-  alias lss='eza -lS'
-  alias lg='eza -l --group-directories-first'
-  alias lc='eza --color=always'
+# Add Homebrew's bin to PATH
+if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+  export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+  export PATH="/opt/homebrew/bin:$PATH"
 fi
 
-# Initialize zoxide
+# Enable Zsh options
+setopt SHARE_HISTORY
+setopt INC_APPEND_HISTORY
+setopt HIST_FIND_NO_DUPS
+setopt AUTO_CD
+
+# Prompt Configuration
+# Using powerlevel10k for a fast and feature-rich prompt
+if [[ ! -d "$HOME/powerlevel10k" ]]; then
+    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+fi
+source ~/powerlevel10k/powerlevel10k.zsh-theme
+
+# Plugin Management with zinit
+if [[ ! -d "$HOME/.zinit/bin" ]]; then
+    mkdir -p "$HOME/.zinit" && git clone https://github.com/zdharma-continuum/zinit.git "$HOME/.zinit/bin"
+fi
+source "$HOME/.zinit/bin/zinit.zsh"
+
+# Plugins
+zinit light zsh-users/zsh-autosuggestions
+zinit light zsh-users/zsh-syntax-highlighting
+zinit light ajeetdsouza/zoxide
+zinit light zsh-users/zsh-completions
+
+# History search key bindings
+bindkey '^[[A' up-line-or-search
+bindkey '^[[B' down-line-or-search
+
+# Enable autosuggestions
+bindkey '^[[Z' autosuggest-accept
+
+# Completion Settings
+rm -f ~/.zcompdump*  # Remove stale compinit cache
+autoload -Uz compinit
+compinit -v  # Enable verbose output for debugging
+zstyle ':completion:*' menu select
+zstyle ':completion:*' descriptions true
+zstyle ':completion:*' verbose true
+zstyle ':completion:*' matcher-list "m:{a-zA-Z}={A-Za-z}" "r:|=*" "l:|=*"
+
+# Aliases
+alias gco="git checkout"
+alias update="sudo apt update && sudo apt upgrade"
+alias cls="clear"
+alias vim="nvim"
+
+# Abbreviations (Fish-like functions)
+function mkcd {
+  mkdir -p "$1" && cd "$1"
+}
+function extract {
+  case "$1" in
+    *.tar.gz) tar -xvzf "$1" ;;
+    *.zip) unzip "$1" ;;
+    *) echo "Unknown file format: $1" ;;
+  esac
+}
+
+# Performance Optimizations
+zstyle ':completion:*' rehash true
+zstyle ':completion:*:descriptions' format '%B%d%b'
+
+# Asynchronous initialization
+zinit wait lucid light-mode for \
+    zsh-users/zsh-history-substring-search \
+    mafredri/zsh-async
+
+# Load asynchronously for faster startup
+zinit ice wait"2" lucid
+zinit light zsh-users/zsh-completions
+
+# Custom Functions
+function edit {
+  nvim "$@"
+}
+
+# Install eza (ls replacement) if not present
+if ! command -v eza &> /dev/null; then
+  echo "eza not found. Please install it manually for better ls functionality."
+fi
+
+# Install Homebrew if not present
+if ! command -v brew &> /dev/null; then
+  echo "Homebrew not found. Installing Homebrew..."
+  if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+  elif [[ "$OSTYPE" == "darwin"* ]]; then
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  fi
+else
+  eval "$(brew shellenv)"
+fi
+
+# Alias ls to eza with color and additional options
+alias ls="eza --icons --group-directories-first"
+alias ll="eza -lh --icons"
+alias la="eza -la --icons"
+
+# Add eza completions manually
+if ! command -v eza &> /dev/null; then
+  echo "eza not found. Please install it manually for better ls functionality."
+else
+  # Add completion definitions for eza
+  function _eza_completion {
+    local -a flags
+    flags=(
+      '--all[show hidden files]'
+      '--long[list in long format]'
+      '--icons[show icons]'
+      '--group-directories-first[show directories first]'
+    )
+    _arguments -s $flags
+  }
+  compdef _eza_completion eza
+fi
+
+# Add zoxide support
+if ! command -v zoxide &> /dev/null; then
+  echo "zoxide not found. Please install it manually for faster navigation."
+fi
 eval "$(zoxide init zsh)"
 
-# Exports
-export ZVM_VI_INSERT_ESCAPE_BINDKEY=jj
+# Nix shell completion
+if command -v nix &> /dev/null; then
+  if [[ -f "/etc/profile.d/nix.sh" ]]; then
+    . /etc/profile.d/nix.sh
+  fi
 
-eval $(thefuck --alias)
+  autoload -U compinit
+  compinit
+  zstyle ':completion:*' menu select
 
-# fnm
-export PATH="/home/nland/.local/share/fnm:$PATH"
-eval "`fnm env`"
-eval "$(fnm env --use-on-cd)"
+  # Nix completions
+  zinit light spwhitt/nix-zsh-completions
+fi
 
-eval "$(starship init zsh)"
+# Source Powerlevel10k Config
+if [[ -f ~/.p10k.zsh ]]; then
+  source ~/.p10k.zsh
+fi
 
-eval "$(fzf --zsh)"
+export EDITOR=nvim
+export ZK_NOTEBOOK_DIR="$HOME/code/github.com/ndland/zk/"
+
+eval "$(fnm env --use-on-cd --shell zsh)"
