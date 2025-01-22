@@ -32,7 +32,6 @@ return {
           "--column",
           "--smart-case",
           "--hidden", -- This makes `live_grep` include hidden files
-          "--glob",
         },
       },
       pickers = {

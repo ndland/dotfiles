@@ -1,18 +1,35 @@
-vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
-  pattern = { "*.md" }, -- Adjust pattern if your notes use a different extension
+-- Treat telekasten files as markdown
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "telekasten",
   callback = function()
-    if vim.bo.filetype == "telekasten" then
-      vim.bo.filetype = "markdown"
-    end
+    vim.bo.filetype = "markdown"
   end,
 })
 
--- Enable line wrapping for markdown files
+-- Markdown-specific settings
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "markdown",
   callback = function()
-    vim.opt.wrap = true
-    vim.opt.textwidth = 80
-    vim.opt.linebreak = true -- Ensure wrapped lines break at convenient points end
+    -- Enable soft wrapping
+    vim.opt_local.wrap = true
+    vim.opt_local.linebreak = true -- Break soft-wrapped lines at word boundaries
+
+    -- Configure hard wrapping for new text
+    vim.opt_local.textwidth = 80 -- Set maximum width for new lines
+    vim.opt_local.formatoptions:append("t") -- Auto-wrap text as you type
+    vim.opt_local.formatoptions:remove("c") -- Avoid comment wrapping for markdown
+
+    -- Additional settings
+    vim.opt_local.spell = true -- Enable spell checking
+    vim.opt_local.conceallevel = 2 -- Enable conceal for syntax
+  end,
+})
+
+-- Reformat existing lines manually or on save
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = "*.md",
+  callback = function()
+    -- Uncomment the line below if you want automatic reformatting on save
+    -- vim.cmd("normal ggVGgq") -- Hard-wrap the entire buffer to 80 characters
   end,
 })

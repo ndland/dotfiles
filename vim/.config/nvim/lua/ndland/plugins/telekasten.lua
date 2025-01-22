@@ -22,19 +22,5 @@ return {
       extension = ".md",
       image_subdir = "img",
     })
-
-    vim.api.nvim_create_autocmd("FileType", {
-      pattern = "telekasten",
-      callback = function()
-        vim.bo.filetype = "markdown"
-      end,
-    })
-
-    vim.api.nvim_create_autocmd("BufEnter", {
-      callback = function()
-        vim.cmd("setlocal spell")
-        vim.opt_local.conceallevel = 2
-      end,
-    })
   end,
 }

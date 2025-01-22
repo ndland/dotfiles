@@ -14,6 +14,9 @@ return {
       { "<leader>bp", "<cmd>bp<cr>", desc = "previous buffer" },
       { "<leader>bd", "<cmd>bd<cr>", desc = "delete buffer" },
 
+      { "<leader>f", group = "File" },
+      { "<leader>fs", ":w<CR>", desc = "Save" },
+
       { "<leader>e", group = "editor" },
       { "<leader>eh", ":nohl<CR>", desc = "Clear search highlights" },
       { "<leader>ee", "<cmd>NvimTreeToggle<CR>", desc = "Toggle file explorer" },
