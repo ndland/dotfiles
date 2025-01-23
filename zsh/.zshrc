@@ -3,8 +3,10 @@
 # Add Homebrew's bin to PATH
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
+  alias update="sudo apt update && sudo apt upgrade"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   export PATH="/opt/homebrew/bin:$PATH"
+  alias update="brew update && brew upgrade && brew cleanup"
 fi
 
 # Enable Zsh options
@@ -20,10 +22,14 @@ if [[ ! -d "$HOME/powerlevel10k" ]]; then
 fi
 source ~/powerlevel10k/powerlevel10k.zsh-theme
 
+# Avoid zinit and zoxide aliases colliding
+alias | grep -q 'zi=' && unalias zi
+
 # Plugin Management with zinit
 if [[ ! -d "$HOME/.zinit/bin" ]]; then
     mkdir -p "$HOME/.zinit" && git clone https://github.com/zdharma-continuum/zinit.git "$HOME/.zinit/bin"
 fi
+
 source "$HOME/.zinit/bin/zinit.zsh"
 
 # Plugins
@@ -31,6 +37,7 @@ zinit light zsh-users/zsh-autosuggestions
 zinit light zsh-users/zsh-syntax-highlighting
 zinit light ajeetdsouza/zoxide
 zinit light zsh-users/zsh-completions
+zinit light junegunn/fzf-git.sh
 
 # History search key bindings
 bindkey '^[[A' up-line-or-search
@@ -52,7 +59,6 @@ fpath=(~/.zsh/completion $fpath)
 
 # Aliases
 alias gco="git checkout"
-alias update="sudo apt update && sudo apt upgrade"
 alias cls="clear"
 alias vim="nvim"
 
@@ -132,7 +138,6 @@ fi
 if ! command -v zoxide &> /dev/null; then
   echo "zoxide not found. Please install it manually for faster navigation."
 fi
-eval "$(zoxide init zsh)"
 
 # Nix shell completion
 if command -v nix &> /dev/null; then
@@ -187,5 +192,8 @@ function update_repo {
 
 alias ut='update_repo ~/.task/ "$taskCommit"'
 alias uzk='update_repo $ZK_NOTEBOOK_DIR "$zkCommit"'
+alias ghs='gh auth switch && gh auth setup-git'
 
 eval "$(fnm env --use-on-cd --shell zsh)"
+
+eval "$(zoxide init zsh)"
