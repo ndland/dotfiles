@@ -17,6 +17,11 @@ return {
       { "<leader>f", group = "File" },
       { "<leader>fs", ":w<CR>", desc = "Save" },
 
+      { "<leader>g", group = "Git" },
+      { "<leader>gs", "<cmd>LazyGit<cr>", desc = "Open LazyGit" },
+      { "<leader>gn", "<cmd>Gitsigns next_hunk<cr>", desc = "Next hunk" },
+      { "<leader>gp", "<cmd>Gitsigns prev_hunk<cr>", desc = "Prev hunk" },
+
       { "<leader>e", group = "editor" },
       { "<leader>eh", ":nohl<CR>", desc = "Clear search highlights" },
       { "<leader>ee", "<cmd>NvimTreeToggle<CR>", desc = "Toggle file explorer" },
@@ -33,20 +38,42 @@ return {
 
       { "<leader>n", group = "notes" },
       { "<leader>ns", "<cmd>ZkNotes<cr>", desc = "ZK Notes" },
-      { "<leader>nd", "<cmd>ZkNew { dir = 'daily', date = 'today' }<cr>", desc = "ZK Daily Note" },
+      {
+        "<leader>nf",
+        function()
+          require("zk.commands").get("ZkNotes")({ sort = { "modified" }, match = { vim.fn.input("Search: ") } })
+        end,
+        desc = "Search ZK Notes",
+      },
+      {
+        "<leader>nd",
+        function()
+          require("zk.commands").get("ZkNew")({ dir = "journal/daily", date = os.date("%Y-%m-%d") })
+        end,
+        desc = "ZK Daily Note",
+      },
       {
         "<leader>nn",
         function()
           vim.ui.input({ prompt = "Enter note title: " }, function(input)
             if input then
-              require("zk").new({ title = input })
+              require("zk.commands").get("ZkNew")({ title = input })
             end
           end)
         end,
         desc = "ZK New",
       },
-      -- { "<leader>np", "<cmd>Telekasten panel<cr>", desc = "Telekasten panel" },
-      -- { "<leader>ns", "<cmd>Telekasten search_notes<cr>", desc = "Search Notes" },
+      -- {
+      --   "<leader>nn",
+      --   function()
+      --     vim.ui.input({ prompt = "Enter note title: " }, function(input)
+      --       if input then
+      --         require("zk").new({ title = input })
+      --       end
+      --     end)
+      --   end,
+      --   desc = "ZK New",
+      -- },
 
       { "<leader>s", group = "splits" },
       { "<leader>sv", "<C-w>v", desc = "Split window vertically" },
