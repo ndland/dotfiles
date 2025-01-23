@@ -171,6 +171,11 @@ function update_repo {
   local commit_msg=$2
 
   cd $dir
+  if [[ -z $(git status --porcelain) ]]; then
+    echo "No changes to commit."
+    cd -
+    return
+  fi
   if [[ -n $(git status --porcelain) ]]; then
     git add .
     git commit -m "$commit_msg"
