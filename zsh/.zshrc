@@ -18,7 +18,7 @@ setopt AUTO_CD
 # Prompt Configuration
 # Using powerlevel10k for a fast and feature-rich prompt
 if [[ ! -d "$HOME/powerlevel10k" ]]; then
-    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+  git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
 fi
 source ~/powerlevel10k/powerlevel10k.zsh-theme
 
@@ -27,7 +27,7 @@ alias | grep -q 'zi=' && unalias zi
 
 # Plugin Management with zinit
 if [[ ! -d "$HOME/.zinit/bin" ]]; then
-    mkdir -p "$HOME/.zinit" && git clone https://github.com/zdharma-continuum/zinit.git "$HOME/.zinit/bin"
+  mkdir -p "$HOME/.zinit" && git clone https://github.com/zdharma-continuum/zinit.git "$HOME/.zinit/bin"
 fi
 
 source "$HOME/.zinit/bin/zinit.zsh"
@@ -80,8 +80,8 @@ zstyle ':completion:*:descriptions' format '%B%d%b'
 
 # Asynchronous initialization
 zinit wait lucid light-mode for \
-    zsh-users/zsh-history-substring-search \
-    mafredri/zsh-async
+  zsh-users/zsh-history-substring-search \
+  mafredri/zsh-async
 
 # Load asynchronously for faster startup
 zinit ice wait"2" lucid
@@ -176,6 +176,11 @@ function update_repo {
   local commit_msg=$2
 
   cd $dir
+
+  echo "Pulling changes from remote..."
+  git pull
+  echo "Done pulling changes."
+
   if [[ -z $(git status --porcelain) ]]; then
     echo "No changes to commit."
     cd -
@@ -185,7 +190,6 @@ function update_repo {
     git add .
     git commit -m "$commit_msg"
   fi
-  git pull
   git push
   cd -
 }
