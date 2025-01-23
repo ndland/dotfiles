@@ -48,6 +48,8 @@ zstyle ':completion:*' descriptions true
 zstyle ':completion:*' verbose true
 zstyle ':completion:*' matcher-list "m:{a-zA-Z}={A-Za-z}" "r:|=*" "l:|=*"
 
+fpath=(~/.zsh/completion $fpath)
+
 # Aliases
 alias gco="git checkout"
 alias update="sudo apt update && sudo apt upgrade"
@@ -163,25 +165,22 @@ else
   zkCommit='doc: update notes from personal machine'
 fi
 
-# Taskwarrior helper to keep in sync
-function ut {
-  cd ~/.task/
+# Helper to automatically update git repositories and push to them
+function update_repo {
+  local dir=$1
+  local commit_msg=$2
+
+  cd $dir
   if [[ -n $(git status --porcelain) ]]; then
     git add .
-    git commit -m "$taskCommit"
+    git commit -m "$commit_msg"
   fi
   git pull
   git push
+  cd -
 }
 
-function uzk {
-  cd $ZK_NOTEBOOK_DIR
-  if [[ -n $(git status --porcelain) ]]; then
-    git add .
-    git commit -m "$zkCommit"
-  fi
-  git pull
-  git push
-}
+alias ut='update_repo ~/.task/ "$taskCommit"'
+alias uzk='update_repo $ZK_NOTEBOOK_DIR "$zkCommit"'
 
 eval "$(fnm env --use-on-cd --shell zsh)"
