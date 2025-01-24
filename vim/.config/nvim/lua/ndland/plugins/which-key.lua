@@ -14,6 +14,12 @@ return {
       { "<leader>bp", "<cmd>bp<cr>", desc = "previous buffer" },
       { "<leader>bd", "<cmd>bd<cr>", desc = "delete buffer" },
 
+      { "<leader>c", group = "code" },
+      { "<leader>ca", vim.lsp.buf.code_action, desc = "Code Actions" },
+      { "<leader>cc", "<cmd>CompilerOpen<cr>", desc = "Compiler Open" },
+      { "<leader>cr", "<cmd>CompilerRedo<cr>", desc = "Compiler Redo" },
+      { "<leader>ct", "<cmd>CompilerToggleResults<cr>", desc = "Compiler Toggle Results" },
+
       { "<leader>f", group = "File" },
       { "<leader>fs", ":w<CR>", desc = "Save" },
 
@@ -48,7 +54,11 @@ return {
       {
         "<leader>nd",
         function()
-          require("zk.commands").get("ZkNew")({ dir = "journal/daily", date = os.date("%Y-%m-%d") })
+          require("zk.commands").get("ZkNew")({
+            dir = "journal/daily",
+            date = os.date("%Y-%m-%d"),
+            title = os.date("%Y-%m-%d"),
+          })
         end,
         desc = "ZK Daily Note",
       },
