@@ -61,6 +61,7 @@ fpath=(~/.zsh/completion $fpath)
 alias gco="git checkout"
 alias cls="clear"
 alias vim="nvim"
+alias t="task"
 
 # Abbreviations (Fish-like functions)
 function mkcd {
