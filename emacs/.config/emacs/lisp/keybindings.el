@@ -8,7 +8,7 @@
   (general-create-definer my-local-leader-def
     :prefix "SPC l")
 
-  (general-def 'motion "g l" 'consult-goto-line)
+  (general-def 'motion "g l" 'consult-line)
 
   ;; Global Keybindings
   (my-leader-def
