@@ -10,6 +10,7 @@ return {
 
     treesitter.setup({
       highlight = {
+        additional_vim_regex_highlighting = { "markdown" },
         enable = true,
         -- additional_vim_regex_highlighting = { "markdown" },
       },

@@ -10,6 +10,7 @@ return {
 
     wk.add({
       { "<leader>b", group = "buffers" },
+      { "<leader>bb", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
       { "<leader>bn", "<cmd>bn<cr>", desc = "next buffer" },
       { "<leader>bp", "<cmd>bp<cr>", desc = "previous buffer" },
       { "<leader>bd", "<cmd>bd<cr>", desc = "delete buffer" },
@@ -21,6 +22,15 @@ return {
       { "<leader>ct", "<cmd>CompilerToggleResults<cr>", desc = "Compiler Toggle Results" },
 
       { "<leader>f", group = "File" },
+      { "<leader>fb", "<cmd>Telescope file_browser<cr>", desc = "File Browser" },
+      { "<leader>fc", "<cmd>Telescope grep_string<cr>", desc = "Search under cursor" },
+      {
+        "<leader>ff",
+        "<cmd>lua require('telescope.builtin').fd({ cwd = vim.fn.expand('%:p:h') })<cr>",
+        desc = "Find File",
+      },
+      { "<leader>fg", "<cmd>Telescope live_grep<cr>", desc = "Search" },
+      { "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "Recent Files" },
       { "<leader>fs", ":w<CR>", desc = "Save" },
 
       { "<leader>g", group = "Git" },
@@ -43,14 +53,6 @@ return {
       { "<leader>etf", "<cmd>tabnew %<CR>", desc = "Open current buffer in new tab" },
 
       { "<leader>n", group = "notes" },
-      { "<leader>ns", "<cmd>ZkNotes<cr>", desc = "ZK Notes" },
-      {
-        "<leader>nf",
-        function()
-          require("zk.commands").get("ZkNotes")({ sort = { "modified" }, match = { vim.fn.input("Search: ") } })
-        end,
-        desc = "Search ZK Notes",
-      },
       {
         "<leader>nd",
         function()
@@ -62,6 +64,7 @@ return {
         end,
         desc = "ZK Daily Note",
       },
+      { "<leader>nf", "<cmd>ZkNotes<cr>", desc = "ZK Notes" },
       {
         "<leader>nn",
         function()
@@ -73,17 +76,24 @@ return {
         end,
         desc = "ZK New",
       },
-      -- {
-      --   "<leader>nn",
-      --   function()
-      --     vim.ui.input({ prompt = "Enter note title: " }, function(input)
-      --       if input then
-      --         require("zk").new({ title = input })
-      --       end
-      --     end)
-      --   end,
-      --   desc = "ZK New",
-      -- },
+      {
+        "<leader>ns",
+        function()
+          vim.ui.input({ prompt = "Search: " }, function(input)
+            if input then
+              require("zk.commands").get("ZkNotes")({
+                sort = { "modified" },
+                match = { input },
+              })
+            end
+          end)
+        end,
+        desc = "Search ZK Notes",
+      },
+
+      { "<leader>p", group = "Projects" },
+      { "<leader>pt", "<cmd>TodoTelescope<cr>", desc = "Todos" },
+      { "<leader>pp", "<cmd>Telescope projects<cr>", desc = "Projects" },
 
       { "<leader>s", group = "splits" },
       { "<leader>sv", "<C-w>v", desc = "Split window vertically" },

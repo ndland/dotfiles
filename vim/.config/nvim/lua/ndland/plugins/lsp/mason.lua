@@ -24,12 +24,14 @@ return {
     })
 
     mason_lspconfig.setup({
+      automatic_installation = true, -- automatically install servers
       -- list of servers for mason to install
       ensure_installed = {
         "html",
         "tailwindcss",
         "lua_ls",
         "emmet_ls",
+        "marksman",
       },
     })
 

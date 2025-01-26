@@ -64,7 +64,7 @@ return {
       end,
     })
 
-    local on_attach = function(client)
+    local on_attach = function(client, bufnr)
       if client.server_capabilities.colorProvider then
         -- Attach document colour support
         require("document-color").buf_attach(bufnr)

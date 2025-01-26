@@ -14,6 +14,7 @@ return {
 
     telescope.setup({
       defaults = {
+        cwd = vim.fn.getcwd(),
         path_display = { "smart" },
         mappings = {
           i = {
@@ -56,20 +57,5 @@ return {
 
     telescope.load_extension("fzf")
     telescope.load_extension("file_browser")
-
-    local wk = require("which-key")
-    wk.add({
-      { "<leader>t", group = "telescope" },
-      { "<leader>tf", group = "files" },
-      { "<leader>tff", "<cmd>Telescope find_files<cr>", desc = "Find File" },
-      { "<leader>tfb", "<cmd>Telescope file_browser<cr>", desc = "File Browser" },
-      { "<leader>tr", "<cmd>Telescope oldfiles<cr>", desc = "Recent Files" },
-      { "<leader>ts", "<cmd>Telescope live_grep<cr>", desc = "Search" },
-      { "<leader>tc", "<cmd>Telescope grep_string<cr>", desc = "Search under cursor" },
-      { "<leader>tt", "<cmd>TodoTelescope<cr>", desc = "Todos" },
-      { "<leader>tm", "<cmd>Telescope media_files<cr>", desc = "Media Files" },
-      { "<leader>tb", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
-      { "<leader>tp", "<cmd>Telescope projects<cr>", desc = "Projects" },
-    })
   end,
 }
