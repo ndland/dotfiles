@@ -7,6 +7,7 @@ return {
   end,
   config = function()
     local wk = require("which-key")
+    local lint = require("lint")
 
     wk.add({
       { "<leader>b", group = "buffers" },
@@ -18,9 +19,16 @@ return {
       { "<leader>c", group = "code" },
       { "<leader>ca", vim.lsp.buf.code_action, desc = "Code Actions" },
       { "<leader>cc", "<cmd>CompilerOpen<cr>", desc = "Compiler Open" },
+      {
+        "<leader>cl",
+        function()
+          lint.try_lint()
+        end,
+        desc = "Trigger linting for current file",
+      },
+      { "<leader>cp", "<cmd>CopilotChatToggle<cr>", desc = "Copilot Chat Toggle" },
       { "<leader>cr", "<cmd>CompilerRedo<cr>", desc = "Compiler Redo" },
       { "<leader>ct", "<cmd>CompilerToggleResults<cr>", desc = "Compiler Toggle Results" },
-      { "<leader>cp", "<cmd>CopilotChatToggle<cr>", desc = "Copilot Chat Toggle" },
 
       { "<leader>f", group = "File" },
       { "<leader>fb", "<cmd>Telescope file_browser<cr>", desc = "File Browser" },

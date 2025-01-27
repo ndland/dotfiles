@@ -27,19 +27,22 @@ return {
       automatic_installation = true, -- automatically install servers
       -- list of servers for mason to install
       ensure_installed = {
-        "html",
-        "tailwindcss",
-        "lua_ls",
         "emmet_ls",
+        "html",
+        "lua_ls",
         "marksman",
+        "tailwindcss",
+        "zk",
       },
     })
 
     mason_tool_installer.setup({
       ensure_installed = {
+        "eslint_d",
+        "markdownlint",
         "prettier", -- prettier formatter
         "stylua", -- lua formatter
-        "eslint_d",
+        "zk",
       },
     })
   end,
