@@ -20,6 +20,7 @@ return {
       { "<leader>cc", "<cmd>CompilerOpen<cr>", desc = "Compiler Open" },
       { "<leader>cr", "<cmd>CompilerRedo<cr>", desc = "Compiler Redo" },
       { "<leader>ct", "<cmd>CompilerToggleResults<cr>", desc = "Compiler Toggle Results" },
+      { "<leader>cp", "<cmd>CopilotChatToggle<cr>", desc = "Copilot Chat Toggle" },
 
       { "<leader>f", group = "File" },
       { "<leader>fb", "<cmd>Telescope file_browser<cr>", desc = "File Browser" },
