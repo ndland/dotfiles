@@ -15,21 +15,10 @@ setopt INC_APPEND_HISTORY
 setopt HIST_FIND_NO_DUPS
 setopt AUTO_CD
 
-# Prompt Configuration
-# Using powerlevel10k for a fast and feature-rich prompt
-if [[ ! -d "$HOME/powerlevel10k" ]]; then
-  git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
-fi
-source ~/powerlevel10k/powerlevel10k.zsh-theme
-
-# Avoid zinit and zoxide aliases colliding
-alias | grep -q 'zi=' && unalias zi
-
 # Plugin Management with zinit
 if [[ ! -d "$HOME/.zinit/bin" ]]; then
   mkdir -p "$HOME/.zinit" && git clone https://github.com/zdharma-continuum/zinit.git "$HOME/.zinit/bin"
 fi
-
 source "$HOME/.zinit/bin/zinit.zsh"
 
 # Plugins
@@ -38,6 +27,7 @@ zinit light zsh-users/zsh-syntax-highlighting
 zinit light ajeetdsouza/zoxide
 zinit light zsh-users/zsh-completions
 zinit light junegunn/fzf-git.sh
+zinit light spwhitt/nix-zsh-completions
 
 # History search key bindings
 bindkey '^[[A' up-line-or-search
@@ -46,22 +36,12 @@ bindkey '^[[B' down-line-or-search
 # Enable autosuggestions
 bindkey '^[[Z' autosuggest-accept
 
-# Completion Settings
-rm -f ~/.zcompdump*  # Remove stale compinit cache
-autoload -Uz compinit
-compinit -v  # Enable verbose output for debugging
-zstyle ':completion:*' menu select
-zstyle ':completion:*' descriptions true
-zstyle ':completion:*' verbose true
-zstyle ':completion:*' matcher-list "m:{a-zA-Z}={A-Za-z}" "r:|=*" "l:|=*"
-
-fpath=(~/.zsh/completion $fpath)
-
 # Aliases
 alias gco="git checkout"
 alias cls="clear"
 alias vim="nvim"
 alias t="task"
+alias tw="timew"
 
 # Abbreviations (Fish-like functions)
 function mkcd {
@@ -74,6 +54,17 @@ function extract {
     *) echo "Unknown file format: $1" ;;
   esac
 }
+
+# Completion Settings
+rm -f ~/.zcompdump*  # Remove stale compinit cache
+autoload -Uz compinit
+compinit
+zstyle ':completion:*' menu select
+zstyle ':completion:*' descriptions true
+zstyle ':completion:*' verbose true
+zstyle ':completion:*' matcher-list "m:{a-zA-Z}={A-Za-z}" "r:|=*" "l:|=*"
+
+fpath=(~/.zsh/completion $fpath)
 
 # Performance Optimizations
 zstyle ':completion:*' rehash true
@@ -93,11 +84,6 @@ function edit {
   nvim "$@"
 }
 
-# Install eza (ls replacement) if not present
-if ! command -v eza &> /dev/null; then
-  echo "eza not found. Please install it manually for better ls functionality."
-fi
-
 # Install Homebrew if not present
 if ! command -v brew &> /dev/null; then
   echo "Homebrew not found. Installing Homebrew..."
@@ -113,50 +99,31 @@ else
 fi
 
 # Alias ls to eza with color and additional options
-alias ls="eza --icons --group-directories-first"
-alias ll="eza -lh --icons"
-alias la="eza -la --icons"
+alias ls="eza --git --header --group --group-directories-first --icons --long"
+alias la="ls -all"
+function lt() {
+  ls --all --tree --level=$1
+}
+# Enable tab completion for the lt function
+compdef '_arguments "1:--level"' lt
 
 # Add eza completions manually
 if ! command -v eza &> /dev/null; then
   echo "eza not found. Please install it manually for better ls functionality."
-else
-  # Add completion definitions for eza
-  function _eza_completion {
-    local -a flags
-    flags=(
-      '--all[show hidden files]'
-      '--long[list in long format]'
-      '--icons[show icons]'
-      '--group-directories-first[show directories first]'
-    )
-    _arguments -s $flags
-  }
-  compdef _eza_completion eza
 fi
 
 # Add zoxide support
-if ! command -v zoxide &> /dev/null; then
-  echo "zoxide not found. Please install it manually for faster navigation."
-fi
+unalias zi
+eval "$(zoxide init zsh)"
 
 # Nix shell completion
 if command -v nix &> /dev/null; then
   if [[ -f "/etc/profile.d/nix.sh" ]]; then
     . /etc/profile.d/nix.sh
   fi
-
   autoload -U compinit
   compinit
   zstyle ':completion:*' menu select
-
-  # Nix completions
-  zinit light spwhitt/nix-zsh-completions
-fi
-
-# Source Powerlevel10k Config
-if [[ -f ~/.p10k.zsh ]]; then
-  source ~/.p10k.zsh
 fi
 
 export EDITOR=nvim
@@ -175,13 +142,10 @@ fi
 function update_repo {
   local dir=$1
   local commit_msg=$2
-
   cd $dir
-
   echo "Pulling changes from remote..."
   git pull
   echo "Done pulling changes."
-
   if [[ -z $(git status --porcelain) ]]; then
     echo "No changes to commit."
     cd -
@@ -201,4 +165,11 @@ alias ghs='gh auth switch && gh auth setup-git'
 
 eval "$(fnm env --use-on-cd --shell zsh)"
 
-eval "$(zoxide init zsh)"
+# Install and configure Starship prompt
+if ! command -v starship &> /dev/null; then
+  echo "Starship not found. Installing..."
+  brew install starship
+fi
+export RPROMPT='$(starship prompt --right)'
+export STARSHIP_CONFIG="$HOME/.config/starship.toml"
+eval "$(starship init zsh)"
