@@ -32,7 +32,7 @@ return {
         "lua_ls",
         "marksman",
         "tailwindcss",
-        "zk",
+        -- "zk",
       },
     })
 
@@ -42,7 +42,7 @@ return {
         "markdownlint",
         "prettier", -- prettier formatter
         "stylua", -- lua formatter
-        "zk",
+        -- "zk",
       },
     })
   end,

@@ -10,6 +10,7 @@ return {
     local lint = require("lint")
 
     wk.add({
+
       { "<leader>b", group = "buffers" },
       { "<leader>bb", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
       { "<leader>bn", "<cmd>bn<cr>", desc = "next buffer" },
@@ -103,6 +104,9 @@ return {
       { "<leader>p", group = "Projects" },
       { "<leader>pt", "<cmd>TodoTelescope<cr>", desc = "Todos" },
       { "<leader>pp", "<cmd>Telescope projects<cr>", desc = "Projects" },
+
+      { "<leader>t", group = "Telescope" },
+      { "<leader>tt", "<cmd>Telescope<cr>", desc = "Telescope" },
 
       { "<leader>s", group = "splits" },
       { "<leader>sv", "<C-w>v", desc = "Split window vertically" },
