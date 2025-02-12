@@ -64,7 +64,7 @@ zstyle ':completion:*' descriptions true
 zstyle ':completion:*' verbose true
 zstyle ':completion:*' matcher-list "m:{a-zA-Z}={A-Za-z}" "r:|=*" "l:|=*"
 
-fpath=(~/.zsh/completion $fpath)
+fpath=(~/.zsh/completions/ $fpath)
 
 # Performance Optimizations
 zstyle ':completion:*' rehash true
@@ -176,6 +176,7 @@ if ! command -v starship &> /dev/null; then
 fi
 export RPROMPT='$(starship prompt --right)'
 export STARSHIP_CONFIG="$HOME/.config/starship.toml"
+export ZK_NOTEBOOK_DIR="$HOME/code/github.com/ndland/zk-notes/"  # Update this to your path
 eval "$(starship init zsh)"
 
 PATH=~/.console-ninja/.bin:$PATH
