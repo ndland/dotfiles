@@ -162,8 +162,12 @@ function update_repo {
 alias ut='update_repo ~/.task/ "$taskCommit"'
 alias uzk='update_repo $ZK_NOTEBOOK_DIR "$zkCommit"'
 alias ghs='gh auth switch && gh auth setup-git'
+alias lg='lazygit'
 
 eval "$(fnm env --use-on-cd --shell zsh)"
+
+# fzf shell integration
+source <(fzf --zsh)
 
 # Install and configure Starship prompt
 if ! command -v starship &> /dev/null; then
@@ -173,3 +177,5 @@ fi
 export RPROMPT='$(starship prompt --right)'
 export STARSHIP_CONFIG="$HOME/.config/starship.toml"
 eval "$(starship init zsh)"
+
+PATH=~/.console-ninja/.bin:$PATH
