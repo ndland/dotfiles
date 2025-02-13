@@ -3,7 +3,7 @@ git:
 
 customCommands:
   - key: "c"
-    command: 'git commit -m "{{ .Form.emoji }} {{ .Form.Type }}{{if .Form.Scopes}}({{ .Form.Scopes }}){{end}}: {{ .Form.Description }}"'
+    command: 'git commit -m "{{ .Form.emoji }} {{ .Form.Type }}{{if .Form.Scopes}}({{ .Form.Scopes }}){{end}}: {{ .Form.Description }} " -m  "{{ .Form.Body }}"'
     description: "commit with commitizen"
     context: "files"
     prompts:
@@ -57,6 +57,9 @@ customCommands:
       - type: "input"
         title: "Enter the short description of the change."
         key: "Description"
+      - type: "input"
+        title: "Enter a longer description of the change."
+        key: "Body"
       - type: "confirm"
         title: "Is the commit message correct?"
-        body: "{{ .Form.emoji }} {{ .Form.Type }}{{if .Form.Scopes}}({{ .Form.Scopes }}){{end}}: {{ .Form.Description }}"
+        body: "{{ .Form.emoji }} {{ .Form.Type }}{{if .Form.Scopes}}({{ .Form.Scopes }}){{end}}: {{ .Form.Description }} \n\n{{ .Form.Body }}"
