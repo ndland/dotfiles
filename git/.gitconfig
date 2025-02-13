@@ -1,62 +1,15 @@
-[includeIf "gitdir:~/code/personal/"]
-  path = ~/.gitconfig-personal
-[includeIf "gitdir:~/code/work/"]
-  path = ~/.gitconfig-work
-[credential]
-	helper = store
-[core]
-	pager = diff-so-fancy | less --tabs=4 -RF
-	editor = "nvim"
-[commit]
-  template = ~/.gitcommit-template
-[interactive]
-	diffFilter = diff-so-fancy --patch
-[color]
-	ui = true
-[color "diff-highlight"]
-	oldNormal = red bold
-	oldHighlight = red bold 52
-	newNormal = green bold
-	newHighlight = green bold 22
-[color "diff"]
-	meta = 11
-	frag = magenta bold
-	func = 146 bold
-	commit = yellow bold
-	old = red bold
-	new = green bold
-	whitespace = red reverse
-
-[merge]
-	tool = "nvim"
-
-[mergetool]
-	keepBackup = false
-	prompt = false
-
-[mergetool "nvim"]
-	cmd = "nvim -d -c \"wincmd l\" -c \"norm ]c\" \"$LOCAL\" \"$MERGED\" \"$REMOTE\""
-
-[gpg]
-	format = openpgp
-	program = gpg
-[commit]
-	gpgSign = false
-[tag]
-	forceSignAnnotated = false
-[gpg "ssh"]
-	program = ssh-keygen
-	allowedSignersFile = 
-[pull]
-	rebase = false
-[filter "lfs"]
-	clean = git-lfs clean -- %f
-	smudge = git-lfs smudge -- %f
-	process = git-lfs filter-process
-	required = true
+[user]
+	name = Nick Land
+	email = land.d.nicholas@gmail.com
 [credential "https://github.com"]
 	helper = 
-	helper = !/opt/homebrew/bin/gh auth git-credential
+	helper = !/home/linuxbrew/.linuxbrew/bin/gh auth git-credential
 [credential "https://gist.github.com"]
 	helper = 
-	helper = !/opt/homebrew/bin/gh auth git-credential
+	helper = !/home/linuxbrew/.linuxbrew/bin/gh auth git-credential
+[pull]
+	rebase = true
+[core]
+	autocrlf = input
+[init]
+	defaultBranch = main
