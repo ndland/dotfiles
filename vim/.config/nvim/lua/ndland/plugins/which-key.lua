@@ -45,7 +45,7 @@ return {
         end,
         desc = "File Explorer",
       },
-      { "<leader>nh", ":nohl<CR>", desc = "Clear search highlights" },
+      { "<leader>;", ":nohl<CR>", desc = "Clear search highlights" },
       {
         "gd",
         function()
@@ -261,17 +261,6 @@ return {
                   require("zk.commands").get("ZkNew")({ title = title, dir = directory })
                 end
               end)
-            end
-          end)
-        end,
-        desc = "ZK New",
-      },
-      {
-        "<leader>nn",
-        function()
-          vim.ui.input({ prompt = "Enter note title: " }, function(input)
-            if input then
-              require("zk.commands").get("ZkNew")({ title = input })
             end
           end)
         end,
