@@ -10,64 +10,230 @@ return {
     local lint = require("lint")
 
     wk.add({
-      --
-      --     { "<leader>b", group = "buffers" },
-      --     { "<leader>bb", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
-      --     { "<leader>bn", "<cmd>bn<cr>", desc = "next buffer" },
-      --     { "<leader>bp", "<cmd>bp<cr>", desc = "previous buffer" },
-      --     { "<leader>bd", "<cmd>bd<cr>", desc = "delete buffer" },
-      --
-      --     { "<leader>c", group = "code" },
-      --     { "<leader>ca", vim.lsp.buf.code_action, desc = "Code Actions" },
-      --     { "<leader>cc", "<cmd>CompilerOpen<cr>", desc = "Compiler Open" },
-      --     {
-      --       "<leader>cl",
-      --       function()
-      --         lint.try_lint()
-      --       end,
-      --       desc = "Trigger linting for current file",
-      --     },
-      --     { "<leader>cp", "<cmd>CopilotChatToggle<cr>", desc = "Copilot Chat Toggle" },
-      --     { "<leader>cr", "<cmd>CompilerRedo<cr>", desc = "Compiler Redo" },
-      --     { "<leader>ct", "<cmd>CompilerToggleResults<cr>", desc = "Compiler Toggle Results" },
-      --
-      --     { "<leader>f", group = "File" },
-      --     { "<leader>fb", "<cmd>Telescope file_browser<cr>", desc = "File Browser" },
-      --     { "<leader>fc", "<cmd>Telescope grep_string<cr>", desc = "Search under cursor" },
-      --     {
-      --       "<leader>ff",
-      --       "<cmd>lua require('telescope.builtin').fd({ cwd = vim.fn.expand('%:p:h') })<cr>",
-      --       desc = "Find File",
-      --     },
-      --     { "<leader>fg", "<cmd>Telescope live_grep<cr>", desc = "Search" },
-      --     { "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "Recent Files" },
-      --     { "<leader>fs", ":w<CR>", desc = "Save" },
-      --
-      --     { "<leader>g", group = "Git" },
-      --     { "<leader>gs", "<cmd>LazyGit<cr>", desc = "Open LazyGit" },
-      --     { "<leader>gn", "<cmd>Gitsigns next_hunk<cr>", desc = "Next hunk" },
-      --     { "<leader>gp", "<cmd>Gitsigns prev_hunk<cr>", desc = "Prev hunk" },
-      --
-      --     { "<leader>e", group = "editor" },
-      --     { "<leader>eh", ":nohl<CR>", desc = "Clear search highlights" },
-      --     { "<leader>ee", "<cmd>NvimTreeToggle<CR>", desc = "Toggle file explorer" },
-      --     { "<leader>ef", "<cmd>NvimTreeFindFileToggle<CR>", desc = "Toggle file explorer on current file" },
-      --     { "<leader>ec", "<cmd>NvimTreeCollapse<CR>", desc = "Collapse file explorer" },
-      --     { "<leader>er", "<cmd>NvimTreeRefresh<CR>", desc = "Refresh file explorer" },
-      --
-      --     { "<leader>et", group = "tabs" },
-      --     { "<leader>eto", "<cmd>tabnew<CR>", desc = "Open new tab" },
-      --     { "<leader>etx", "<cmd>tabclose<CR>", desc = "Close current tab" },
-      --     { "<leader>etn", "<cmd>tabn<CR>", desc = "Go to next tab" },
-      --     { "<leader>etp", "<cmd>tabp<CR>", desc = "Go to previous tab" },
-      --     { "<leader>etf", "<cmd>tabnew %<CR>", desc = "Open current buffer in new tab" },
-      --
+      {
+        "<leader><space>",
+        function()
+          Snacks.picker.smart()
+        end,
+        desc = "Smart Find Files",
+      },
+      {
+        "<leader>,",
+        function()
+          Snacks.picker.buffers()
+        end,
+        desc = "Buffers",
+      },
+      {
+        "<leader>/",
+        function()
+          Snacks.picker.grep()
+        end,
+        desc = "Grep",
+      },
+      {
+        "<leader>:",
+        function()
+          Snacks.picker.command_history()
+        end,
+        desc = "Command History",
+      },
+      {
+        "<leader>e",
+        function()
+          Snacks.explorer()
+        end,
+        desc = "File Explorer",
+      },
+      { "<leader>nh", ":nohl<CR>", desc = "Clear search highlights" },
+      {
+        "gd",
+        function()
+          Snacks.picker.lsp_definitions()
+        end,
+        desc = "Goto Definition",
+      },
+      {
+        "gD",
+        function()
+          Snacks.picker.lsp_declarations()
+        end,
+        desc = "Goto Declaration",
+      },
+      {
+        "gr",
+        function()
+          Snacks.picker.lsp_references()
+        end,
+        nowait = true,
+        desc = "References",
+      },
+      {
+        "gI",
+        function()
+          Snacks.picker.lsp_implementations()
+        end,
+        desc = "Goto Implementation",
+      },
+      {
+        "gy",
+        function()
+          Snacks.picker.lsp_type_definitions()
+        end,
+        desc = "Goto T[y]pe Definition",
+      },
+      {
+        "gs",
+        function()
+          Snacks.picker.lsp_symbols()
+        end,
+        desc = "LSP Symbols",
+      },
+      {
+        "gS",
+        function()
+          Snacks.picker.lsp_workspace_symbols()
+        end,
+        desc = "LSP Workspace Symbols",
+      },
+
+      { "<leader>b", group = "buffers" },
+      {
+        "<leader>bb",
+        function()
+          Snacks.picker.buffers()
+        end,
+        desc = "Buffers",
+      },
+      {
+        "<leader>bs",
+        function()
+          Snacks.picker.grep_buffers()
+        end,
+        desc = "Grep Open Buffers",
+      },
+      { "<leader>bn", "<cmd>bn<cr>", desc = "next buffer" },
+      { "<leader>bp", "<cmd>bp<cr>", desc = "previous buffer" },
+      { "<leader>bd", "<cmd>bd<cr>", desc = "delete buffer" },
+
+      { "<leader>c", group = "code" },
+      { "<leader>ca", vim.lsp.buf.code_action, desc = "Code Actions" },
+      { "<leader>cc", "<cmd>CompilerOpen<cr>", desc = "Compiler Open" },
+      {
+        "<leader>cl",
+        function()
+          lint.try_lint()
+        end,
+        desc = "Trigger linting for current file",
+      },
+      { "<leader>cp", "<cmd>CopilotChatToggle<cr>", desc = "Copilot Chat Toggle" },
+      { "<leader>cr", "<cmd>CompilerRedo<cr>", desc = "Compiler Redo" },
+      { "<leader>ct", "<cmd>CompilerToggleResults<cr>", desc = "Compiler Toggle Results" },
+
+      { "<leader>f", group = "File" },
+      {
+        "<leader>fc",
+        function()
+          Snacks.picker.files({ cwd = vim.fn.stdpath("config") })
+        end,
+        desc = "Find Config File",
+      },
+      {
+        "<leader>ff",
+        function()
+          Snacks.picker.files()
+        end,
+        desc = "Find Files",
+      },
+      {
+        "<leader>fg",
+        function()
+          Snacks.picker.git_files()
+        end,
+        desc = "Find Git Files",
+      },
+      {
+        "<leader>fr",
+        function()
+          Snacks.picker.recent()
+        end,
+        desc = "Recent",
+      },
+      { "<leader>fs", ":w<CR>", desc = "Save" },
+
+      { "<leader>g", group = "Git" },
+      {
+        "<leader>gB",
+        function()
+          Snacks.git.blame_line()
+        end,
+        desc = "Git blame line",
+      },
+      {
+        "<leader>gb",
+        function()
+          Snacks.picker.git_branches()
+        end,
+        desc = "Git Branches",
+      },
+      {
+        "<leader>gg",
+        function()
+          Snacks.lazygit()
+        end,
+        desc = "Lazygit",
+      },
+      {
+        "<leader>gl",
+        function()
+          Snacks.picker.git_log()
+        end,
+        desc = "Git Log",
+      },
+      {
+        "<leader>gL",
+        function()
+          Snacks.picker.git_log_line()
+        end,
+        desc = "Git Log Line",
+      },
+      {
+        "<leader>gs",
+        function()
+          Snacks.picker.git_status()
+        end,
+        desc = "Git Status",
+      },
+      {
+        "<leader>gS",
+        function()
+          Snacks.picker.git_stash()
+        end,
+        desc = "Git Stash",
+      },
+      {
+        "<leader>gd",
+        function()
+          Snacks.picker.git_diff()
+        end,
+        desc = "Git Diff (Hunks)",
+      },
+      {
+        "<leader>gf",
+        function()
+          Snacks.picker.git_log_file()
+        end,
+        desc = "Git Log File",
+      },
+      { "<leader>gn", "<cmd>Gitsigns next_hunk<cr>", desc = "Next hunk" },
+      { "<leader>gp", "<cmd>Gitsigns prev_hunk<cr>", desc = "Prev hunk" },
+
       { "<leader>n", group = "notes" },
       {
         "<leader>nd",
         function()
           require("zk.commands").get("ZkNew")({
-            dir = "journal/daily",
+            dir = "05-daily",
             date = os.date("%Y-%m-%d"),
             title = os.date("%Y-%m-%d"),
           })
@@ -75,6 +241,31 @@ return {
         desc = "ZK Daily Note",
       },
       { "<leader>nf", "<cmd>ZkNotes<cr>", desc = "ZK Notes" },
+      {
+        "<leader>nn",
+        function()
+          local zk_notes_dir = "~/code/github.com/ndland/zk-notes/" -- Update this to your zk notes directory
+          local handle = io.popen("find " .. zk_notes_dir .. " -type d")
+          local result = handle:read("*a")
+          handle:close()
+
+          local directories = {}
+          for dir in result:gmatch("[^\r\n]+") do
+            table.insert(directories, dir)
+          end
+
+          vim.ui.input({ prompt = "Enter note title: " }, function(title)
+            if title then
+              vim.ui.select(directories, { prompt = "Select directory: " }, function(directory)
+                if directory then
+                  require("zk.commands").get("ZkNew")({ title = title, dir = directory })
+                end
+              end)
+            end
+          end)
+        end,
+        desc = "ZK New",
+      },
       {
         "<leader>nn",
         function()
@@ -100,27 +291,180 @@ return {
         end,
         desc = "Search ZK Notes",
       },
-      --
-      --     { "<leader>p", group = "Projects" },
-      --     { "<leader>pt", "<cmd>TodoTelescope<cr>", desc = "Todos" },
-      --     { "<leader>pp", "<cmd>Telescope projects<cr>", desc = "Projects" },
-      --
-      --     { "<leader>t", group = "Telescope" },
-      --     { "<leader>tt", "<cmd>Telescope<cr>", desc = "Telescope" },
-      --
-      --     { "<leader>s", group = "splits" },
-      --     { "<leader>sv", "<C-w>v", desc = "Split window vertically" },
-      --     { "<leader>sh", "<C-w>s", desc = "Split window horizontally" },
-      --     { "<leader>se", "<C-w>=", desc = "Make splits equal size" },
-      --     { "<leader>sx", "<cmd>close<CR>", desc = "Close current split" },
-      --     { "<leader>sm", "<cmd>MaximizerToggle<CR>", desc = "Close current split" },
-      --
-      --     { "<leader>x", group = "Trouble" },
-      --     { "<leader>xw", "<cmd>Trouble diagnostics toggle<CR>", desc = "Open trouble workspace diagnostics" },
-      --     { "<leader>xd", "<cmd>Trouble diagnostics toggle filter.buf=0<CR>", desc = "Open trouble document diagnostics" },
-      --     { "<leader>xq", "<cmd>Trouble quickfix toggle<CR>", desc = "Open trouble quickfix list" },
-      --     { "<leader>xl", "<cmd>Trouble loclist toggle<CR>", desc = "Open trouble location list" },
-      --     { "<leader>xt", "<cmd>Trouble todo toggle<CR>", desc = "Open todos in trouble" },
+
+      { "<leader>p", group = "Projects" },
+      {
+        "<leader>pp",
+        function()
+          Snacks.picker.projects()
+        end,
+        desc = "Projects",
+      },
+
+      { "<leader>s", group = "search" },
+      {
+        "<leader>sb",
+        function()
+          Snacks.picker.lines()
+        end,
+        desc = "Buffer Lines",
+      },
+      {
+        "<leader>sg",
+        function()
+          Snacks.picker.grep()
+        end,
+        desc = "Grep",
+      },
+      {
+        "<leader>sw",
+        function()
+          Snacks.picker.grep_word()
+        end,
+        desc = "Visual selection or word",
+        mode = { "n", "x" },
+      },
+      -- search
+      {
+        '<leader>s"',
+        function()
+          Snacks.picker.registers()
+        end,
+        desc = "Registers",
+      },
+      {
+        "<leader>s/",
+        function()
+          Snacks.picker.search_history()
+        end,
+        desc = "Search History",
+      },
+      {
+        "<leader>sa",
+        function()
+          Snacks.picker.autocmds()
+        end,
+        desc = "Autocmds",
+      },
+      {
+        "<leader>sb",
+        function()
+          Snacks.picker.lines()
+        end,
+        desc = "Buffer Lines",
+      },
+      {
+        "<leader>sc",
+        function()
+          Snacks.picker.command_history()
+        end,
+        desc = "Command History",
+      },
+      {
+        "<leader>sC",
+        function()
+          Snacks.picker.commands()
+        end,
+        desc = "Commands",
+      },
+      {
+        "<leader>sd",
+        function()
+          Snacks.picker.diagnostics()
+        end,
+        desc = "Diagnostics",
+      },
+      {
+        "<leader>sD",
+        function()
+          Snacks.picker.diagnostics_buffer()
+        end,
+        desc = "Buffer Diagnostics",
+      },
+      {
+        "<leader>sh",
+        function()
+          Snacks.picker.help()
+        end,
+        desc = "Help Pages",
+      },
+      {
+        "<leader>sH",
+        function()
+          Snacks.picker.highlights()
+        end,
+        desc = "Highlights",
+      },
+      {
+        "<leader>si",
+        function()
+          Snacks.picker.icons()
+        end,
+        desc = "Icons",
+      },
+      {
+        "<leader>sj",
+        function()
+          Snacks.picker.jumps()
+        end,
+        desc = "Jumps",
+      },
+      {
+        "<leader>sk",
+        function()
+          Snacks.picker.keymaps()
+        end,
+        desc = "Keymaps",
+      },
+      {
+        "<leader>sl",
+        function()
+          Snacks.picker.loclist()
+        end,
+        desc = "Location List",
+      },
+      {
+        "<leader>sm",
+        function()
+          Snacks.picker.marks()
+        end,
+        desc = "Marks",
+      },
+      {
+        "<leader>sM",
+        function()
+          Snacks.picker.man()
+        end,
+        desc = "Man Pages",
+      },
+      {
+        "<leader>sp",
+        function()
+          Snacks.picker.lazy()
+        end,
+        desc = "Search for Plugin Spec",
+      },
+      {
+        "<leader>sq",
+        function()
+          Snacks.picker.qflist()
+        end,
+        desc = "Quickfix List",
+      },
+      {
+        "<leader>sR",
+        function()
+          Snacks.picker.resume()
+        end,
+        desc = "Resume",
+      },
+      {
+        "<leader>su",
+        function()
+          Snacks.picker.undo()
+        end,
+        desc = "Undo History",
+      },
     })
   end,
   opts = {},
