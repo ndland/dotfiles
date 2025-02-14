@@ -176,7 +176,11 @@ if ! command -v starship &> /dev/null; then
 fi
 export RPROMPT='$(starship prompt --right)'
 export STARSHIP_CONFIG="$HOME/.config/starship.toml"
-export ZK_NOTEBOOK_DIR="$HOME/code/github.com/ndland/zk-notes/"  # Update this to your path
+if [[ "$(hostname)" == "VTMACMKXYVH42WL" ]]; then
+  export ZK_NOTEBOOK_DIR="$HOME/code/personal/github.com/ndland/zk-notes/"
+else
+  export ZK_NOTEBOOK_DIR="$HOME/code/github.com/ndland/zk-notes/"  # Update this to your path
+fi
 eval "$(starship init zsh)"
 
 PATH=~/.console-ninja/.bin:$PATH
