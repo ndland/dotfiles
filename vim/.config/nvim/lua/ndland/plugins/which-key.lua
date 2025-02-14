@@ -99,6 +99,27 @@ return {
 
       { "<leader>b", group = "buffers" },
       {
+        "<leader>bw",
+        function()
+          if highlight_enabled then
+            vim.cmd("match none")
+            highlight_enabled = false
+          else
+            vim.cmd("highlight ExtraWhitespace ctermbg=red guibg=#F38BA8")
+            vim.cmd("match ExtraWhitespace /\\s\\+$/")
+            highlight_enabled = true
+          end
+        end,
+        desc = "Toggle Highlight Trailing Whitespace",
+      },
+      {
+        "<leader>bc",
+        function()
+          vim.cmd([[%s/\s\+$//e]])
+        end,
+        desc = "Clear Whitespace Highlight",
+      },
+      {
         "<leader>bb",
         function()
           Snacks.picker.buffers()
@@ -244,28 +265,68 @@ return {
       {
         "<leader>nn",
         function()
-          local zk_notes_dir = "~/code/github.com/ndland/zk-notes/" -- Update this to your zk notes directory
-          local handle = io.popen("find " .. zk_notes_dir .. " -type d")
-          local result = handle:read("*a")
+          local handle = io.popen("uname -n")
+          local computer_name = handle:read("*a"):gsub("%s+", "")
           handle:close()
 
-          local directories = {}
-          for dir in result:gmatch("[^\r\n]+") do
-            table.insert(directories, dir)
+          local zk_notes_dir
+
+          if computer_name == "VTMACMKXYVH42WL" then
+            zk_notes_dir = "~/code/personal/github.com/ndland/zk-notes/" -- Your directory
+          else
+            zk_notes_dir = "~/code/github.com/ndland/zk-notes/" -- Default directory
           end
 
-          vim.ui.input({ prompt = "Enter note title: " }, function(title)
-            if title then
-              vim.ui.select(directories, { prompt = "Select directory: " }, function(directory)
-                if directory then
-                  require("zk.commands").get("ZkNew")({ title = title, dir = directory })
+          local handle = io.popen("find " .. zk_notes_dir .. " -type d")
+          if handle then
+            local result = handle:read("*a")
+            handle:close()
+
+            if result then
+              local directories = {}
+              for dir in result:gmatch("[^\r\n]+") do
+                table.insert(directories, dir)
+              end
+
+              vim.ui.input({ prompt = "Enter note title: " }, function(title)
+                if title then
+                  vim.ui.select(directories, { prompt = "Select directory: " }, function(directory)
+                    if directory then
+                      require("zk.commands").get("ZkNew")({ title = title, dir = directory })
+                    end
+                  end)
                 end
               end)
             end
-          end)
+          end
         end,
         desc = "ZK New",
       },
+      -- {
+      --   "<leader>nn",
+      --   function()
+      --     local zk_notes_dir = "~/code/github.com/ndland/zk-notes/" -- Update this to your zk notes directory
+      --     local handle = io.popen("find " .. zk_notes_dir .. " -type d")
+      --     local result = handle:read("*a")
+      --     handle:close()
+      --
+      --     local directories = {}
+      --     for dir in result:gmatch("[^\r\n]+") do
+      --       table.insert(directories, dir)
+      --     end
+      --
+      --     vim.ui.input({ prompt = "Enter note title: " }, function(title)
+      --       if title then
+      --         vim.ui.select(directories, { prompt = "Select directory: " }, function(directory)
+      --           if directory then
+      --             require("zk.commands").get("ZkNew")({ title = title, dir = directory })
+      --           end
+      --         end)
+      --       end
+      --     end)
+      --   end,
+      --   desc = "ZK New",
+      -- },
       {
         "<leader>ns",
         function()

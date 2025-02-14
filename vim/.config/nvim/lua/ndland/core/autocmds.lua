@@ -1,11 +1,3 @@
--- Treat telekasten files as markdown
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "telekasten",
-  callback = function()
-    vim.bo.filetype = "markdown"
-  end,
-})
-
 -- Markdown-specific settings
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "markdown",
