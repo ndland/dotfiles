@@ -1,7 +1,6 @@
 return {
   "folke/snacks.nvim",
   lazy = false,
-  ---@type snacks.Config
   opts = {
     ---@class snacks.input.Config
     input = {
@@ -16,7 +15,7 @@ return {
           matcher = { sort_empty = false, fuzzy = true },
         },
         files = {
-          cmd = "rg",
+          cmd = "fd",
           hidden = true,
         },
       },
