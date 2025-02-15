@@ -302,31 +302,6 @@ return {
         end,
         desc = "ZK New",
       },
-      -- {
-      --   "<leader>nn",
-      --   function()
-      --     local zk_notes_dir = "~/code/github.com/ndland/zk-notes/" -- Update this to your zk notes directory
-      --     local handle = io.popen("find " .. zk_notes_dir .. " -type d")
-      --     local result = handle:read("*a")
-      --     handle:close()
-      --
-      --     local directories = {}
-      --     for dir in result:gmatch("[^\r\n]+") do
-      --       table.insert(directories, dir)
-      --     end
-      --
-      --     vim.ui.input({ prompt = "Enter note title: " }, function(title)
-      --       if title then
-      --         vim.ui.select(directories, { prompt = "Select directory: " }, function(directory)
-      --           if directory then
-      --             require("zk.commands").get("ZkNew")({ title = title, dir = directory })
-      --           end
-      --         end)
-      --       end
-      --     end)
-      --   end,
-      --   desc = "ZK New",
-      -- },
       {
         "<leader>ns",
         function()
@@ -341,6 +316,8 @@ return {
         end,
         desc = "Search ZK Notes",
       },
+
+      { "<leader>o", "<cmd>Octo<cr>", desc = "Octo" },
 
       { "<leader>p", group = "Projects" },
       {
