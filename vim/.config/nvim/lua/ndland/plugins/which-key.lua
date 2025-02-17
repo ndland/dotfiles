@@ -47,6 +47,13 @@ return {
       },
       { "<leader>;", ":nohl<CR>", desc = "Clear search highlights" },
       {
+        "<leader>t",
+        function()
+          Snacks.terminal.toggle()
+        end,
+        desc = "Toggle terminal",
+      },
+      {
         "gd",
         function()
           Snacks.picker.lsp_definitions()

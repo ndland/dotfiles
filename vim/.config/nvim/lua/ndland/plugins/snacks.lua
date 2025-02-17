@@ -24,5 +24,6 @@ return {
       enabled = true,
       example = "github",
     },
+    terminal = {},
   },
 }

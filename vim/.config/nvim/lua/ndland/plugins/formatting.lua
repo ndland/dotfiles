@@ -8,13 +8,13 @@ return {
       formatters_by_ft = {
         css = { "prettier" },
         html = { "prettier" },
-        javascript = { "prettier" },
-        -- javascriptreact = { "prettier" },
+        javascript = { "eslint_d" },
+        javascriptreact = { "eslint_d" },
         json = { "prettier" },
         lua = { "stylua" },
         markdown = { "markdownlint" },
         typescript = { "prettier" },
-        -- typescriptreact = { "prettier" },
+        typescriptreact = { "eslint_d" },
         yaml = { "prettier" },
       },
 
