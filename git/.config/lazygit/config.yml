@@ -1,3 +1,6 @@
+# See this for more information:
+# https://cbea.ms/git-commit/
+# https://www.conventionalcommits.org/en/v1.0.0/
 git:
   parseEmoji: true
 
@@ -55,7 +58,7 @@ customCommands:
         title: "Enter the scope(s) of this change."
         key: "Scopes"
       - type: "input"
-        title: "Enter the short description of the change."
+        title: "Enter the short description of the change. (If applied, this commit will...)"
         key: "Description"
       - type: "input"
         title: "Enter a longer description of the change."
