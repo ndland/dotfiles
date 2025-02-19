@@ -108,6 +108,7 @@ return {
       {
         "<leader>bw",
         function()
+          local highlight_enabled
           if highlight_enabled then
             vim.cmd("match none")
             highlight_enabled = false

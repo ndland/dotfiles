@@ -12,6 +12,7 @@ return {
       sources = {
         explorer = {
           auto_close = true,
+          hidden = true,
           matcher = { sort_empty = false, fuzzy = true },
         },
         files = {
