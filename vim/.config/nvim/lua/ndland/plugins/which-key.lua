@@ -499,6 +499,11 @@ return {
         end,
         desc = "Undo History",
       },
+      {
+        "<leader>l",
+        "<cmd>Glow<cr>",
+        desc = "Glow",
+      },
     })
   end,
   opts = {},
