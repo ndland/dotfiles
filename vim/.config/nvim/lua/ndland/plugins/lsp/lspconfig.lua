@@ -89,13 +89,6 @@ return {
           capabilities = capabilities,
         })
       end,
-      ["emmet_ls"] = function()
-        -- configure emmet language server
-        lspconfig["emmet_ls"].setup({
-          capabilities = capabilities,
-          filetypes = { "html", "typescriptreact", "javascriptreact", "css", "sass", "scss", "less", "svelte" },
-        })
-      end,
       ["lua_ls"] = function()
         -- configure lua server (with special settings)
         lspconfig["lua_ls"].setup({
@@ -109,26 +102,6 @@ return {
               completion = {
                 callSnippet = "Replace",
               },
-            },
-          },
-        })
-      end,
-      ["tailwindcss"] = function()
-        lspconfig["tailwindcss"].setup({
-          on_attach = on_attach,
-          capabilities = capabilities,
-        })
-      end,
-      ["zk"] = function()
-        lspconfig["zk"].setup({
-          on_attach = on_attach,
-          capabilities = capabilities,
-          filetypes = { "markdown", "zk" },
-          zk = {
-            linkFormat = "[[{{title}}]]",
-            diagnostics = {
-              enable = true,
-              disable = { "dead-link" },
             },
           },
         })

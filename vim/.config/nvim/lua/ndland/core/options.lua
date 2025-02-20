@@ -28,3 +28,4 @@ opt.backspace = "indent,eol,start" -- allow backspace on indent, end of line or 
 opt.clipboard:append("unnamedplus") -- use system clipboard as default register
 
 vim.g.mapleader = " "
+vim.g.maplocalleader = "l"

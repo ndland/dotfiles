@@ -27,7 +27,7 @@ return {
       {
         "<leader>/",
         function()
-          Snacks.picker.grep()
+          Snacks.picker.grep({ hidden = true })
         end,
         desc = "Grep",
       },
@@ -46,13 +46,6 @@ return {
         desc = "File Explorer",
       },
       { "<leader>;", ":nohl<CR>", desc = "Clear search highlights" },
-      {
-        "<leader>t",
-        function()
-          Snacks.terminal.toggle()
-        end,
-        desc = "Toggle terminal",
-      },
       {
         "gd",
         function()
@@ -160,13 +153,6 @@ return {
       { "<leader>ct", "<cmd>CompilerToggleResults<cr>", desc = "Compiler Toggle Results" },
 
       { "<leader>f", group = "File" },
-      {
-        "<leader>fc",
-        function()
-          Snacks.picker.files({ cwd = vim.fn.stdpath("config") })
-        end,
-        desc = "Find Config File",
-      },
       {
         "<leader>ff",
         function()
@@ -343,13 +329,6 @@ return {
           Snacks.picker.lines()
         end,
         desc = "Buffer Lines",
-      },
-      {
-        "<leader>sg",
-        function()
-          Snacks.picker.grep()
-        end,
-        desc = "Grep",
       },
       {
         "<leader>sw",
