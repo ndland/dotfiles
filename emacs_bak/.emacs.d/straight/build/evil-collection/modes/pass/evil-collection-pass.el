@@ -1,1 +1,0 @@
-/Users/tz4m2z/.emacs.d/straight/repos/evil-collection/modes/pass/evil-collection-pass.el

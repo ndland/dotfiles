@@ -1,1 +1,0 @@
-/Users/tz4m2z/.emacs.d/straight/repos/evil-collection/modes/elfeed/evil-collection-elfeed.el

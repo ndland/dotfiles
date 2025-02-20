@@ -1,1 +1,0 @@
-/Users/tz4m2z/.emacs.d/straight/repos/evil-collection/modes/cus-theme/evil-collection-cus-theme.el

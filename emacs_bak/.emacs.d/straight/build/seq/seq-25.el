@@ -1,1 +1,0 @@
-/Users/tz4m2z/.emacs.d/straight/repos/seq/seq-25.el

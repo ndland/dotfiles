@@ -1,1 +1,0 @@
-/Users/tz4m2z/.emacs.d/straight/repos/mermaid-mode/mermaid-mode.el

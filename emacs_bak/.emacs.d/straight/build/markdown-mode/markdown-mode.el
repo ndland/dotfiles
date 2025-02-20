@@ -1,1 +1,0 @@
-/Users/tz4m2z/.emacs.d/straight/repos/markdown-mode/markdown-mode.el

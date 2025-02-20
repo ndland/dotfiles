@@ -1,1 +1,0 @@
-/Users/tz4m2z/.emacs.d/straight/repos/doom-modeline/doom-modeline-segments.el
