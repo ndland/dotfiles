@@ -32,6 +32,7 @@ return {
         "lua_ls",
         "marksman",
         "tailwindcss",
+        "typescript-language-server",
         -- "zk",
       },
     })
