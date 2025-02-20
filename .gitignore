@@ -120,3 +120,4 @@ zsdoc/data
 /emacs/.config/emacs/elpa/
 /emacs/.config/emacs/straight/
 /emacs/.config/emacs/recentf
+tmux/.config/tmux/plugins
