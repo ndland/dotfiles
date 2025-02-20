@@ -119,20 +119,6 @@ return {
           capabilities = capabilities,
         })
       end,
-      ["zk"] = function()
-        lspconfig["zk"].setup({
-          on_attach = on_attach,
-          capabilities = capabilities,
-          filetypes = { "markdown", "zk" },
-          zk = {
-            linkFormat = "[[{{title}}]]",
-            diagnostics = {
-              enable = true,
-              disable = { "dead-link" },
-            },
-          },
-        })
-      end,
     })
   end,
 }
