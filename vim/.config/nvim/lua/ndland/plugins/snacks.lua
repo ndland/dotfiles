@@ -18,6 +18,7 @@ return {
         files = {
           cmd = "fd",
           hidden = true,
+          exclude = { "node_modules" },
         },
       },
     },
