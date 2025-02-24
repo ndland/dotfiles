@@ -37,9 +37,8 @@ bindkey '^[[B' down-line-or-search
 bindkey '^[[Z' autosuggest-accept
 
 # Aliases
-alias gco="git checkout"
-alias cls="clear"
 alias vim="nvim"
+alias bn="buku --np"
 alias t="task"
 alias tw="timew"
 
