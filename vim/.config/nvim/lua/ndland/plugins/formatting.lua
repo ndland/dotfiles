@@ -13,7 +13,7 @@ return {
         json = { "prettier" },
         lua = { "stylua" },
         markdown = { "markdownlint" },
-        typescript = { "prettier" },
+        typescript = { "eslint_d" },
         typescriptreact = { "eslint_d" },
         yaml = { "prettier" },
       },
