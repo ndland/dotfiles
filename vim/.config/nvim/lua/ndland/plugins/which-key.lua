@@ -38,12 +38,20 @@ return {
         end,
         desc = "Command History",
       },
+      { "<leader>e", group = "explorer" },
       {
-        "<leader>e",
+        "<leader>ef",
         function()
           Snacks.explorer()
         end,
         desc = "File Explorer",
+      },
+      {
+        "<leader>er",
+        function()
+          Snacks.explorer.reveal()
+        end,
+        desc = "File Explorer Reveal",
       },
       { "<leader>;", ":nohl<CR>", desc = "Clear search highlights" },
       {
@@ -136,7 +144,10 @@ return {
       },
       { "<leader>bn", "<cmd>bn<cr>", desc = "next buffer" },
       { "<leader>bp", "<cmd>bp<cr>", desc = "previous buffer" },
-      { "<leader>bd", "<cmd>bd<cr>", desc = "delete buffer" },
+      { "<leader>bo", "<cmd>only<cr>", desc = "delete other splits" },
+      { "<leader>bd", group = "delete buffers" },
+      { "<leader>bdd", "<cmd>bd<cr>", desc = "delete buffer" },
+      { "<leader>bda", "<cmd>bufdo bd<cr>", desc = "delete all buffers" },
 
       { "<leader>c", group = "code" },
       { "<leader>ca", vim.lsp.buf.code_action, desc = "Code Actions" },
@@ -271,7 +282,7 @@ return {
             zk_notes_dir = "~/code/github.com/ndland/zk-notes/" -- Default directory
           end
 
-          local handle = io.popen("find " .. zk_notes_dir .. " -type d")
+          local handle = io.popen("find " .. zk_notes_dir .. " -type d -not -path '*/.*'")
           if handle then
             local result = handle:read("*a")
             handle:close()

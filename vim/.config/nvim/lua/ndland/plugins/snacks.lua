@@ -13,7 +13,8 @@ return {
         explorer = {
           auto_close = true,
           hidden = true,
-          matcher = { sort_empty = false, fuzzy = true },
+          -- matcher = { sort_empty = false, fuzzy = true },
+          replace_netrw = true, -- Replace netrw with the snacks explorer
         },
         files = {
           cmd = "fd",

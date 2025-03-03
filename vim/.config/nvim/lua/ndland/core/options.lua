@@ -29,3 +29,5 @@ opt.clipboard:append("unnamedplus") -- use system clipboard as default register
 
 vim.g.mapleader = " "
 vim.g.maplocalleader = "l"
+vim.g.editorconfig = true
+vim.b.editorconfig = true

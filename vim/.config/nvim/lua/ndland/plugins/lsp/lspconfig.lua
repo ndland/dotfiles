@@ -64,16 +64,6 @@ return {
       end,
     })
 
-    local on_attach = function(client, bufnr)
-      if client.server_capabilities.colorProvider then
-        -- Attach document colour support
-        require("document-color").buf_attach(bufnr)
-      end
-    end
-
-    -- used to enable autocompletion (assign to every lsp server config)
-    local capabilities = cmp_nvim_lsp.default_capabilities()
-
     -- Change the Diagnostic symbols in the sign column (gutter)
     -- (not in youtube nvim video)
     local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
@@ -85,6 +75,8 @@ return {
     mason_lspconfig.setup_handlers({
       -- default handler for installed servers
       function(server_name)
+        -- used to enable autocompletion (assign to every lsp server config)
+        local capabilities = cmp_nvim_lsp.default_capabilities()
         lspconfig[server_name].setup({
           capabilities = capabilities,
         })
@@ -92,7 +84,6 @@ return {
       ["lua_ls"] = function()
         -- configure lua server (with special settings)
         lspconfig["lua_ls"].setup({
-          capabilities = capabilities,
           settings = {
             Lua = {
               -- make the language server recognize "vim" global
@@ -102,6 +93,18 @@ return {
               completion = {
                 callSnippet = "Replace",
               },
+            },
+          },
+        })
+      end,
+      ["jsonls"] = function()
+        local capabilities = cmp_nvim_lsp.default_capabilities()
+        lspconfig["jsonls"].setup({
+          capabilities = capabilities,
+          settings = {
+            json = {
+              schemas = require("schemastore").json.schemas(),
+              validate = { enable = true },
             },
           },
         })

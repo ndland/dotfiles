@@ -11,21 +11,32 @@ return {
       -- install jsregexp (optional!).
       build = "make install_jsregexp",
     },
+    {
+      "zbirenbaum/copilot-cmp",
+      config = function()
+        require("copilot_cmp").setup({
+          suggestion = { enabled = false },
+          panel = { enabled = false },
+        })
+      end,
+    }, -- for GitHub Copilot
+    {
+      "David-Kunz/cmp-npm",
+      dependencies = { "nvim-lua/plenary.nvim" },
+      ft = "json",
+      config = function()
+        require("cmp-npm").setup({})
+      end,
+    },
     "saadparwaiz1/cmp_luasnip", -- for autocompletion
     "rafamadriz/friendly-snippets", -- useful snippets
     "onsails/lspkind.nvim", -- vs-code like pictograms
   },
   config = function()
     local cmp = require("cmp")
+    require("cmp-npm").setup({})
 
     local luasnip = require("luasnip")
-
-    local lspkind = require("lspkind")
-
-    local lspkind_format = lspkind.cmp_format({
-      maxwidth = 50,
-      ellipsis_char = "...",
-    })
 
     local tailwindcss_format = require("tailwindcss-colorizer-cmp").formatter
 
@@ -52,6 +63,8 @@ return {
       }),
       -- sources for autocompletion
       sources = cmp.config.sources({
+        { name = "npm", keyword_length = 4 },
+        { name = "copilot" },
         { name = "nvim_lsp" },
         { name = "luasnip" }, -- snippets
         { name = "buffer" }, -- text within current buffer
@@ -62,20 +75,26 @@ return {
         fields = { "abbr", "kind", "menu" },
         expandable_indicator = true,
         format = function(entry, vim_item)
-          vim_item = lspkind_format(entry, vim_item)
-          vim_item = tailwindcss_format(entry, vim_item)
-          return vim_item
+          if vim.tbl_contains({ "path" }, entry.source.name) then
+            local icon, hl_group = require("nvim-web-devicons").get_icon(entry:completion_item().label)
+            if icon then
+              vim_item.kind = icon
+              vim_item.kind_hl_group = hl_group
+              vim_item.menu = ({
+                npm = "[npm]",
+                copilot = "[copilot]",
+                nvim_lsp = "[LSP]",
+                luasnip = "[Snippet]",
+                buffer = "[Buffer]",
+                path = "[Path]",
+              })[entry.source.name]
+              -- vim_item = tailwindcss_format(entry, vim_item)
+              return vim_item
+            end
+          end
+          return require("lspkind").cmp_format({ with_text = true })(entry, vim_item)
         end,
       },
-
-      -- configure lspkind for vs-code like pictograms in completion menu
-      -- formatting = {
-      --   format = lspkind.cmp_format({
-      --     maxwidth = 50,
-      --     ellipsis_char = "...",
-      --   }),
-      -- },
-      -- formatting = require("tailwindcss-colorizer-cmp").formatter,
     })
   end,
 }
