@@ -5,9 +5,9 @@ git:
   parseEmoji: true
 
 customCommands:
-  - key: "c"
+  - key: "C"
     command: 'git commit -m "{{ .Form.emoji }} {{ .Form.Type }}{{if .Form.Scopes}}({{ .Form.Scopes }}){{end}}: {{ .Form.Description }} " -m  "{{ .Form.Body }}"'
-    description: "commit with commitizen"
+    description: "Conventional Commit"
     context: "files"
     prompts:
       - command: gitmoji -l
@@ -66,3 +66,9 @@ customCommands:
       - type: "confirm"
         title: "Is the commit message correct?"
         body: "{{ .Form.emoji }} {{ .Form.Type }}{{if .Form.Scopes}}({{ .Form.Scopes }}){{end}}: {{ .Form.Description }} \n\n{{ .Form.Body }}"
+
+  - key: "c"
+    command: 'git cz'
+    description: "commit with commitizen"
+    context: "files"
+    subprocess: true
