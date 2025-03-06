@@ -39,6 +39,7 @@ bindkey '^[[Z' autosuggest-accept
 # Aliases
 alias vim="nvim"
 alias bn="buku --np"
+alias bw="buku --np -w"
 alias t="task"
 alias tw="timew"
 
