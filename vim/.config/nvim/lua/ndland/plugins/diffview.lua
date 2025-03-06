@@ -2,11 +2,10 @@ return {
   "sindrets/diffview.nvim",
   config = function()
     require("diffview").setup({
+      use_icons = true,
       view = {
-        x = {
-          layout = {
-            type = "diff4_mixed",
-          },
+        merge_tool = {
+          layout = "diff4_mixed",
         },
       },
     })
