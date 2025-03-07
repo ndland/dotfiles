@@ -1,28 +1,34 @@
--- Markdown-specific settings
+-- Auto Commands for Markdown
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "markdown",
   callback = function()
-    -- Enable soft wrapping
+    -- Enable word wrap and better line breaking
     vim.opt_local.wrap = true
-    vim.opt_local.linebreak = true -- Break soft-wrapped lines at word boundaries
+    vim.opt_local.linebreak = true -- Break lines at sensible points
+    vim.opt_local.breakindent = true -- Keep indentation for wrapped lines
+    vim.opt_local.textwidth = 80
+    vim.opt_local.showbreak = "↪ " -- Indicate wrapped lines with an arrow
 
-    -- Configure hard wrapping for new text
-    vim.opt_local.textwidth = 80 -- Set maximum width for new lines
-    vim.opt_local.formatoptions:append("t") -- Auto-wrap text as you type
-    vim.opt_local.formatoptions:remove("c") -- Avoid comment wrapping for markdown
+    -- Conceal certain elements (for prettification)
+    vim.opt_local.conceallevel = 2
+    vim.opt_local.concealcursor = "nc"
 
-    -- Additional settings
-    vim.opt_local.spell = true -- Enable spell checking
-    vim.opt_local.conceallevel = 2 -- Enable conceal for syntax
+    -- Enable spell check
+    vim.opt_local.spell = true
 
-    -- Indentation settings for Markdown
-    vim.opt_local.shiftwidth = 2
+    -- Set tab width for readability
     vim.opt_local.tabstop = 2
-    vim.opt_local.softtabstop = 2
-    vim.opt_local.expandtab = true -- Use spaces instead of tabs for indentation
+    vim.opt_local.shiftwidth = 2
+    vim.opt_local.expandtab = true
 
-    -- Ensure proper indentation for lists
-    vim.opt_local.formatoptions:append("n") -- Automatically indent new list items
+    -- Enable cursor line for focus
+    vim.opt_local.cursorline = true
+
+    -- Syntax Highlighting & Indentation
+    vim.g.markdown_folding = 1 -- Enable Markdown folding
+    vim.g.markdown_syntax_conceal = 0 -- Show syntax normally
+    vim.g.vim_markdown_folding_disabled = 1 -- No automatic folding
+    vim.g.vim_markdown_auto_insert_bullets = 0 -- No auto bullet insertion
   end,
 })
 
