@@ -12,6 +12,7 @@ return {
       sources = {
         explorer = {
           auto_close = true,
+          ignored = true,
           hidden = true,
           -- matcher = { sort_empty = false, fuzzy = true },
           replace_netrw = true, -- Replace netrw with the snacks explorer
