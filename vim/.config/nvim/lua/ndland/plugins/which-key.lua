@@ -491,9 +491,33 @@ return {
         desc = "Undo History",
       },
       {
+        "<leader>st",
+        function()
+          Snacks.picker.todo_comments()
+        end,
+        desc = "Todo",
+      },
+      {
+        "<leader>sT",
+        function()
+          Snacks.picker.todo_comments({ keywords = { "PERF", "HACK", "TODO", "FIX", "NOTE", "WARNING", "FIXME" } })
+        end,
+        desc = "Todo/Fix/Fixme",
+      },
+      {
         "<leader>l",
         "<cmd>Glow<cr>",
         desc = "Glow",
+      },
+      {
+        "<leader>L",
+        "<cmd>Lazy<cr>",
+        desc = "Lazy",
+      },
+      {
+        "<leader>M",
+        "<cmd>Mason<cr>",
+        desc = "Mason",
       },
     })
   end,
