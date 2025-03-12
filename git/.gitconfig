@@ -7,9 +7,14 @@
 [credential "https://gist.github.com"]
 	helper = 
 	helper = !/opt/homebrew/bin/gh auth git-credential
-[pull]
-	rebase = true
 [core]
 	autocrlf = input
 [init]
 	defaultBranch = main
+[merge]
+  tool = diffview
+[mergetool]
+  prompt = false
+  keepBackup = false
+[mergetool "diffview"]
+  cmd = nvim -n -c "DiffviewOpen" "$MERGE"
