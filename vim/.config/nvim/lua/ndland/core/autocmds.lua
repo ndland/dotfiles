@@ -25,9 +25,9 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.cursorline = true
 
     -- Syntax Highlighting & Indentation
-    vim.g.markdown_folding = 1 -- Enable Markdown folding
+    -- vim.g.markdown_folding = 1 -- Enable Markdown folding
     vim.g.markdown_syntax_conceal = 0 -- Show syntax normally
-    vim.g.vim_markdown_folding_disabled = 1 -- No automatic folding
+    -- vim.g.vim_markdown_folding_disabled = 1 -- No automatic folding
     vim.g.vim_markdown_auto_insert_bullets = 0 -- No auto bullet insertion
   end,
 })
