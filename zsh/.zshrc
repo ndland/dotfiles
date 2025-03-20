@@ -65,14 +65,14 @@ function extract {
 
 # Completion Settings
 rm -f ~/.zcompdump*  # Remove stale compinit cache
+
+fpath=(~/.zsh/completions/ $fpath)
 autoload -Uz compinit
 compinit
 zstyle ':completion:*' menu select
 zstyle ':completion:*' descriptions true
 zstyle ':completion:*' verbose true
 zstyle ':completion:*' matcher-list "m:{a-zA-Z}={A-Za-z}" "r:|=*" "l:|=*"
-
-fpath=(~/.zsh/completions/ $fpath)
 
 # Performance Optimizations
 zstyle ':completion:*' rehash true
