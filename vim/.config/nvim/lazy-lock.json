@@ -5,7 +5,7 @@
   },
   "CopilotChat.nvim": {
     "branch": "main",
-    "commit": "b8911c6da0d69f83fac46f613344fe9bbc6f670c"
+    "commit": "cd82b6b9c4cfb254218f5782cc3339e05cbb9989"
   },
   "LuaSnip": {
     "branch": "master",
@@ -49,7 +49,7 @@
   },
   "conform.nvim": {
     "branch": "master",
-    "commit": "f9ef25a7ef00267b7d13bfc00b0dea22d78702d5"
+    "commit": "9e434d78751dcdcaef048b62555914ed4a2b7b61"
   },
   "copilot-cmp": {
     "branch": "master",
@@ -57,7 +57,7 @@
   },
   "copilot.vim": {
     "branch": "release",
-    "commit": "5015939f131627a6a332c9e3ecad9a7cb4c2e549"
+    "commit": "a9228e015528c9307890c48083c925eb98a64a79"
   },
   "diffview.nvim": {
     "branch": "main",
@@ -81,11 +81,11 @@
   },
   "gitsigns.nvim": {
     "branch": "main",
-    "commit": "7010000889bfb6c26065e0b0f7f1e6aa9163edd9"
+    "commit": "3c76f7fabac723aa682365ef782f88a83ccdb4ac"
   },
   "glow.nvim": {
     "branch": "main",
-    "commit": "238070a686c1da3bccccf1079700eb4b5e19aea4"
+    "commit": "5d5954b2f22e109d4a6eba8b2618c5b96e4ee7a2"
   },
   "lazy.nvim": {
     "branch": "main",
@@ -97,7 +97,7 @@
   },
   "lualine.nvim": {
     "branch": "master",
-    "commit": "9fef261b53fbe3a2ef01ee9667f6fde064b1ed10"
+    "commit": "1517caa8fff05e4b4999857319d3b0609a7f57fa"
   },
   "markdown-preview.nvim": {
     "branch": "master",
@@ -113,7 +113,7 @@
   },
   "mason-tool-installer.nvim": {
     "branch": "main",
-    "commit": "5639d58a3d11ff7c05c8e31e159bfedae55d7961"
+    "commit": "98767d37f8e5255a5111fc1e3163232d4dc07bda"
   },
   "mason.nvim": {
     "branch": "main",
@@ -145,7 +145,7 @@
   },
   "nvim-lint": {
     "branch": "master",
-    "commit": "936197073214c26a347fb933c9459c8766376b23"
+    "commit": "93b8040115c9114dac1047311763bef275e752dc"
   },
   "nvim-lsp-file-operations": {
     "branch": "master",
@@ -153,7 +153,7 @@
   },
   "nvim-lspconfig": {
     "branch": "master",
-    "commit": "699cf2ce74e40e7c5068cf93a6bd6a74b24c5ec3"
+    "commit": "ff6471d4f837354d8257dfa326b031dd8858b16e"
   },
   "nvim-notify": {
     "branch": "master",
@@ -161,11 +161,11 @@
   },
   "nvim-tree.lua": {
     "branch": "master",
-    "commit": "c09ff35de503a41fa62465c6b4ae72d96e7a7ce4"
+    "commit": "44d9b58f11d5a426c297aafd0be1c9d45617a849"
   },
   "nvim-treesitter": {
     "branch": "master",
-    "commit": "ff553df2f4c5641be2b282e1a0a072c46cf03591"
+    "commit": "9df671fda41bc4af91b9f7ea3fa1628ba988a77b"
   },
   "nvim-ts-autotag": {
     "branch": "main",
@@ -181,7 +181,7 @@
   },
   "octo.nvim": {
     "branch": "master",
-    "commit": "3dfbc7936a9057b8370b903c9e3a115f07dae00d"
+    "commit": "97660ea338c3c94e9e367258a322afc1e154cbbd"
   },
   "overseer.nvim": {
     "branch": "master",
@@ -193,7 +193,7 @@
   },
   "schemastore.nvim": {
     "branch": "main",
-    "commit": "a0df1a2a9c960b677bf2dd1610b434fca045056d"
+    "commit": "e659e0c6ca06727ed898aaaeea3850f528898684"
   },
   "snacks.nvim": {
     "branch": "main",
@@ -237,6 +237,6 @@
   },
   "zk-nvim": {
     "branch": "main",
-    "commit": "01769fb74653588a6185a24ab99419c223bd2a8b"
+    "commit": "8fdd7032633045ece559273370fc0ec75ee8ffce"
   }
 }
