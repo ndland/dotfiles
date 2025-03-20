@@ -12,7 +12,7 @@ return {
         javascriptreact = { "prettierd", "eslint_d" },
         json = { "prettier" },
         lua = { "stylua" },
-        markdown = { "markdownlint" },
+        markdown = { "prettier", "markdownlint" },
         typescript = { "prettierd", "eslint_d" },
         typescriptreact = { "prettierd", "eslint_d" },
         yaml = { "prettier" },

@@ -10,11 +10,11 @@ return {
 
     -- This line is here because if it's not, the main colorscheme gets
     -- overridden when lualine loads
-    vim.cmd("colorscheme catppuccin")
+    vim.cmd("colorscheme dracula-soft")
 
     lualine.setup({
       options = {
-        theme = "catppuccin",
+        theme = "dracula",
       },
       sections = {
         lualine_a = {

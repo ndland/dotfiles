@@ -1,11 +1,10 @@
 return {
-  "catppuccin/nvim",
-  name = "catppuccin",
+  "Mofiqul/dracula.nvim",
   lazy = false,
   priority = 1000,
   opts = {},
   config = function()
-    vim.cmd("set termguicolors")
-    vim.cmd("colorscheme catppuccin")
+    -- vim.cmd("set termguicolors")
+    vim.cmd("colorscheme dracula-soft")
   end,
 }
