@@ -11,15 +11,15 @@ return {
       -- install jsregexp (optional!).
       build = "make install_jsregexp",
     },
-    {
-      "zbirenbaum/copilot-cmp",
-      config = function()
-        require("copilot_cmp").setup({
-          suggestion = { enabled = false },
-          panel = { enabled = false },
-        })
-      end,
-    }, -- for GitHub Copilot
+    -- {
+    --   "zbirenbaum/copilot-cmp",
+    --   config = function()
+    --     require("copilot_cmp").setup({
+    --       suggestion = { enabled = false },
+    --       panel = { enabled = false },
+    --     })
+    --   end,
+    -- }, -- for GitHub Copilot
     {
       "David-Kunz/cmp-npm",
       dependencies = { "nvim-lua/plenary.nvim" },
@@ -64,7 +64,7 @@ return {
       -- sources for autocompletion
       sources = cmp.config.sources({
         { name = "npm", keyword_length = 4 },
-        { name = "copilot" },
+        -- { name = "copilot" },
         { name = "nvim_lsp" },
         { name = "luasnip" }, -- snippets
         { name = "buffer" }, -- text within current buffer
@@ -82,7 +82,7 @@ return {
               vim_item.kind_hl_group = hl_group
               vim_item.menu = ({
                 npm = "[npm]",
-                copilot = "[copilot]",
+                -- copilot = "[copilot]",
                 nvim_lsp = "[LSP]",
                 luasnip = "[Snippet]",
                 buffer = "[Buffer]",
