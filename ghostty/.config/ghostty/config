@@ -1,5 +1,5 @@
 font-family="Iosevka NFM Medium"
-theme = dracula
+theme = catppuccin-macchiato
 font-size = 14
 
 # This is the configuration file for Ghostty.
