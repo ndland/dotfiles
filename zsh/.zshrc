@@ -10,7 +10,7 @@ fi
 # Add Homebrew's bin to PATH
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
   export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
-  alias update="sudo apt update && sudo apt upgrade"
+  alias update="sudo apt update && sudo apt upgrade && brew update && brew upgrade && brew cleanup"
 elif [[ "$OSTYPE" == "darwin"* ]]; then
   export PATH="/opt/homebrew/bin:$PATH"
   alias update="brew update && brew upgrade && brew cleanup"
@@ -136,39 +136,6 @@ fi
 
 export EDITOR=nvim
 
-if [[ "$HOST" == "GMMACANCNXYVH42"* ]]; then
-  export ZK_NOTEBOOK_DIR="$HOME/code/personal/github.com/ndland/zk/"
-  taskCommit='feat: update tasks from work machine'
-  zkCommit='doc: update notes from work machine'
-else
-  export ZK_NOTEBOOK_DIR="$HOME/code/github.com/ndland/zk/"
-  taskCommit='feat: update tasks from personal machine'
-  zkCommit='doc: update notes from personal machine'
-fi
-
-# Helper to automatically update git repositories and push to them
-function update_repo {
-  local dir=$1
-  local commit_msg=$2
-  cd $dir
-  echo "Pulling changes from remote..."
-  git pull
-  echo "Done pulling changes."
-  if [[ -z $(git status --porcelain) ]]; then
-    echo "No changes to commit."
-    cd -
-    return
-  fi
-  if [[ -n $(git status --porcelain) ]]; then
-    git add .
-    git commit -m "$commit_msg"
-  fi
-  git push
-  cd -
-}
-
-alias ut='update_repo ~/.task/ "$taskCommit"'
-alias uzk='update_repo $ZK_NOTEBOOK_DIR "$zkCommit"'
 alias ghs='gh auth switch && gh auth setup-git'
 alias lg='lazygit'
 
@@ -177,29 +144,11 @@ eval "$(fnm env --use-on-cd --shell zsh)"
 # fzf shell integration
 source <(fzf --zsh)
 
-# Install and configure Starship prompt
-if ! command -v starship &> /dev/null; then
-  echo "Starship not found. Installing..."
-  brew install starship
-fi
-export RPROMPT='$(starship prompt --right)'
-export STARSHIP_CONFIG="$HOME/.config/starship.toml"
 if [[ "$(hostname)" == "VTMACMKXYVH42WL" ]]; then
   export ZK_NOTEBOOK_DIR="$HOME/code/personal/github.com/ndland/zk-notes/"
 else
   export ZK_NOTEBOOK_DIR="$HOME/code/github.com/ndland/zk-notes/"  # Update this to your path
 fi
-
-function y() {
-	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-	yazi "$@" --cwd-file="$tmp"
-	if cwd="$(command cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
-		builtin cd -- "$cwd"
-	fi
-	rm -f -- "$tmp"
-}
-
-# eval "$(starship init zsh)"
 
 PATH=~/.console-ninja/.bin:$PATH
 
