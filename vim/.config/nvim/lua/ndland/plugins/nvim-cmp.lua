@@ -11,15 +11,15 @@ return {
       -- install jsregexp (optional!).
       build = "make install_jsregexp",
     },
-    -- {
-    --   "zbirenbaum/copilot-cmp",
-    --   config = function()
-    --     require("copilot_cmp").setup({
-    --       suggestion = { enabled = false },
-    --       panel = { enabled = false },
-    --     })
-    --   end,
-    -- }, -- for GitHub Copilot
+    {
+      "zbirenbaum/copilot-cmp",
+      config = function()
+        require("copilot_cmp").setup({
+          suggestion = { enabled = false },
+          panel = { enabled = false },
+        })
+      end,
+    }, -- for GitHub Copilot
     {
       "David-Kunz/cmp-npm",
       dependencies = { "nvim-lua/plenary.nvim" },
