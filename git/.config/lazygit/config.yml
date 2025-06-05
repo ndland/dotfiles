@@ -3,7 +3,6 @@
 # https://www.conventionalcommits.org/en/v1.0.0/
 git:
   parseEmoji: true
-
 customCommands:
   - key: "C"
     command: 'git commit -m "{{ .Form.emoji }} {{ .Form.Type }}{{if .Form.Scopes}}({{ .Form.Scopes }}){{end}}: {{ .Form.Description }} " -m  "{{ .Form.Body }}"'
@@ -66,9 +65,8 @@ customCommands:
       - type: "confirm"
         title: "Is the commit message correct?"
         body: "{{ .Form.emoji }} {{ .Form.Type }}{{if .Form.Scopes}}({{ .Form.Scopes }}){{end}}: {{ .Form.Description }} \n\n{{ .Form.Body }}"
-
   - key: "c"
     command: 'git cz'
     description: "commit with commitizen"
     context: "files"
-    subprocess: true
+    output: terminal

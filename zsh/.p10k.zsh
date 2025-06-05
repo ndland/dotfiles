@@ -103,12 +103,13 @@
     # disk_usage            # disk usage
     # ram                   # free RAM
     # swap                  # used swap
-    todo                    # todo items (https://github.com/todotxt/todo.txt-cli)
-    # timewarrior             # timewarrior tracking status (https://timewarrior.net/)
-    # taskwarrior             # taskwarrior task count (https://taskwarrior.org/)
+    # todo                  # todo items (https://github.com/todotxt/todo.txt-cli)
+    # timewarrior           # timewarrior tracking status (https://timewarrior.net/)
+    # taskwarrior           # taskwarrior task count (https://taskwarrior.org/)
     per_directory_history   # Oh My Zsh per-directory-history local/global indicator
     # cpu_arch              # CPU architecture
     time                    # current time
+    gh_user                 # show logged in gh user
     # =========================[ Line #2 ]=========================
     newline
     # ip                    # ip address and bandwidth usage for a specified network interface
@@ -1781,6 +1782,14 @@
     p10k segment -b 1 -f 3 -i '⭐' -t 'hello, %n'
   }
 
+  function prompt_gh_user() {
+      if gh auth status &>/dev/null; then
+          local user
+          user=$(gh auth status -a | grep 'Logged in to' | awk '{print $7}')
+          p10k segment -t "GitHub: $user"
+      fi
+  }
+
   # User-defined prompt segments may optionally provide an instant_prompt_* function. Its job
   # is to generate the prompt segment for display in instant prompt. See
   # https://github.com/romkatv/powerlevel10k#instant-prompt.
@@ -1801,8 +1810,8 @@
   }
 
   # User-defined prompt segments can be customized the same way as built-in segments.
-  typeset -g POWERLEVEL9K_EXAMPLE_FOREGROUND=3
-  typeset -g POWERLEVEL9K_EXAMPLE_BACKGROUND=1
+  typeset -g POWERLEVEL9K_GH_USER_FOREGROUND=0
+  typeset -g POWERLEVEL9K_GH_USER_BACKGROUND=4
   # typeset -g POWERLEVEL9K_EXAMPLE_VISUAL_IDENTIFIER_EXPANSION='⭐'
 
   # Transient prompt works similarly to the builtin transient_rprompt option. It trims down prompt
