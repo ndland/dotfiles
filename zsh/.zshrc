@@ -16,10 +16,17 @@ elif [[ "$OSTYPE" == "darwin"* ]]; then
   alias update="brew update && brew upgrade && brew cleanup"
 fi
 
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=10000
+SAVEHIST=10000
+
 # Enable Zsh options
 setopt SHARE_HISTORY
-setopt INC_APPEND_HISTORY
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_REDUCE_BLANKS
 setopt HIST_FIND_NO_DUPS
+setopt INC_APPEND_HISTORY
+setopt EXTENDED_HISTORY
 setopt AUTO_CD
 
 # Plugin Management with zinit
@@ -149,6 +156,9 @@ if [[ "$(hostname)" == "VTMACMKXYVH42WL" ]]; then
 else
   export ZK_NOTEBOOK_DIR="$HOME/code/github.com/ndland/zk-notes/"  # Update this to your path
 fi
+
+# Mount my nas
+sudo mount -t drvfs G: /mnt/g
 
 PATH=~/.console-ninja/.bin:$PATH
 
