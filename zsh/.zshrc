@@ -75,7 +75,7 @@ rm -f ~/.zcompdump*  # Remove stale compinit cache
 
 fpath=(~/.zsh/completions/ $fpath)
 autoload -Uz compinit
-compinit
+compinit -C
 zstyle ':completion:*' menu select
 zstyle ':completion:*' descriptions true
 zstyle ':completion:*' verbose true
@@ -128,7 +128,10 @@ if ! command -v eza &> /dev/null; then
 fi
 
 # Add zoxide support
-unalias zi
+if alias zi &> /dev/null; then
+  unalias zi
+fi
+
 eval "$(zoxide init zsh)"
 
 # Nix shell completion
@@ -156,9 +159,6 @@ if [[ "$(hostname)" == "VTMACMKXYVH42WL" ]]; then
 else
   export ZK_NOTEBOOK_DIR="$HOME/code/github.com/ndland/zk-notes/"  # Update this to your path
 fi
-
-# Mount my nas
-sudo mount -t drvfs G: /mnt/g
 
 PATH=~/.console-ninja/.bin:$PATH
 
