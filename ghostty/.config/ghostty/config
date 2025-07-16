@@ -1,5 +1,5 @@
 font-family="'Iosevka Nerd Font Mono', 'JetBrainsMono Nerd Font', 'Monaspace Xenon Var'"
-theme = tokyonight-storm
+theme = catppuccin-macchiato
 font-size = 13
 
 # This is the configuration file for Ghostty.
