@@ -144,7 +144,7 @@ if command -v nix &> /dev/null; then
   zstyle ':completion:*' menu select
 fi
 
-export EDITOR="code -rw"
+export EDITOR="nvim"
 
 alias ghs='gh auth switch && gh auth setup-git'
 alias lg='lazygit'
