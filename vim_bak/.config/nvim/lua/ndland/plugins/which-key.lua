@@ -521,5 +521,7 @@ return {
       },
     })
   end,
-  opts = {},
+  opts = {
+    preset = "modern",
+  },
 }
