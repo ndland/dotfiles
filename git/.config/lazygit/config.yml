@@ -70,3 +70,8 @@ customCommands:
     description: "commit with commitizen"
     context: "files"
     output: terminal
+  - key: "r"
+    command: 'npx cz --retry'
+    description: "Retry commit"
+    context: "files"
+    output: terminal
