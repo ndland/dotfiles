@@ -1,6 +1,21 @@
 return {
 	"folke/trouble.nvim",
-	opts = {}, -- for default options, refer to the configuration section for custom setup.
+	dependencies = {
+		"nvim-tree/nvim-web-devicons",
+	},
+	opts = {
+		modes = {
+			test = {
+				mode = "diagnostics",
+				preview = {
+					type = "split",
+					relative = "win",
+					position = "right",
+					size = 0.3,
+				},
+			},
+		},
+	}, -- for default options, refer to the configuration section for custom setup.
 	cmd = "Trouble",
 	keys = {
 		{

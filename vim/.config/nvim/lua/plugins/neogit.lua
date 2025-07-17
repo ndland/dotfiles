@@ -16,7 +16,7 @@ return {
 		{
 			"<leader>g",
 			function()
-				require("which-key").show({ global = false })
+				require("which-key").show()
 			end,
 			desc = "Git",
 		},
