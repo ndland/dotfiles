@@ -142,13 +142,6 @@ return {
 			desc = "Git Log Line",
 		},
 		{
-			"<leader>gs",
-			function()
-				Snacks.picker.git_status()
-			end,
-			desc = "Git Status",
-		},
-		{
 			"<leader>gS",
 			function()
 				Snacks.picker.git_stash()
@@ -456,13 +449,13 @@ return {
 			desc = "Git Browse",
 			mode = { "n", "v" },
 		},
-		{
-			"<leader>gg",
-			function()
-				Snacks.lazygit()
-			end,
-			desc = "Lazygit",
-		},
+		-- {
+		-- 	"<leader>gg",
+		-- 	function()
+		-- 		Snacks.lazygit()
+		-- 	end,
+		-- 	desc = "Lazygit",
+		-- },
 		{
 			"<leader>un",
 			function()
