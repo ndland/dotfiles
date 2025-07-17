@@ -5,6 +5,13 @@ return {
 		"sindrets/diffview.nvim", -- optional - Diff integration
 		"folke/snacks.nvim", -- optional
 	},
+	config = function()
+		local neogit = require("neogit")
+
+		neogit.setup({
+			graph_style = "unicode",
+		})
+	end,
 	keys = {
 		{
 			"<leader>g",
