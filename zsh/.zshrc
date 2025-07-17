@@ -155,9 +155,9 @@ eval "$(fnm env --use-on-cd --shell zsh)"
 source <(fzf --zsh)
 
 if [[ "$(hostname)" == "VTMACMKXYVH42WL" ]]; then
-  export ZK_NOTEBOOK_DIR="$HOME/code/personal/github.com/ndland/zk-notes/"
+  export ZK_NOTEBOOK_DIR="$HOME/code/personal/github.com/ndland/zk/"
 else
-  export ZK_NOTEBOOK_DIR="$HOME/code/github.com/ndland/zk-notes/"  # Update this to your path
+  export ZK_NOTEBOOK_DIR="$HOME/code/github.com/ndland/zk/"  # Update this to your path
 fi
 
 PATH=~/.console-ninja/.bin:$PATH
