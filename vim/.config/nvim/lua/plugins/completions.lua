@@ -12,7 +12,10 @@ return {
 		},
 		completion = { documentation = { auto_show = true } },
 		sources = {
-			default = { "lsp", "path", "snippets", "buffer" },
+			default = { "ecolog", "lsp", "path", "snippets", "buffer" },
+			providers = {
+				ecolog = { name = "ecolog", module = "ecolog.integrations.cmp.blink_cmp" },
+			},
 		},
 		fuzzy = { implementation = "prefer_rust_with_warning" },
 	},
