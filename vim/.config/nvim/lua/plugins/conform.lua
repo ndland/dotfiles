@@ -6,6 +6,7 @@ return {
 			formatters_by_ft = {
 				markdown = { "markdownlint" },
 				lua = { "stylua" },
+				typescriptreact = { "eslint", "prettier", stop_after_first = true },
 			},
 			format_on_save = {
 				lsp_fallback = true,

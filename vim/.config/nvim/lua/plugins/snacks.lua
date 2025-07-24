@@ -60,6 +60,13 @@ return {
 			end,
 			desc = "File Explorer",
 		},
+		{
+			"<leader>gl",
+			function()
+				Snacks.picker.git_log()
+			end,
+			desc = "Git Log",
+		},
 	},
 	init = function()
 		vim.api.nvim_create_autocmd("User", {

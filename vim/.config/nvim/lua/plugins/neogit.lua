@@ -1,11 +1,15 @@
 return {
 	"NeogitOrg/neogit",
 	dependencies = {
-		"nvim-lua/plenary.nvim", -- required
-		"sindrets/diffview.nvim", -- optional - Diff integration
-		"folke/snacks.nvim", -- optional
+		"nvim-lua/plenary.nvim",
+		"sindrets/diffview.nvim",
+		"folke/snacks.nvim",
 	},
 	config = function()
+		local wk = require("which-key")
+		wk.add({
+			{ "<leader>g", group = "Git" },
+		})
 		local neogit = require("neogit")
 
 		neogit.setup({
@@ -16,13 +20,6 @@ return {
 		})
 	end,
 	keys = {
-		{
-			"<leader>g",
-			function()
-				require("which-key").show()
-			end,
-			desc = "Git",
-		},
 		{
 			"<leader>gs",
 			function()
