@@ -46,13 +46,6 @@ return {
 			end,
 			desc = "Command History",
 		},
-		-- {
-		-- 	"<leader>n",
-		-- 	function()
-		-- 		Snacks.picker.notifications()
-		-- 	end,
-		-- 	desc = "Notification History",
-		-- },
 		{
 			"<leader>e",
 			function()
@@ -66,6 +59,21 @@ return {
 				Snacks.picker.git_log()
 			end,
 			desc = "Git Log",
+		},
+		{
+			"<leader>h",
+			function()
+				Snacks.picker.help()
+			end,
+			desc = "Help",
+		},
+		{ "<leader>s", "<Nop>", desc = "Search" },
+		{
+			"<leader>sb",
+			function()
+				Snacks.picker.lines()
+			end,
+			desc = "Search Buffer",
 		},
 	},
 	init = function()

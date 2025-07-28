@@ -4,9 +4,10 @@ return {
 	config = function()
 		require("conform").setup({
 			formatters_by_ft = {
-				markdown = { "markdownlint" },
 				lua = { "stylua" },
-				typescriptreact = { "eslint", "prettier", stop_after_first = true },
+				markdown = { "markdownlint" },
+				typescriptreact = { "eslint_d", "prettier", stop_after_first = true },
+				-- astro = { "prettier" },
 			},
 			format_on_save = {
 				lsp_fallback = true,

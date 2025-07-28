@@ -6,10 +6,6 @@ return {
 		"folke/snacks.nvim",
 	},
 	config = function()
-		local wk = require("which-key")
-		wk.add({
-			{ "<leader>g", group = "Git" },
-		})
 		local neogit = require("neogit")
 
 		neogit.setup({
@@ -20,6 +16,7 @@ return {
 		})
 	end,
 	keys = {
+		{ "<leader>g", "<Nop>", desc = "Git" },
 		{
 			"<leader>gs",
 			function()
