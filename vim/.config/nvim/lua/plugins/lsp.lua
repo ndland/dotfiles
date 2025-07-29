@@ -17,6 +17,7 @@ return {
 		local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
 
 		vim.lsp.enable("ts_ls")
+		vim.lsp.enable("marksman")
 		vim.lsp.config("lua_ls", {
 			settings = {
 				Lua = {
@@ -35,7 +36,6 @@ return {
 				},
 			},
 		})
-		vim.lsp.enable("eslint")
 
 		vim.diagnostic.config({
 			virtual_text = true,
