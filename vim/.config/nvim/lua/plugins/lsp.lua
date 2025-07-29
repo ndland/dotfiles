@@ -13,38 +13,29 @@ return {
 			desc = "Open diagnostics in float",
 		},
 	},
-	opts = {
-		servers = {
-			astro = {},
-			eslint = {},
-			lua_ls = {
-				settings = {
-					Lua = {
-						runtime = {
-							version = "LuaJIT",
-						},
-						diagnostics = {
-							globals = {
-								"vim",
-								"Snacks",
-							},
+	config = function(_, opts)
+		local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
+
+		vim.lsp.enable("ts_ls")
+		vim.lsp.config("lua_ls", {
+			settings = {
+				Lua = {
+					runtime = {
+						-- Tell the language server which version of Lua you're using
+						-- (most likely LuaJIT in the case of Neovim)
+						version = "LuaJIT",
+					},
+					diagnostics = {
+						-- Get the language server to recognize the `vim` global
+						globals = {
+							"vim",
+							"require",
 						},
 					},
 				},
 			},
-			tailwindcss = {},
-			ts_ls = {},
-		},
-	},
-
-	config = function(_, opts)
-		local lspconfig = require("lspconfig")
-		for server, config in pairs(opts.servers) do
-			config.capabilities = require("blink.cmp").get_lsp_capabilities(config.capabilities)
-			lspconfig[server].setup(config)
-		end
-
-		local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
+		})
+		vim.lsp.enable("eslint")
 
 		vim.diagnostic.config({
 			virtual_text = true,

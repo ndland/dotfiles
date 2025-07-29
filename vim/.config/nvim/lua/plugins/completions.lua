@@ -10,6 +10,14 @@ return {
 		appearance = {
 			nerd_font_variant = "mono",
 		},
+		cmdline = {
+			keymap = {
+				["<Tab>"] = { "accept" },
+				["<CR>"] = { "accept_and_enter", "fallback" },
+			},
+			-- (optionally) automatically show the menu
+			completion = { menu = { auto_show = true } },
+		},
 		completion = {
 			documentation = { auto_show = true, auto_show_delay_ms = 500 },
 			ghost_text = { enabled = true },

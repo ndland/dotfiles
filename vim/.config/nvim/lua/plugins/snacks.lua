@@ -61,7 +61,7 @@ return {
 			desc = "Git Log",
 		},
 		{
-			"<leader>h",
+			"<leader>`",
 			function()
 				Snacks.picker.help()
 			end,
