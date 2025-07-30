@@ -6,7 +6,8 @@ return {
 			formatters_by_ft = {
 				lua = { "stylua" },
 				markdown = { "markdownlint" },
-				typescriptreact = { "eslint_d", "prettier", stop_after_first = true },
+
+				typescriptreact = { "prettier", stop_after_first = true },
 				-- astro = { "prettier" },
 			},
 			format_on_save = {
