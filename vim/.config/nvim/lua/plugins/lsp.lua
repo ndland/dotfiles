@@ -5,10 +5,7 @@ return {
 		{
 			"<leader>d",
 			function()
-				vim.diagnostic.open_float({
-					focusable = true,
-					close_events = { "CursorMoved", "BufLeave", "InsertEnter" },
-				})
+				vim.diagnostic.open_float(nil, { focusable = true })
 			end,
 			desc = "Open diagnostics in float",
 		},
