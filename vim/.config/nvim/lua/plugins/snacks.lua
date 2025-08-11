@@ -61,6 +61,13 @@ return {
 			desc = "Git Log",
 		},
 		{
+			"<leader>gb",
+			function()
+				Snacks.git.blame_line()
+			end,
+			desc = "Git Blame",
+		},
+		{
 			"<leader>`",
 			function()
 				Snacks.picker.help()
