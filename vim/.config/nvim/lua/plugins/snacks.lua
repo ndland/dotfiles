@@ -82,6 +82,13 @@ return {
 			end,
 			desc = "Search Buffer",
 		},
+		{
+			"<leader>st",
+			function()
+				Snacks.picker.todo_comments()
+			end,
+			desc = "Todos",
+		},
 	},
 	init = function()
 		vim.api.nvim_create_autocmd("User", {
