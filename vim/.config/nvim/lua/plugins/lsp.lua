@@ -13,26 +13,28 @@ return {
 	config = function(_, opts)
 		local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
 
-		vim.lsp.enable("ts_ls")
 		vim.lsp.config("lua_ls", {
 			settings = {
 				Lua = {
 					runtime = {
-						-- Tell the language server which version of Lua you're using
-						-- (most likely LuaJIT in the case of Neovim)
-						version = "LuaJIT",
+						version = "LuaJIT", -- Neovim uses LuaJIT
 					},
 					diagnostics = {
-						-- Get the language server to recognize the `vim` global
-						globals = {
-							"vim",
-							"require",
-						},
+						globals = { "vim" },
 					},
+					workspace = {
+						-- Make the server aware of Neovim runtime files
+						library = {
+							vim.env.VIMRUNTIME,
+							unpack(vim.api.nvim_list_runtime_paths()),
+						},
+						checkThirdParty = false, -- don't prompt for third party
+					},
+					telemetry = { enable = false },
 				},
 			},
 		})
-		vim.lsp.enable("eslint")
+		vim.lsp.enable({ "lua_ls", "ts_ls", "eslint" })
 
 		vim.diagnostic.config({
 			virtual_text = true,
