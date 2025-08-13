@@ -12,5 +12,15 @@ return {
 			end,
 			desc = "Buffer Local Keymaps (which-key)",
 		},
+		{
+			"<leader>b",
+			"Nop",
+			desc = "Buffers",
+		},
+		{
+			"<leader>bd",
+			"<CMD>bd<CR>",
+			desc = "Delete Buffer",
+		},
 	},
 }

@@ -1,7 +1,7 @@
 return {
 	"zk-org/zk-nvim",
 	keys = {
-		{ "<leader>n", group = "notes" },
+		{ "<leader>n", "Nop", desc = "notes" },
 		{
 			"<leader>nn",
 			"<Cmd>ZkNew { title = vim.fn.input('Title: ') }<CR>",

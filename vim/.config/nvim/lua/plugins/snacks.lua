@@ -30,7 +30,7 @@ return {
 			function()
 				Snacks.picker.buffers()
 			end,
-			desc = "Buffers",
+			desc = "List open buffers",
 		},
 		{
 			"<leader>/",
@@ -82,12 +82,20 @@ return {
 			end,
 			desc = "Search Buffer",
 		},
+		{ "<leader>p", "<Nop>", desc = "Project" },
 		{
-			"<leader>st",
+			"<leader>pt",
 			function()
 				Snacks.picker.todo_comments()
 			end,
-			desc = "Todos",
+			desc = "Project Todos",
+		},
+		{
+			"<leader>pm",
+			function()
+				Snacks.picker.marks()
+			end,
+			desc = "Project Marks",
 		},
 	},
 	init = function()
