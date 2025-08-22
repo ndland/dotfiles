@@ -34,6 +34,15 @@ return {
 				},
 			},
 		})
+
+		vim.keymap.set("n", "K", function()
+			vim.lsp.buf.hover({
+				border = "rounded",
+				title = "Type Info",
+				focusable = true,
+			})
+		end)
+
 		vim.lsp.enable({ "lua_ls", "ts_ls", "eslint" })
 
 		vim.diagnostic.config({

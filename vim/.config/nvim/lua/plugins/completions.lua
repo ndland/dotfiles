@@ -1,6 +1,6 @@
 return {
 	"saghen/blink.cmp",
-	dependencies = { "rafamadriz/friendly-snippets", "onsails/lspkind.nvim" },
+	dependencies = { "rafamadriz/friendly-snippets", "onsails/lspkind.nvim", "chrisgrieser/nvim-scissors" },
 
 	version = "1.*",
 	---@module 'blink.cmp'
@@ -66,6 +66,13 @@ return {
 		},
 		sources = {
 			default = { "lsp", "path", "snippets", "buffer" },
+			providers = {
+				snippets = {
+					opts = {
+						search_paths = { vim.fn.stdpath("config") .. "/snippets" },
+					},
+				},
+			},
 		},
 		fuzzy = { implementation = "prefer_rust_with_warning" },
 	},

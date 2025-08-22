@@ -1,0 +1,1 @@
+{"uf":{"prefix":"uf","body":["const form = useForm({","  defaultValues: { \"$1\" },","  onSubmit: ({ value }) => {","    // TODO: this gets posted to kafka","    // eslint-disable-next-line no-console","    console.log('value', value);","  }","});"]}}
