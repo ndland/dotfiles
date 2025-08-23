@@ -11,11 +11,12 @@ formulae=(
   'neovim'
   'ripgrep'
   'fzf'
+  'stow'
 )
 
 # Set the source and destination directories for stow
 stow_dir="$HOME/dotfiles"
-nvim_dir="nvim"
+nvim_dir="vim"
 
 # Function to install Homebrew formulae
 install_formulae() {
@@ -48,8 +49,15 @@ symlink_nvim() {
   echo "Symlinking complete."
 }
 
+install_colorscript() {
+  git clone https://gitlab.com/dwt1/shell-color-scripts.git
+  cd shell-color-scripts
+  sudo make install
+}
+
 # --- Execution ---
 install_formulae
 symlink_nvim
+install_colorscript
 
 echo "Script finished successfully! 🎉"
