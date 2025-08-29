@@ -3,6 +3,11 @@ return {
 	keys = {
 		{ "<leader>n", "Nop", desc = "notes" },
 		{
+			"<leader>nb",
+			"<Cmd>ZkBacklink<CR>",
+			desc = "Backlinks",
+		},
+		{
 			"<leader>nn",
 			"<Cmd>ZkNew { title = vim.fn.input('Title: ') }<CR>",
 			desc = "New note with title",
@@ -16,6 +21,11 @@ return {
 			"<leader>nf",
 			"<Cmd>ZkNotes { sort = { 'modified' }, match = { vim.fn.input('Search: ') } }<CR>",
 			desc = "Find notes",
+		},
+		{
+			"<leader>nt",
+			"<Cmd>ZkTags<CR>",
+			desc = "Find tags",
 		},
 	},
 	config = function()

@@ -25,6 +25,7 @@ return {
 				"markdownlint",
 				"prettier", -- prettier formatter
 				"stylua", -- lua formatter
+				"tailwindcss",
 				"zk",
 			},
 		})

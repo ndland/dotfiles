@@ -8,9 +8,10 @@ set -e
 # --- Configuration ---
 # Set the desired formulae to install
 formulae=(
+  'fzf'
+  'gh'
   'neovim'
   'ripgrep'
-  'fzf'
   'stow'
 )
 
@@ -54,6 +55,8 @@ install_colorscript() {
   cd shell-color-scripts
   sudo make install
 }
+
+chsh -s $(which fish)
 
 # --- Execution ---
 install_formulae
