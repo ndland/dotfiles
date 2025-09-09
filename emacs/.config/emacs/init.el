@@ -1,4 +1,11 @@
-(setq user-emacs-directory (expand-file-name "~/.config/emacs/"))
+;; Tangle this file to init.el on save.
+(defun my/org-babel-tangle-on-save ()
+  "Tangle the current Org buffer to init.el on save."
+  (when (string-equal (buffer-file-name) (expand-file-name "~/.config/emacs/init.org"))
+    (org-babel-tangle-file (buffer-file-name)
+			   (expand-file-name "~/.config/emacs/init.el"))))
+
+(add-hook 'after-save-hook #'my/org-babel-tangle-on-save)
 
 (defvar bootstrap-version)
 (let ((bootstrap-file
@@ -16,28 +23,99 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-;; Configure straight.el with use-package
-(straight-use-package 'use-package)
-(setq straight-use-package-by-default t)
+(use-package evil
+  :straight t
+  :init
+  (setq evil-want-keybinding nil)
+  :config
+  (evil-mode 1))
 
-;; Directory for modular configuration files
-(defvar my-config-dir (expand-file-name "lisp/" user-emacs-directory)
-  "Directory for modular configuration files.")
+(use-package evil-collection
+  :after evil
+  :straight t
+  :config
+  (evil-collection-init))
 
-;; Ensure the directory exists
-(unless (file-exists-p my-config-dir)
-  (make-directory my-config-dir))
+(use-package catppuccin-theme
+  :straight t
+  :config
+  (load-theme 'catppuccin :no-confirm)
+  (setq catppuccin-flavor 'macchiato)
+  (catppuccin-reload))
 
-;; Add modular configuration directory to load-path
-(add-to-list 'load-path my-config-dir)
+;; Auto completion example
+(use-package corfu
+  :straight t
+  :custom
+  (corfu-auto t)
+  :init
+  (global-corfu-mode))
 
-;; Load all `.el` files in my-config-dir
-(mapc (lambda (file)
-        (load (file-name-sans-extension file)))
-      (directory-files my-config-dir 'full "\\.el$"))
+;; Use Dabbrev with Corfu!
+(use-package dabbrev
+  :straight t
+  ;; Swap M-/ and C-M-/
+  :bind (("M-/" . dabbrev-completion)
+         ("C-M-/" . dabbrev-expand))
+  :config
+  (add-to-list 'dabbrev-ignored-buffer-regexps "\\` ")
+  ;; Available since Emacs 29 (Use `dabbrev-ignored-buffer-regexps' on older Emacs)
+  (add-to-list 'dabbrev-ignored-buffer-modes 'authinfo-mode)
+  (add-to-list 'dabbrev-ignored-buffer-modes 'doc-view-mode)
+  (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode)
+  (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
 
-;; Set custom file
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-(unless (file-exists-p custom-file)
-  (write-region "" nil custom-file))
-(load custom-file)
+;; Optionally use the `orderless' completion style.
+(use-package orderless
+  :straight t
+  :custom
+  ;; (orderless-style-dispatchers '(orderless-affix-dispatch))
+  ;; (orderless-component-separator #'orderless-escapable-split-on-space)
+  (completion-styles '(orderless basic))
+  (completion-category-overrides '((file (styles partial-completion))))
+  (completion-category-defaults nil) ;; Disable defaults, use our settings
+  (completion-pcm-leading-wildcard t)) ;; Emacs 31: partial-completion behaves like substring
+
+;; Enable Vertico.
+(use-package vertico
+  :straight t
+  :init
+  (vertico-mode))
+
+;; Persist history over Emacs restarts. Vertico sorts by history position.
+(use-package savehist
+  :straight t
+  :init
+  (savehist-mode))
+
+;; Enable rich annotations using the Marginalia package
+(use-package marginalia
+  :straight t
+  ;; Bind `marginalia-cycle' locally in the minibuffer.  To make the binding
+  ;; available in the *Completions* buffer, add it to the
+  ;; `completion-list-mode-map'.
+  :bind (:map minibuffer-local-map
+         ("M-A" . marginalia-cycle))
+
+  ;; The :init section is always executed.
+  :init
+
+  ;; Marginalia must be activated in the :init section of use-package such that
+  ;; the mode gets enabled right away. Note that this forces loading the
+  ;; package.
+  (marginalia-mode))
+
+(use-package magit
+  :straight t
+  :bind (("C-x g" . magit-status)
+         ("C-x C-g" . magit-status)))
+
+(use-package forge
+  :straight t
+  :after magit)
+
+;; Example: Configure the "flycheck" package for syntax checking.
+;; (use-package flycheck
+;;   :ensure t
+;;   :init
+;;   (global-flycheck-mode))
