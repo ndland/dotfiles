@@ -1,9 +1,10 @@
 ;; Tangle this file to init.el on save.
 (defun my/org-babel-tangle-on-save ()
   "Tangle the current Org buffer to init.el on save."
-  (when (string-equal (buffer-file-name) (expand-file-name "~/.config/emacs/init.org"))
+  (when (string-equal (file-truename (buffer-file-name)) 
+                      (file-truename (expand-file-name "~/.config/emacs/init.org")))
     (org-babel-tangle-file (buffer-file-name)
-			   (expand-file-name "~/.config/emacs/init.el"))))
+                           (expand-file-name "~/.config/emacs/init.el"))))
 
 (add-hook 'after-save-hook #'my/org-babel-tangle-on-save)
 
@@ -23,6 +24,27 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
+(which-key-mode 1)
+
+;; Use-package configuration for yasnippet
+(use-package yasnippet
+  :straight t
+  :defer 2  ;; Load yasnippet after 2 seconds
+  :init
+  (yas-global-mode 1)  ;; Enable yasnippet globally
+  :config
+  (setq yas-snippet-dirs '("~/.config/emacs/snippets"  ;; Custom snippets directory
+                           yas-installed-snippets-dir))  ;; Include default snippets
+  (define-key yas-minor-mode-map (kbd "C-c y") 'yas-expand)  ;; Keybinding to expand snippets
+  (define-key yas-minor-mode-map (kbd "C-c y i") 'yas-insert-snippet)  ;; Keybinding to insert a snippet
+  (define-key yas-minor-mode-map (kbd "C-c y n") 'yas-new-snippet)  ;; Keybinding to create a new snippet
+  (define-key yas-minor-mode-map (kbd "C-c y v") 'yas-visit-snippet-file))  ;; Keybinding to visit a snippet file
+
+;; Optional: Load snippets from a specific directory
+(use-package yasnippet-snippets
+  :after yasnippet
+  :straight t)
+
 (use-package evil
   :straight t
   :init
@@ -31,8 +53,8 @@
   (evil-mode 1))
 
 (use-package evil-collection
-  :after evil
   :straight t
+  :after evil
   :config
   (evil-collection-init))
 
@@ -44,12 +66,49 @@
   (catppuccin-reload))
 
 ;; Auto completion example
+    ;;;; Code Completion
+    ;;;; Code Completion
 (use-package corfu
   :straight t
+  ;; Optional customizations
   :custom
-  (corfu-auto t)
+  (corfu-cycle t)                 ; Allows cycling through candidates
+  (corfu-auto t)                  ; Enable auto completion
+  (corfu-auto-prefix 2)           ; Minimum length of prefix for completion
+  (corfu-auto-delay 0)            ; No delay for completion
+  (corfu-popupinfo-delay '(0.5 . 0.2))  ; Automatically update info popup after that numver of seconds
+  (corfu-preview-current 'insert) ; insert previewed candidate
+  (corfu-preselect 'prompt)
+  (corfu-on-exact-match nil)      ; Don't auto expand tempel snippets
+  ;; Optionally use TAB for cycling, default is `corfu-complete'.
+  :bind (:map corfu-map
+	      ("M-SPC"      . corfu-insert-separator)
+	      ("TAB"        . corfu-next)
+	      ([tab]        . corfu-next)
+	      ("S-TAB"      . corfu-previous)
+	      ([backtab]    . corfu-previous)
+	      ("S-<return>" . corfu-insert)
+	      ("RET"        . corfu-insert))
+
   :init
-  (global-corfu-mode))
+  (global-corfu-mode)
+  (corfu-history-mode)
+  (corfu-popupinfo-mode) ; Popup completion info
+  :config
+  (add-hook 'eshell-mode-hook
+            (lambda () (setq-local corfu-quit-at-boundary t
+                                   corfu-quit-no-match t
+                                   corfu-auto nil)
+              (corfu-mode))
+            nil
+            t))
+
+;; (use-package corfu
+;;   :straight t
+;;   :custom
+;;   (corfu-auto t)
+;;   :init
+;;   (global-corfu-mode))
 
 ;; Use Dabbrev with Corfu!
 (use-package dabbrev
@@ -95,7 +154,7 @@
   ;; available in the *Completions* buffer, add it to the
   ;; `completion-list-mode-map'.
   :bind (:map minibuffer-local-map
-         ("M-A" . marginalia-cycle))
+              ("M-A" . marginalia-cycle))
 
   ;; The :init section is always executed.
   :init
@@ -113,6 +172,167 @@
 (use-package forge
   :straight t
   :after magit)
+
+(use-package org
+  :straight '(org :type git :repo "https://git.savannah.gnu.org/git/emacs/org-mode.git" :branch "main")
+  :custom
+  (org-log-done t)                       ; Log time when marking a task DONE
+  (org-deadline-warning-days 7)          ; Warn about deadlines 7 days in advance
+  (org-startup-with-inline-images t)     ; Display images inline on startup
+  (org-ellipsis "...")                   ; Use '...' for collapsed text
+  (org-hide-emphasis-markers t)          ; Hide emphasis markers like bold `*`
+  (org-startup-folded nil)               ; Start files with all headlines unfolded
+  (org-src-fontify-natively t)           ; Use native major mode for fontifying code blocks
+  (org-src-tab-acts-natively t)          ; Allow tab key to work normally in code blocks
+  (org-edit-src-content-indentation 0)  ; No indentation in source blocks
+  (org-confirm-babel-evaluate nil)       ; Don't ask for confirmation before evaluating
+  :hook
+  (org-mode . (lambda () (electric-pair-mode)))) ; Automatically insert matching pairs (e.g., ())
+
+(use-package org-roam
+  :straight t
+  :after org
+  :custom
+  ;; The directory where your Org-roam files will be stored.
+  (org-roam-directory "~/org/roam/")
+  ;; Set this to nil to suppress the V2 migration warning.
+  (org-roam-v2-migration-p nil)
+  :config
+  ;; This command is crucial for org-roam to set up its database.
+  (org-roam-setup))
+
+(setq treesit-language-source-alist
+      '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+	(cmake "https://github.com/uyha/tree-sitter-cmake")
+	(css "https://github.com/tree-sitter/tree-sitter-css")
+	(elisp "https://github.com/Wilfred/tree-sitter-elisp")
+	(go "https://github.com/tree-sitter/tree-sitter-go")
+	(html "https://github.com/tree-sitter/tree-sitter-html")
+	(javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+	(json "https://github.com/tree-sitter/tree-sitter-json")
+	(make "https://github.com/alemuller/tree-sitter-make")
+	(markdown "https://github.com/ikatyang/tree-sitter-markdown")
+	(python "https://github.com/tree-sitter/tree-sitter-python")
+	(toml "https://github.com/tree-sitter/tree-sitter-toml")
+	(tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+	(typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+	(yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+
+(use-package flycheck
+  :straight t
+  :init (global-flycheck-mode)
+  :bind (:map flycheck-mode-map
+              ("M-n" . flycheck-next-error) ; optional but recommended error navigation
+              ("M-p" . flycheck-previous-error)))
+
+
+(use-package lsp-mode
+  :diminish "LSP"
+  :straight t
+  :preface
+  (defun lsp-booster--advice-json-parse (old-fn &rest args)
+    "Try to parse bytecode instead of json."
+    (or
+     (when (equal (following-char) ?#)
+
+       (let ((bytecode (read (current-buffer))))
+         (when (byte-code-function-p bytecode)
+           (funcall bytecode))))
+     (apply old-fn args)))
+  (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
+    "Prepend emacs-lsp-booster command to lsp CMD."
+    (let ((orig-result (funcall old-fn cmd test?)))
+      (if (and (not test?)                             ;; for check lsp-server-present?
+               (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
+               lsp-use-plists
+               (not (functionp 'json-rpc-connection))  ;; native json-rpc
+               (executable-find "emacs-lsp-booster"))
+          (progn
+            (message "Using emacs-lsp-booster for %s!" orig-result)
+            (cons "emacs-lsp-booster" orig-result))
+        orig-result)))
+  :init
+  (setq lsp-use-plists t)
+  ;; Initiate https://github.com/blahgeek/emacs-lsp-booster for performance
+  (advice-add (if (progn (require 'json)
+                         (fboundp 'json-parse-buffer))
+                  'json-parse-buffer
+                'json-read)
+              :around
+              #'lsp-booster--advice-json-parse)
+  (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
+  :hook ((lsp-mode . lsp-diagnostics-mode)
+         (lsp-mode . lsp-enable-which-key-integration)
+         ((tsx-ts-mode
+           typescript-ts-mode
+           js-ts-mode) . lsp-deferred))
+  :custom
+  (lsp-keymap-prefix "C-c l")           ; Prefix for LSP actions
+  (lsp-completion-provider :none)       ; Using Corfu as the provider
+  (lsp-diagnostics-provider :flycheck)
+  (lsp-session-file (locate-user-emacs-file ".lsp-session"))
+  (lsp-log-io nil)                      ; IMPORTANT! Use only for debugging! Drastically affects performance
+  (lsp-keep-workspace-alive nil)        ; Close LSP server if all project buffers are closed
+  (lsp-idle-delay 0.5)                  ; Debounce timer for `after-change-function'
+  ;; core
+  (lsp-enable-xref t)                   ; Use xref to find references
+  (lsp-auto-configure t)                ; Used to decide between current active servers
+  (lsp-eldoc-enable-hover t)            ; Display signature information in the echo area
+  (lsp-enable-dap-auto-configure t)     ; Debug support
+  (lsp-enable-file-watchers nil)
+  (lsp-enable-folding nil)              ; I disable folding since I use origami
+  (lsp-enable-imenu t)
+  (lsp-enable-indentation nil)          ; I use prettier
+  (lsp-enable-links nil)                ; No need since we have `browse-url'
+  (lsp-enable-on-type-formatting nil)   ; Prettier handles this
+  (lsp-enable-suggest-server-download t) ; Useful prompt to download LSP providers
+  (lsp-enable-symbol-highlighting t)     ; Shows usages of symbol at point in the current buffer
+  (lsp-enable-text-document-color nil)   ; This is Treesitter's job
+
+  (lsp-ui-sideline-show-hover nil)      ; Sideline used only for diagnostics
+  (lsp-ui-sideline-diagnostic-max-lines 20) ; 20 lines since typescript errors can be quite big
+  ;; completion
+  (lsp-completion-enable t)
+  (lsp-completion-enable-additional-text-edit t) ; Ex: auto-insert an import for a completion candidate
+  (lsp-enable-snippet t)                         ; Important to provide full JSX completion
+  (lsp-completion-show-kind t)                   ; Optional
+  ;; headerline
+  (lsp-headerline-breadcrumb-enable t)  ; Optional, I like the breadcrumbs
+  (lsp-headerline-breadcrumb-enable-diagnostics nil) ; Don't make them red, too noisy
+  (lsp-headerline-breadcrumb-enable-symbol-numbers nil)
+  (lsp-headerline-breadcrumb-icons-enable nil)
+  ;; modeline
+  (lsp-modeline-code-actions-enable nil) ; Modeline should be relatively clean
+  (lsp-modeline-diagnostics-enable nil)  ; Already supported through `flycheck'
+  (lsp-modeline-workspace-status-enable nil) ; Modeline displays "LSP" when lsp-mode is enabled
+  (lsp-signature-doc-lines 1)                ; Don't raise the echo area. It's distracting
+  (lsp-ui-doc-use-childframe t)              ; Show docs for symbol at point
+  (lsp-eldoc-render-all nil)            ; This would be very useful if it would respect `lsp-signature-doc-lines', currently it's distracting
+  ;; lens
+  (lsp-lens-enable nil)                 ; Optional, I don't need it
+  ;; semantic
+  (lsp-semantic-tokens-enable nil)      ; Related to highlighting, and we defer to treesitter
+
+  :init
+  (setq lsp-use-plists t))
+
+(use-package lsp-completion
+  :no-require
+  :hook ((lsp-mode . lsp-completion-mode)))
+
+(use-package lsp-ui
+  :straight t
+  :commands
+  (lsp-ui-doc-show
+   lsp-ui-doc-glance)
+  :bind (:map lsp-mode-map
+              ("C-c C-d" . 'lsp-ui-doc-glance))
+  :after (lsp-mode evil)
+  :config (setq lsp-ui-doc-enable t
+                evil-lookup-func #'lsp-ui-doc-glance ; Makes K in evil-mode toggle the doc for symbol at point
+                lsp-ui-doc-show-with-cursor nil      ; Don't show doc when cursor is over symbol - too distracting
+                lsp-ui-doc-include-signature t       ; Show signature
+                lsp-ui-doc-position 'at-point))
 
 ;; Example: Configure the "flycheck" package for syntax checking.
 ;; (use-package flycheck
