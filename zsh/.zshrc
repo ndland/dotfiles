@@ -1,3 +1,5 @@
+# Add deno completions to search path
+if [[ ":$FPATH:" != *":/home/ndland/.zsh/completions:"* ]]; then export FPATH="/home/ndland/.zsh/completions:$FPATH"; fi
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -160,7 +162,8 @@ else
   export ZK_NOTEBOOK_DIR="$HOME/code/github.com/ndland/zk/"  # Update this to your path
 fi
 
-PATH=~/.console-ninja/.bin:$PATH
+
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+. "/home/ndland/.deno/env"
