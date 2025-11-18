@@ -7,6 +7,7 @@ return {
 	opts = {
 		dashboard = { example = "github" },
 		explorer = { enabled = true },
+		image = {},
 		input = { enabled = true },
 		notifier = {
 			enabled = true,
