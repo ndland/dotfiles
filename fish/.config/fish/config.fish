@@ -4,7 +4,7 @@ if status is-interactive
 
     # Commands to run in interactive sessions can go here
     # Initialize oh-my-posh with custom theme
-    oh-my-posh init fish --config ~/my_theme.yml | source
+    oh-my-posh init fish --config ~/.config/fish/my_theme.yml | source
 end
 
 # Wrapper function to update POSH_GITHUB_USER when gh auth switch is run
