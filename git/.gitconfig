@@ -20,4 +20,3 @@
   cmd = nvim -n -c "DiffviewOpen" "$MERGE"
 [fetch]
 	prune = true
-
