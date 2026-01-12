@@ -1,6 +1,15 @@
 font-family="'Iosevka Nerd Font Mono', 'JetBrainsMono Nerd Font', 'Monaspace Xenon Var'"
 theme = catppuccin-macchiato
 font-size = 13
+background-opacity = 0.95
+
+# Terminal behavior
+scrollback-limit = 10000
+mouse-hide-while-typing = true
+confirm-close-surface = false
+
+# Shell Integration
+shell-integration = fish
 
 # This is the configuration file for Ghostty.
 #
