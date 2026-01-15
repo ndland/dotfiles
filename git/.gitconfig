@@ -27,3 +27,5 @@
 	diffFilter = diff-so-fancy --patch
 [diff]
 	tool = vscode
+[difftool "vscode"]
+	cmd = code --wait --diff $LOCAL $REMOTE
