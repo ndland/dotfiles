@@ -1,61 +1,26 @@
 if status is-interactive
-    # Set POSH_GITHUB_USER environment variable
-    set -gx POSH_GITHUB_USER (gh api user --jq .login 2>/dev/null; or echo "unknown")
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
-    # Commands to run in interactive sessions can go here
-    # Initialize oh-my-posh with custom theme
-    oh-my-posh init fish --config ~/.config/fish/my_theme.yml | source
-end
+  # Commands to run in interactive sessions can go here
+  # Initialize oh-my-posh with custom theme
+  oh-my-posh init fish --config ~/.config/fish/my_theme.yml | source
 
-# Cache the last update time to avoid excessive API calls
-set -g __github_user_last_update 0
-set -g __github_user_cache_ttl 300  # 5 minutes
-
-# Get GitHub user with error handling
-function __get_github_user
-    gh api user --jq .login 2>/dev/null; or echo "unknown"
-end
-
-# Update GitHub user, but only if cache is stale
-function __update_github_user_cached
-    set current_time (date +%s)
-    set time_since_update (math "$current_time - $__github_user_last_update")
-    
-    if test $time_since_update -gt $__github_user_cache_ttl
-        set new_user (__get_github_user)
-        # Only update cache timestamp if we got a valid response
-        if test "$new_user" != "unknown"
-            set -gx POSH_GITHUB_USER $new_user
-            set -g __github_user_last_update $current_time
-        end
-    end
-end
-
-# Hook to update POSH_GITHUB_USER before each prompt render (with caching)
-function __update_github_user --on-event fish_prompt
-    __update_github_user_cached
-end
-
-# Wrapper function to update POSH_GITHUB_USER when gh auth commands are run
-function gh --wraps=gh
+  # Wrapper function to update POSH_GITHUB_USER when gh auth switch is run
+  function gh --wraps=gh
     command gh $argv
-    # Update POSH_GITHUB_USER after any auth command (switch, login, logout, refresh, etc.)
-    if test "$argv[1]" = "auth"
-        set new_user (command gh api user --jq .login 2>/dev/null; or echo "unknown")
-        if test "$new_user" != "unknown"
-            set -gx POSH_GITHUB_USER $new_user
-            set -g __github_user_last_update (date +%s)
-        end
+    if test "$argv[1]" = "auth" -a "$argv[2]" = "switch"
+      set -gx POSH_GITHUB_USER (command gh api user --jq .login)
     end
-end
+  end
 
-function y
-	set tmp (mktemp -t "yazi-cwd.XXXXXX")
-	yazi $argv --cwd-file="$tmp"
-	if read -z cwd < "$tmp"; and [ -n "$cwd" ]; and [ "$cwd" != "$PWD" ]
-		builtin cd -- "$cwd"
-	end
-	rm -f -- "$tmp"
+  function y
+    set tmp (mktemp -t "yazi-cwd.XXXXXX")
+    yazi $argv --cwd-file="$tmp"
+    if read -z cwd < "$tmp"; and [ -n "$cwd" ]; and [ "$cwd" != "$PWD" ]
+      builtin cd -- "$cwd"
+    end
+    rm -f -- "$tmp"
+  end
 end
 
 # Completion for yarn test:unit --scope

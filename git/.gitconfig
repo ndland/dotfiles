@@ -9,10 +9,11 @@
 	helper = !/home/linuxbrew/.linuxbrew/bin/gh auth git-credential
 [core]
 	autocrlf = input
+	pager = diff-so-fancy | less --tabs=4 -RFX
 [init]
 	defaultBranch = main
 [merge]
-  tool = diffview
+	tool = vscode
 [mergetool]
   prompt = false
   keepBackup = false
@@ -20,3 +21,9 @@
   cmd = nvim -n -c "DiffviewOpen" "$MERGE"
 [fetch]
 	prune = true
+[mergetool "vscode"]
+	cmd = code --wait $MERGED
+[interactive]
+	diffFilter = diff-so-fancy --patch
+[diff]
+	tool = vscode
