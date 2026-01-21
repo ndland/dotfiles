@@ -59,5 +59,7 @@ function __fish_yarn_test_unit_scopes
     end
 end
 
+source "$HOME/.config/fish/conf.d/fzf-git.fish"
+
 # Complete --scope flag for yarn test:unit
 complete -c yarn -n '__fish_seen_subcommand_from test:unit' -l scope -r -a '(__fish_yarn_test_unit_scopes)' -d 'Package scope'
