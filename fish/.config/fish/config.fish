@@ -1,5 +1,16 @@
 if status is-interactive
-  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+  # Initialize Homebrew (check common paths for macOS and Linux)
+  set -l brew_path ""
+  if test -f /opt/homebrew/bin/brew
+    set brew_path /opt/homebrew/bin/brew
+  else if test -f /usr/local/bin/brew
+    set brew_path /usr/local/bin/brew
+  else if test -f /home/linuxbrew/.linuxbrew/bin/brew
+    set brew_path /home/linuxbrew/.linuxbrew/bin/brew
+  end
+  if test -n "$brew_path"
+    eval ($brew_path shellenv)
+  end
 
   # Commands to run in interactive sessions can go here
   # Initialize oh-my-posh with custom theme
