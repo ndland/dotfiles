@@ -1,4 +1,4 @@
-font-family="'Iosevka Nerd Font Mono', 'JetBrainsMono Nerd Font', 'Monaspace Xenon Var'"
+font-family="'JetBrainsMono Nerd Font', 'Iosevka Nerd Font Mono', 'Monaspace Xenon Var'"
 theme = catppuccin-macchiato
 font-size = 13
 background-opacity = 0.95
