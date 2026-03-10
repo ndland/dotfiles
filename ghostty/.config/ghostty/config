@@ -3,7 +3,7 @@ font-family-italic="IosevkaTerm NFM Italic"
 font-family="JetBrainsMono NFM"
 font-family-italic="JetBrainsMono NFM Italic"
 theme = TokyoNight Storm
-font-size = 15
+font-size = 14
 background-opacity = 0.95
 
 # Terminal behavior
