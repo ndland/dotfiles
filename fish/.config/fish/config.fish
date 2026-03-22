@@ -14,7 +14,8 @@ if status is-interactive
 
   # Commands to run in interactive sessions can go here
   # Initialize oh-my-posh with custom theme
-  oh-my-posh init fish --config ~/.config/fish/my_theme.yml | source
+  # oh-my-posh init fish --config ~/.config/fish/my_theme.yml | source
+  oh-my-posh init fish --config 'dracula' | source
 
   # Wrapper function to update POSH_GITHUB_USER when gh auth switch is run
   function gh --wraps=gh
@@ -70,7 +71,9 @@ function __fish_yarn_test_unit_scopes
     end
 end
 
-source "$HOME/.config/fish/conf.d/fzf-git.fish"
+fnm env --use-on-cd | source
 
 # Complete --scope flag for yarn test:unit
 complete -c yarn -n '__fish_seen_subcommand_from test:unit' -l scope -r -a '(__fish_yarn_test_unit_scopes)' -d 'Package scope'
+
+export PATH="$HOME/.local/bin:$PATH"
