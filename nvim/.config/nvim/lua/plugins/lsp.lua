@@ -22,6 +22,7 @@ return {
 			ensure_installed = {
 				"astro",
 				"cssls",
+				"eslint",
 				"html",
 				"tailwindcss",
 				"ts_ls",
@@ -99,6 +100,10 @@ return {
 				capabilities = capabilities,
 			})
 
+			vim.lsp.config("eslint", {
+				capabilities = capabilities,
+			})
+
 			vim.lsp.config("html", {
 				capabilities = capabilities,
 			})
@@ -148,6 +153,7 @@ return {
 			vim.lsp.enable("html")
 			vim.lsp.enable("cssls")
 			vim.lsp.enable("astro")
+			vim.lsp.enable("eslint")
 			vim.lsp.enable("tailwindcss")
 		end,
 	},
