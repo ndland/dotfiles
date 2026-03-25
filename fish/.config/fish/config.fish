@@ -12,10 +12,7 @@ if status is-interactive
     eval ($brew_path shellenv)
   end
 
-  # Commands to run in interactive sessions can go here
-  # Initialize oh-my-posh with custom theme
-  # oh-my-posh init fish --config ~/.config/fish/my_theme.yml | source
-  oh-my-posh init fish --config 'dracula' | source
+  starship init fish | source
 
   # Wrapper function to update POSH_GITHUB_USER when gh auth switch is run
   function gh --wraps=gh
@@ -70,6 +67,19 @@ function __fish_yarn_test_unit_scopes
         end
     end
 end
+
+# WezTerm-specific aliases
+if set -q WEZTERM_EXECUTABLE
+  # WezTerm-aware cd (updates pane title)
+  function wez-cd
+    cd $argv
+    wezterm cli set-notes -- pane-id (wezterm cli list --format json | jq -r '.[] | select(.foreground_process_name=="fish") | .pane_id')
+  end
+end
+
+# Neovim as default editor
+set -gx EDITOR nvim
+set -gx VISUAL nvim
 
 fnm env --use-on-cd | source
 
