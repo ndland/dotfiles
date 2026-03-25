@@ -2,7 +2,7 @@ font-family="IosevkaTerm NFM"
 font-family-italic="IosevkaTerm NFM Italic"
 font-family="JetBrainsMono NFM"
 font-family-italic="JetBrainsMono NFM Italic"
-theme = TokyoNight Storm
+theme = Dracula
 font-size = 14
 background-opacity = 0.95
 
