@@ -17,4 +17,5 @@ return {
 		max_width_window_percentage = nil,
 		max_height_window_percentage = 50,
 	},
+	enabled = false,
 }
