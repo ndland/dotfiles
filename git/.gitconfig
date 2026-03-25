@@ -1,31 +1,58 @@
-[user]
-	name = Nick Land
-	email = land.d.nicholas@gmail.com
-[credential "https://github.com"]
-	helper = 
-	helper = !/home/linuxbrew/.linuxbrew/bin/gh auth git-credential
-[credential "https://gist.github.com"]
-	helper = 
-	helper = !/home/linuxbrew/.linuxbrew/bin/gh auth git-credential
+[includeIf "gitdir:~/code/personal/"]
+  path = ~/.gitconfig-personal
+
+[includeIf "gitdir:~/code/work/"]
+  path = ~/.gitconfig-work
+
 [core]
-	autocrlf = input
-	pager = diff-so-fancy | less --tabs=4 -RFX
-[init]
-	defaultBranch = main
-[merge]
-	tool = vscode
-[mergetool]
-  prompt = false
-  keepBackup = false
-[mergetool "diffview"]
-  cmd = nvim -n -c "DiffviewOpen" "$MERGE"
-[fetch]
-	prune = true
-[mergetool "vscode"]
-	cmd = code --wait $MERGED
+  editor = nvim
+  pager = delta
+
 [interactive]
-	diffFilter = diff-so-fancy --patch
+  diffFilter = delta --color-only --syntax-theme=Dracula
+
+[gpg]
+  format = ssh
+  program = gpg
+
+[gpg "ssh"]
+  program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+  allowedSignersFile = 
+
+[commit]
+  gpgSign = true
+
+[alias]
+  lg = log --graph --decorate --oneline --all --pretty=format:'%C(auto)%h %d %s %C(blue)<%an> %C(green)(%cr)'
+
+[tag]
+  forceSignAnnotated = false
+
+[delta]
+  syntax-theme = Dracula
+  line-numbers = true
+  side-by-side = true
+  navigate = true
+  dark = true
+
 [diff]
-	tool = vscode
-[difftool "vscode"]
-	cmd = code --wait --diff $LOCAL $REMOTE
+	tool = nvimdiff
+
+[difftool]
+	prompt = false
+	trustExitCode = true
+
+[difftool "nvimdiff"]
+	cmd = nvim -d "$LOCAL" "$REMOTE"
+
+[merge]
+	tool = nvimdiff
+	conflictstyle = zdiff3
+
+[mergetool]
+	prompt = false
+	keepBackup = false
+
+[mergetool "nvimdiff"]
+	cmd = nvim -d "$LOCAL" "$MERGED" "$REMOTE" "$BASE"
+	trustExitCode = true
