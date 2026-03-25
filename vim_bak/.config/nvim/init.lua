@@ -1,2 +1,2 @@
-require("ndland.core")
-require("ndland.lazy")
+require("config.options")
+require("config.lazy")
