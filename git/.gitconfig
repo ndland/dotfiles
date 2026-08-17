@@ -34,23 +34,23 @@
   dark = true
 
 [diff]
-	tool = nvimdiff
+  tool = cursor
 
 [difftool]
-	prompt = false
-	trustExitCode = true
+  prompt = false
+  trustExitCode = true
 
-[difftool "nvimdiff"]
-	cmd = nvim -d "$LOCAL" "$REMOTE"
+[difftool "cursor"]
+  cmd = cursor --wait --diff "$LOCAL" "$REMOTE"
 
 [merge]
-	tool = nvimdiff
-	conflictstyle = zdiff3
+  tool = cursor
+  conflictstyle = zdiff3
 
 [mergetool]
-	prompt = false
-	keepBackup = false
+  prompt = false
+  keepBackup = false
 
-[mergetool "nvimdiff"]
-	cmd = nvim -d "$LOCAL" "$MERGED" "$REMOTE" "$BASE"
-	trustExitCode = true
+[mergetool "cursor"]
+  cmd = cursor --wait --merge "$REMOTE" "$LOCAL" "$BASE" "$MERGED"
+  trustExitCode = true
