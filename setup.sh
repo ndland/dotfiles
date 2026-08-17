@@ -1,66 +1,104 @@
 #!/usr/bin/env bash
+# Bootstrap this machine from the repo: Homebrew, bundle, stow configs, fish login shell.
+#
+# New Mac: xcode-select --install, clone this repo, ./setup.sh
+# Existing Mac: git pull && ./setup.sh
 
-# This script installs Homebrew formulae and symlinks the nvim directory using GNU Stow.
+set -euo pipefail
 
-# Exit immediately if a command exits with a non-zero status.
-set -e
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BREWFILE="${REPO_ROOT}/.Brewfile"
+TARGET="${HOME}"
+HOMEBREW_INSTALL_URL='https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh'
 
-# --- Configuration ---
-# Set the desired formulae to install
-formulae=(
-  'fzf'
-  'gh'
-  'neovim'
-  'ripgrep'
-  'stow'
-)
+brew_executable() {
+  if [[ -x /opt/homebrew/bin/brew ]]; then
+    echo /opt/homebrew/bin/brew
+  elif [[ -x /usr/local/bin/brew ]]; then
+    echo /usr/local/bin/brew
+  elif command -v brew >/dev/null 2>&1; then
+    command -v brew
+  fi
+}
 
-# Set the source and destination directories for stow
-stow_dir="$HOME/dotfiles"
-nvim_dir="vim"
+require_homebrew() {
+  local brew_path
+  brew_path="$(brew_executable || true)"
 
-# Function to install Homebrew formulae
+  if [[ -z "${brew_path}" ]]; then
+    echo "Installing Homebrew..."
+    /bin/bash -c "$(curl -fsSL "${HOMEBREW_INSTALL_URL}")"
+    brew_path="$(brew_executable || true)"
+  fi
+
+  if [[ -z "${brew_path}" ]]; then
+    echo "Homebrew is not installed. Install it from https://brew.sh then re-run $0." >&2
+    exit 1
+  fi
+
+  eval "$("${brew_path}" shellenv)"
+}
+
 install_formulae() {
-  echo "Installing Homebrew formulae..."
-  for formula in "${formulae[@]}"; do
-    if brew list --formula | grep -q "$formula"; then
-      echo "  $formula is already installed. Skipping..."
-    else
-      echo "  Installing $formula..."
-      brew install "$formula"
-    fi
+  if [[ ! -f "${BREWFILE}" ]]; then
+    echo "Missing ${BREWFILE}." >&2
+    exit 1
+  fi
+
+  echo "Installing Homebrew formulae from ${BREWFILE}..."
+  brew bundle --file="${BREWFILE}"
+}
+
+stow_packages() {
+  if ! command -v stow >/dev/null 2>&1; then
+    echo "GNU Stow is not installed. Add it to .Brewfile and re-run $0." >&2
+    exit 1
+  fi
+
+  echo "Symlinking packages into ${TARGET}..."
+
+  local pkg_dir pkg
+  for pkg_dir in "${REPO_ROOT}"/*/; do
+    pkg="$(basename "${pkg_dir}")"
+    echo "  stow ${pkg}"
+    stow --dir="${REPO_ROOT}" --target="${TARGET}" --restow "${pkg}"
   done
 }
 
-# Function to symlink nvim config with stow
-symlink_nvim() {
-  if ! command -v stow &> /dev/null; then
-    echo "GNU Stow not found. Please install it with 'brew install stow'."
+install_fish_plugins() {
+  if ! command -v fish >/dev/null 2>&1; then
+    return
+  fi
+
+  echo "Installing fish plugins..."
+  fish -c "fisher update" || echo "fisher update skipped."
+}
+
+set_login_shell() {
+  local fish_path
+  fish_path="$(command -v fish || true)"
+
+  if [[ -z "${fish_path}" ]]; then
+    echo "fish is not installed. Add it to .Brewfile and re-run $0." >&2
     exit 1
   fi
 
-  if [[ ! -d "$stow_dir/$nvim_dir" ]]; then
-    echo "The '$stow_dir/$nvim_dir' directory does not exist. Please ensure your dotfiles are in place."
-    exit 1
+  local current=""
+  current="$(dscl . -read "${HOME}" UserShell 2>/dev/null | awk '{print $2}' || true)"
+
+  if [[ "${current}" == "${fish_path}" || "${SHELL}" == "${fish_path}" ]]; then
+    echo "Login shell is already ${fish_path}."
+    return
   fi
 
-  echo "Symlinking $nvim_dir using stow..."
-  cd "$stow_dir"
-  stow "$nvim_dir" -t $HOME
-  echo "Symlinking complete."
+  echo "Setting login shell to ${fish_path}..."
+  chsh -s "${fish_path}"
 }
 
-install_colorscript() {
-  git clone https://gitlab.com/dwt1/shell-color-scripts.git
-  cd shell-color-scripts
-  sudo make install
-}
-
-chsh -s $(which fish)
-
-# --- Execution ---
+require_homebrew
 install_formulae
-symlink_nvim
-install_colorscript
+stow_packages
+install_fish_plugins
+set_login_shell
 
-echo "Script finished successfully! 🎉"
+echo "Done."

@@ -1,83 +1,66 @@
-tap "homebrew/bundle"
-tap "homebrew/cask-fonts"
-tap "homebrew/cask-versions"
+# Bootstrap set for a new Mac. Audited against this machine's brew leaves,
+# fish history, and app last-used dates. Not a dump of every library.
 
-brew "bat-extras"
-brew "bat"
-brew "bitwarden-cli"
-brew "buku"
-brew "cask"
-brew "diff-so-fancy"
-brew "exa"
-brew "fd"
+# Shell and prompt
+brew "fish"
+brew "fisher"
+brew "oh-my-posh"
+brew "direnv"
 brew "fnm"
-brew "fzf"
-brew "gh"
-brew "git"
-brew "git-flow-avh"
-brew "gitlint"
-brew "gnupg"
-brew "gnutls"
-brew "go"
-brew "gpg"
-brew "jq"
-brew "lazygit"
-brew "mas"
-brew "neovim"
-brew "openssl@3"
-brew "pinentry-mac"
-brew "ripgrep"
-brew "thefuck"
-brew "tldr"
-brew "wget"
-brew "yadm"
-brew "zsh"
-brew "zsh-completions"
 brew "zoxide"
-# brew "watch"
 
-cask "bitwarden"
-# cask "firefox-developer-edition"
-# cask "firefox"
+# Editor and file tools (y, lg, ls, bat, vale, zk)
+brew "neovim"
+brew "yazi"
+brew "ffmpeg-full"
+brew "imagemagick-full"
+brew "poppler"
+brew "resvg"
+brew "sevenzip"
+brew "lazygit"
+brew "eza"
+brew "bat"
+brew "vale"
+brew "zk"
+brew "buku"
+brew "btop"
+
+# Git and GitHub
+brew "git"
+brew "git-delta"
+brew "gh"
+brew "act"
+brew "beads"
+brew "jfrog-cli"
+
+# Search / fuzzy / JSON
+brew "ripgrep"
+brew "fd"
+brew "fzf"
+brew "jq"
+
+# Bootstrap and misc
+brew "stow"
+brew "tmux"
+brew "uv"
+brew "wget"
+brew "task"
+
+# GUI — used in the last few weeks
+cask "1password"
+cask "brave-browser"
+cask "cursor"
+cask "cursor-cli"
+cask "docker-desktop"
 cask "dracula-insomnia"
-cask "font-anonymice-nerd-font"
-cask "font-caskaydia-cove-nerd-font"
-cask "font-hack-nerd-font"
-cask "gitkraken"
-cask "google-chrome-canary"
-cask "google-chrome-dev"
-cask "google-chrome"
+cask "fantastical"
+cask "ghostty"
 cask "insomnia"
-cask "iterm2"
-cask "jetbrains-toolbox"
-# cask "logseq"
-cask "microsoft-excel"
 cask "obsidian"
-# cask "rancher"
-cask "qcad"
 cask "raycast"
-cask "thingsmacsandboxhelper"
-# cask "tuxguitar"
-cask "visual-studio-code"
+cask "wezterm@nightly"
 
-if 'GMMACANCN6345JM' == `scutil --get HostName`.strip
-  brew "maven"
-  brew "dracula/install/dracula-git"
-else
-  cask "blender"
-  cask "calibre"
-  cask "forklift"
-  cask "freecad"
-  cask "guitar-pro"
-  cask "inkscape"
-  cask "librecad"
-  cask "thunderbird"
-
-  # Install apps from the app store
-  mas "Day One", id: 1055511498
-  mas "Omnivore", id: 1564031042
-  mas "Things 3", id: 904280696
-  mas "Xcode", id: 497799835
-end
-
-
+# Fonts used by WezTerm and Cursor
+cask "font-iosevka-etoile"
+cask "font-iosevka-nerd-font"
+cask "font-iosevka-term-nerd-font"
