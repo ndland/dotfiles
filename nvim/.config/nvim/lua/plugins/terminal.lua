@@ -2,12 +2,54 @@ return {
 	{
 		"akinsho/toggleterm.nvim",
 		version = "*",
-		cmd = { "ToggleTerm", "TermExec" },
+		cmd = { "ToggleTerm", "TermExec", "ToggleTermToggleAll", "TermSelect" },
 		keys = {
 			{ "<leader>tt", "<cmd>ToggleTerm direction=float<cr>", desc = "Toggle terminal" },
 			{ "<leader>tf", "<cmd>ToggleTerm direction=float<cr>", desc = "Float terminal" },
 			{ "<leader>th", "<cmd>ToggleTerm direction=horizontal size=15<cr>", desc = "Horizontal terminal" },
 			{ "<leader>tv", "<cmd>ToggleTerm direction=vertical size=60<cr>", desc = "Vertical terminal" },
+			{
+				"<leader>tn",
+				function()
+					local Terminal = require("toggleterm.terminal").Terminal
+					local terms = require("toggleterm.terminal").get_all()
+					local used = {}
+
+					for _, term in pairs(terms) do
+						if term.count then
+							used[term.count] = true
+						end
+					end
+
+					local count = 1
+					while used[count] do
+						count = count + 1
+					end
+
+					local term = Terminal:new({
+						count = count,
+						direction = "float",
+						hidden = false,
+						close_on_exit = false,
+						float_opts = {
+							border = "rounded",
+						},
+					})
+
+					term:toggle()
+				end,
+				desc = "New terminal",
+			},
+			{
+				"<leader>ts",
+				"<cmd>TermSelect<cr>",
+				desc = "Select terminal",
+			},
+			{
+				"<leader>ta",
+				"<cmd>ToggleTermToggleAll<cr>",
+				desc = "Toggle all terminals",
+			},
 			{
 				"<leader>tg",
 				function()
@@ -58,6 +100,7 @@ return {
 				dir = "git_dir",
 				direction = "float",
 				hidden = true,
+				close_on_exit = false,
 				float_opts = {
 					border = "rounded",
 				},

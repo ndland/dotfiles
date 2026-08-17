@@ -26,10 +26,10 @@ return {
 		opts = {
 			picker = "telescope",
 			enable_builtin = true,
-		},
-		ssh_aliases = {
-			workgit = "github.com",
-			personalGit = "github.com",
+			ssh_aliases = {
+				["workgit"] = "github.com",
+				["personalgit"] = "github.com",
+			},
 		},
 	},
 }
