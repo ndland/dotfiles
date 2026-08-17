@@ -1,7 +1,43 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json
 # Dracula palette — https://draculatheme.com — segment text on dark #282a36 (Background)
-# Taskwarrior “current task” = started task (+ACTIVE); run `task <id> start` to set.
 # Use alignment: right (not type: rprompt): fish draws fish_right_prompt on the cursor line, so rprompt would move to line 2 with a multiline prompt.
+#
+# Git tuning: keep the primary segment cheap; detailed status is shown on demand via tooltips.
+# Path style folder: show only the current directory, without leading `../..` parents.
+
+transient_prompt:
+    foreground: '#f8f8f2'
+    background: transparent
+    template: '❯ '
+
+tooltips_action: prepend
+tooltips:
+    - type: git
+      tips:
+        - git
+        - g
+        - lg
+        - lazygit
+      style: diamond
+      leading_diamond: 
+      trailing_diamond: 
+      foreground: '#282a36'
+      background: '#bd93f9'
+      template: ' {{ .RepoName }}{{ if .RelativeDir }}/{{ .RelativeDir }}{{ end }} {{ if .Detached }}{{ .Ref }}{{ else }}{{ .HEAD }}{{ end }}{{ if .Working.Changed }}  {{ .Working.String }}{{ end }}{{ if .Staging.Changed }}  {{ .Staging.String }}{{ end }}{{ if gt .StashCount 0 }}  {{ .StashCount }}{{ end }}{{ if gt .WorktreeCount 0 }}  {{ .WorktreeCount }}{{ end }} '
+      timeout: 3000
+      options:
+        fetch_status: true
+        branch_template: '{{ .Branch }}'
+        mapped_branches:
+            bug/*: "\U0001F41B "
+            feature/*: "\U0001F680 "
+        untracked_modes:
+            '*': 'normal'
+      background_templates:
+        - '{{ if or (.Working.Changed) (.Staging.Changed) }}#bd93f9{{ end }}'
+        - '{{ if and (gt .Ahead 0) (gt .Behind 0) }}#bd93f9{{ end }}'
+        - '{{ if gt .Ahead 0 }}#8be9fd{{ end }}'
+        - '{{ if gt .Behind 0 }}#ff5555{{ end }}'
 
 blocks:
     - type: prompt
@@ -14,6 +50,9 @@ blocks:
           background: '#ffb86c'
           type: session
           style: diamond
+          cache:
+            duration: 24h
+            strategy: session
         - options:
             style: folder
           trailing_diamond: 
@@ -23,23 +62,20 @@ blocks:
           type: path
           style: diamond
         - options:
-            fetch_status: true
+            fetch_status: false
             fetch_upstream_icon: true
             branch_template: '{{ abbrev 32 .Branch }}'
             mapped_branches:
                 bug/*: "\U0001F41B "
                 feature/*: "\U0001F680 "
-            # source: cli
-            untracked_modes:
-                /Users/user/Projects/oh-my-posh/: "no"
           trailing_diamond: 
-          template: '{{ .UpstreamIcon }}{{ .HEAD }}{{if .BranchStatus }} {{ .BranchStatus }}{{ end }}{{ if .Working.Changed }}  {{ .Working.String }}{{ end }}{{ if and (.Working.Changed) (.Staging.Changed) }} |{{ end }}{{ if .Staging.Changed }}  {{ .Staging.String }}{{ end }}{{ if gt .StashCount 0 }}  {{ .StashCount }}{{ end }}'
+          template: '{{ .UpstreamIcon }}{{ if .Detached }}{{ abbrev 7 .Ref }}{{ else }}{{ abbrev 32 .Ref }}{{ end }}{{if .BranchStatus }} {{ .BranchStatus }}{{ end }}'
           foreground: '#282a36'
           background: '#bd93f9'
           type: git
           style: diamond
+          timeout: 500
           background_templates:
-            - '{{ if or (.Working.Changed) (.Staging.Changed) }}#bd93f9{{ end }}'
             - '{{ if and (gt .Ahead 0) (gt .Behind 0) }}#bd93f9{{ end }}'
             - '{{ if gt .Ahead 0 }}#8be9fd{{ end }}'
             - '{{ if gt .Behind 0 }}#ff5555{{ end }}'
@@ -49,25 +85,19 @@ blocks:
           background: '#50fa7b'
           type: node
           style: diamond
+          cache:
+            duration: 1h
+            strategy: folder
     - type: prompt
       alignment: right
       overflow: hide
       segments:
         - leading_diamond: 
-          template: ' {{ .Env.POSH_GITHUB_USER }} '
+          template: '{{ if .Env.POSH_GITHUB_USER }} {{ .Env.POSH_GITHUB_USER }} {{ end }}'
           foreground: '#282a36'
           background: '#f1fa8c'
           type: text
           style: diamond
-        - leading_diamond: 
-          template: ' {{ if .Commands.Active }}{{ $tasks := .Commands.Active | fromJson }}{{ if gt (len $tasks) 0 }}{{ "\uf4a0" }} {{ index (index $tasks 0) "description" | trunc 70 }}{{ end }}{{ end }}'
-          foreground: '#282a36'
-          background: '#ff79c6'
-          type: taskwarrior
-          style: diamond
-          options:
-            commands:
-              active: "+ACTIVE +PENDING limit:1 export"
         - options:
             time_format: "15:04:05"
           leading_diamond: 
@@ -81,9 +111,26 @@ blocks:
       alignment: left
       newline: true
       segments:
+        - type: status
+          style: diamond
+          leading_diamond: 
+          trailing_diamond: 
+          foreground: '#f8f8f2'
+          background: '#ff5555'
+          template: '  {{ .String }} '
+        - type: executiontime
+          style: diamond
+          leading_diamond: 
+          trailing_diamond: 
+          foreground: '#282a36'
+          background: '#6272a4'
+          template: '  {{ .FormattedMs }} '
+          options:
+            threshold: 2000
+            style: austin
         - type: text
           style: plain
           foreground: '#f8f8f2'
-          template: '❯ '
+          template: '❯'
 version: 4
 final_space: true
