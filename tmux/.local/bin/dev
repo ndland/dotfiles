@@ -1,0 +1,136 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+discover_repositories() {
+    [[ -d "$HOME/code" ]] || return
+
+    find "$HOME/code" \
+        -mindepth 2 \
+        -maxdepth 8 \
+        -type d \
+        -name .git \
+        -printf '%h\n' \
+        2>/dev/null |
+        sort -u
+}
+
+select_repository() {
+    local query="${1:-}"
+
+    if [[ "$query" == "." ]]; then
+        git rev-parse --show-toplevel 2>/dev/null || pwd
+        return
+    fi
+
+    if [[ -n "$query" && -d "$query" ]]; then
+        realpath "$query"
+        return
+    fi
+
+    local repositories
+    repositories="$(discover_repositories)"
+
+    if [[ -z "$repositories" ]]; then
+        echo "No Git repositories found beneath ~/code." >&2
+        exit 1
+    fi
+
+    if [[ -n "$query" ]]; then
+        local matches
+
+        matches="$(
+            printf '%s\n' "$repositories" |
+                grep -i -- "$query" ||
+                true
+        )"
+
+        local count
+        count="$(
+            printf '%s\n' "$matches" |
+                sed '/^$/d' |
+                wc -l
+        )"
+
+        if [[ "$count" -eq 1 ]]; then
+            printf '%s\n' "$matches"
+            return
+        fi
+
+        printf '%s\n' "$matches" |
+            fzf \
+                --prompt="project> " \
+                --query="$query" \
+                --height=80% \
+                --reverse
+
+        return
+    fi
+
+    printf '%s\n' "$repositories" |
+        fzf \
+            --prompt="project> " \
+            --height=80% \
+            --reverse
+}
+
+SELECTED="$(
+    select_repository "${1:-}"
+)"
+
+[[ -n "$SELECTED" ]] || exit 0
+
+RELATIVE="${SELECTED#$HOME/}"
+
+SESSION="$(
+    printf '%s' "$RELATIVE" |
+        tr '/.' '__' |
+        tr -cd '[:alnum:]_-'
+)"
+
+SESSION="${SESSION:0:80}"
+SESSION="${SESSION:-dev}"
+
+if ! tmux has-session \
+    -t "$SESSION" \
+    2>/dev/null; then
+
+    tmux new-session \
+        -d \
+        -s "$SESSION" \
+        -c "$SELECTED" \
+        -n code
+
+    tmux send-keys \
+        -t "$SESSION:code" \
+        'nvim .' \
+        C-m
+
+    tmux new-window \
+        -d \
+        -t "$SESSION" \
+        -n agent \
+        -c "$SELECTED"
+
+    if command -v opencode >/dev/null 2>&1; then
+        tmux send-keys \
+            -t "$SESSION:agent" \
+            'opencode' \
+            C-m
+    fi
+
+    tmux new-window \
+        -d \
+        -t "$SESSION" \
+        -n run \
+        -c "$SELECTED"
+
+    tmux select-window \
+        -t "$SESSION:code"
+fi
+
+if [[ -n "${TMUX:-}" ]]; then
+    tmux switch-client -t "$SESSION"
+else
+    tmux attach-session -t "$SESSION"
+fi

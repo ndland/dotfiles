@@ -55,23 +55,51 @@ stow_packages() {
     exit 1
   fi
 
-  echo "Symlinking packages into ${TARGET}..."
+  echo "Symlinking tracked dotfile packages into ${TARGET}..."
 
-  local pkg_dir pkg
-  for pkg_dir in "${REPO_ROOT}"/*/; do
-    pkg="$(basename "${pkg_dir}")"
+  local pkg
+
+  while IFS= read -r pkg; do
+    [[ -n "${pkg}" ]] || continue
+
+    # Only directories containing tracked files are eligible packages.
+    # This prevents unrelated/untracked directories from being stowed.
+    if [[ ! -d "${REPO_ROOT}/${pkg}" ]]; then
+      continue
+    fi
+
     echo "  stow ${pkg}"
-    stow --dir="${REPO_ROOT}" --target="${TARGET}" --restow "${pkg}"
-  done
+
+    stow \
+      --no-folding \
+      --dir="${REPO_ROOT}" \
+      --target="${TARGET}" \
+      --restow \
+      "${pkg}"
+  done < <(
+    git -C "${REPO_ROOT}" ls-files \
+      | awk -F/ 'NF > 1 { print $1 }' \
+      | sort -u
+  )
 }
 
-install_fish_plugins() {
-  if ! command -v fish >/dev/null 2>&1; then
-    return
+
+install_mise_toolchain() {
+  local mise_path=""
+
+  if command -v mise >/dev/null 2>&1; then
+    mise_path="$(command -v mise)"
+  elif [[ -x "${HOME}/.local/bin/mise" ]]; then
+    mise_path="${HOME}/.local/bin/mise"
   fi
 
-  echo "Installing fish plugins..."
-  fish -c "fisher update" || echo "fisher update skipped."
+  if [[ -z "${mise_path}" ]]; then
+    echo "mise was expected from Homebrew but is unavailable." >&2
+    exit 1
+  fi
+
+  echo "Installing portable mise toolchain..."
+  "${mise_path}" install --yes
 }
 
 set_login_shell() {
@@ -98,7 +126,13 @@ set_login_shell() {
 require_homebrew
 install_formulae
 stow_packages
-install_fish_plugins
+install_mise_toolchain
+
+if [[ -x "${HOME}/.local/bin/configure-git-platform" ]]; then
+  echo "Configuring platform-specific Git/1Password integration..."
+  "${HOME}/.local/bin/configure-git-platform"
+fi
+
 set_login_shell
 
 echo "Done."

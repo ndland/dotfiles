@@ -1,0 +1,274 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+die() {
+    printf 'git-ssh-role: %s\n' "$*" >&2
+    exit 1
+}
+
+normalize_key() {
+    local value="$1"
+
+    value="${value#key::}"
+
+    if [[ -f "$value" ]]; then
+        value="$(cat "$value")"
+    fi
+
+    printf '%s\n' "$value" |
+        awk '
+            /^(ssh-|ecdsa-)/ {
+                print $1 " " $2
+                exit
+            }
+        '
+}
+
+key_from_config() {
+    local config="$1"
+    local raw=""
+
+    raw="$(
+        git config \
+            --file "$config" \
+            --get user.signingkey \
+            2>/dev/null || true
+    )"
+
+    [[ -n "$raw" ]] || return 1
+
+    normalize_key "$raw"
+}
+
+fingerprint_key() {
+    local key="$1"
+    local tmp
+
+    tmp="$(mktemp)"
+
+    printf '%s\n' "$key" > "$tmp"
+
+    ssh-keygen \
+        -E sha256 \
+        -lf "$tmp" \
+        2>/dev/null |
+        awk '{ print $2 }'
+
+    rm -f "$tmp"
+}
+
+PERSONAL_CONFIG="$HOME/.gitconfig-personal"
+WORK_CONFIG="$HOME/.gitconfig-work"
+
+[[ -f "$PERSONAL_CONFIG" ]] ||
+    die "missing $PERSONAL_CONFIG"
+
+[[ -f "$WORK_CONFIG" ]] ||
+    die "missing $WORK_CONFIG"
+
+PERSONAL_KEY="$(
+    key_from_config "$PERSONAL_CONFIG"
+)" || die "personal signing key unavailable"
+
+WORK_KEY="$(
+    key_from_config "$WORK_CONFIG"
+)" || die "work signing key unavailable"
+
+SELECTED_KEY=""
+ROLE=""
+
+EFFECTIVE_RAW="$(
+    git config \
+        --get user.signingkey \
+        2>/dev/null || true
+)"
+
+if [[ -n "$EFFECTIVE_RAW" ]]; then
+    EFFECTIVE_KEY="$(
+        normalize_key "$EFFECTIVE_RAW"
+    )"
+
+    if [[ "$EFFECTIVE_KEY" == "$PERSONAL_KEY" ]]; then
+        ROLE="personal"
+        SELECTED_KEY="$PERSONAL_KEY"
+
+    elif [[ "$EFFECTIVE_KEY" == "$WORK_KEY" ]]; then
+        ROLE="work"
+        SELECTED_KEY="$WORK_KEY"
+
+    else
+        die "repository resolves an unknown SSH signing identity"
+    fi
+else
+    # Clone/new-repository fallback:
+    # infer role only from an explicitly mapped parent tree.
+    case "$PWD/" in
+        "$HOME/code/personal/"*|\
+        "$HOME/code/github.com/ndland/"*|\
+        "$HOME/code/learning/"*)
+            ROLE="personal"
+            SELECTED_KEY="$PERSONAL_KEY"
+            ;;
+
+        "$HOME/code/work/"*)
+            ROLE="work"
+            SELECTED_KEY="$WORK_KEY"
+            ;;
+
+        *)
+            die "repository/path is not mapped to personal or work identity"
+            ;;
+    esac
+fi
+
+if [[ "${1:-}" == "--workstation-diagnose" ]]; then
+    printf 'role=%s\n' "$ROLE"
+    printf 'fingerprint=%s\n' \
+        "$(fingerprint_key "$SELECTED_KEY")"
+    exit 0
+fi
+
+[[ "$#" -gt 0 ]] ||
+    die "no SSH arguments supplied"
+
+cleanup_file=""
+
+cleanup() {
+    if [[ -n "$cleanup_file" ]]; then
+        rm -f "$cleanup_file" 2>/dev/null || true
+    fi
+}
+
+trap cleanup EXIT INT TERM
+
+UNAME="$(uname -s)"
+
+if [[ "$UNAME" == "Linux" ]] \
+    && grep -qiE 'microsoft|wsl' /proc/version 2>/dev/null; then
+
+    SSH_EXE=""
+
+    if command -v ssh.exe >/dev/null 2>&1; then
+        SSH_EXE="$(command -v ssh.exe)"
+    elif [[ -x /mnt/c/Windows/System32/OpenSSH/ssh.exe ]]; then
+        SSH_EXE="/mnt/c/Windows/System32/OpenSSH/ssh.exe"
+    fi
+
+    [[ -n "$SSH_EXE" ]] ||
+        die "Windows OpenSSH ssh.exe unavailable"
+
+    WIN_TEMP="$(
+        cmd.exe /d /c 'echo %TEMP%' \
+            2>/dev/null |
+            tr -d '\r' |
+            tail -n 1
+    )"
+
+    [[ -n "$WIN_TEMP" ]] ||
+        die "unable to resolve Windows TEMP"
+
+    WIN_TEMP_WSL="$(
+        wslpath -u "$WIN_TEMP"
+    )"
+
+    cleanup_file="$(
+        mktemp \
+            "$WIN_TEMP_WSL/git-ssh-role.XXXXXX.pub"
+    )"
+
+    printf '%s\n' "$SELECTED_KEY" \
+        > "$cleanup_file"
+
+    WINDOWS_PUBLIC="$(
+        wslpath -w "$cleanup_file"
+    )"
+
+    # GitHub gets a deliberately clean SSH configuration.
+    # This prevents a legacy Windows ~/.ssh/config IdentityFile
+    # from overriding role selection.
+    if printf ' %s ' "$*" | grep -qi 'github\.com'; then
+        "$SSH_EXE" \
+            -F NUL \
+            -o IdentitiesOnly=yes \
+            -i "$WINDOWS_PUBLIC" \
+            "$@"
+
+        exit $?
+    fi
+
+    # Preserve Windows SSH config for non-GitHub hosts, while
+    # still making the selected role key available.
+    "$SSH_EXE" \
+        -o IdentitiesOnly=yes \
+        -i "$WINDOWS_PUBLIC" \
+        "$@"
+
+    exit $?
+fi
+
+if [[ "$UNAME" == "Darwin" ]]; then
+    SSH_EXE="/usr/bin/ssh"
+
+    [[ -x "$SSH_EXE" ]] ||
+        die "macOS OpenSSH unavailable"
+
+    TEMP_ROOT="${TMPDIR:-/tmp}"
+
+    cleanup_file="$(
+        mktemp \
+            "${TEMP_ROOT%/}/git-ssh-role.XXXXXX.pub"
+    )"
+
+    printf '%s\n' "$SELECTED_KEY" \
+        > "$cleanup_file"
+
+    if printf ' %s ' "$*" | grep -qi 'github\.com'; then
+        "$SSH_EXE" \
+            -F /dev/null \
+            -o IdentitiesOnly=yes \
+            -i "$cleanup_file" \
+            "$@"
+
+        exit $?
+    fi
+
+    "$SSH_EXE" \
+        -o IdentitiesOnly=yes \
+        -i "$cleanup_file" \
+        "$@"
+
+    exit $?
+fi
+
+# Generic Linux fallback.
+SSH_EXE="$(
+    command -v ssh \
+        2>/dev/null || true
+)"
+
+[[ -n "$SSH_EXE" ]] ||
+    die "OpenSSH unavailable"
+
+cleanup_file="$(
+    mktemp \
+        "${TMPDIR:-/tmp}/git-ssh-role.XXXXXX.pub"
+)"
+
+printf '%s\n' "$SELECTED_KEY" \
+    > "$cleanup_file"
+
+if printf ' %s ' "$*" | grep -qi 'github\.com'; then
+    "$SSH_EXE" \
+        -F /dev/null \
+        -o IdentitiesOnly=yes \
+        -i "$cleanup_file" \
+        "$@"
+
+    exit $?
+fi
+
+"$SSH_EXE" \
+    -o IdentitiesOnly=yes \
+    -i "$cleanup_file" \
+    "$@"

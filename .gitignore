@@ -113,3 +113,15 @@ zsdoc/data
 
 # End of https://www.toptal.com/developers/gitignore/api/emacs,vim,zsh,homebrew
 tmux/.config/tmux/plugins
+
+# -----------------------------------------------------------------
+# Cross-platform workstation machine/runtime state
+# -----------------------------------------------------------------
+fish_variables
+fish_history
+config.local.fish
+**/tmux/plugins/
+.gitconfig-platform
+
+# tmux runtime plugins must never live inside the Stow package.
+tmux/.config/tmux/plugins/

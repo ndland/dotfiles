@@ -7,6 +7,37 @@ if wezterm.config_builder then
 	config = wezterm.config_builder()
 end
 
+-- BEGIN HOST-SPECIFIC DEFAULT DOMAIN
+--
+-- One canonical configuration is shared by Windows and macOS.
+--
+-- Windows:
+--   default directly into the selected WSL distribution.
+--
+-- macOS/Linux:
+--   retain native local-domain behavior.
+if wezterm.target_triple:find("windows") then
+local distro = os.getenv("WEZTERM_WSL_DISTRO") or "Ubuntu-24.04"
+local wanted_domain = "WSL:" .. distro
+local found = false
+
+for _, domain in ipairs(wezterm.default_wsl_domains()) do
+if domain.name == wanted_domain then
+found = true
+break
+end
+end
+
+if found then
+config.default_domain = wanted_domain
+else
+wezterm.log_error(
+"Requested WSL default domain is unavailable: " .. wanted_domain
+)
+end
+end
+-- END HOST-SPECIFIC DEFAULT DOMAIN
+
 -- Appearance
 config.color_scheme = "Dracula (Official)"
 config.window_background_opacity = 0.97

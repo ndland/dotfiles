@@ -3,23 +3,17 @@
 
 # Shell and prompt
 brew "fish"
-brew "fisher"
 brew "oh-my-posh"
 brew "direnv"
 brew "fnm"
 brew "zoxide"
 
 # Editor and file tools (y, lg, ls, bat, vale, zk)
-brew "neovim"
-brew "yazi"
 brew "ffmpeg-full"
 brew "imagemagick-full"
 brew "poppler"
 brew "resvg"
 brew "sevenzip"
-brew "lazygit"
-brew "eza"
-brew "bat"
 brew "vale"
 brew "zk"
 brew "buku"
@@ -27,22 +21,19 @@ brew "btop"
 
 # Git and GitHub
 brew "git"
-brew "git-delta"
-brew "gh"
 brew "act"
 brew "beads"
 brew "jfrog-cli"
 
 # Search / fuzzy / JSON
 brew "ripgrep"
-brew "fd"
 brew "fzf"
 brew "jq"
 
 # Bootstrap and misc
 brew "stow"
+brew "mise"
 brew "tmux"
-brew "uv"
 brew "wget"
 brew "task"
 

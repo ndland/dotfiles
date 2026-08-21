@@ -1,0 +1,130 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+CONFIG="$HOME/.gitconfig-platform"
+TMP="${CONFIG}.tmp.$$"
+
+cleanup() {
+    rm -f "$TMP"
+}
+
+trap cleanup EXIT
+
+: > "$TMP"
+
+OS="$(uname -s)"
+
+IS_WSL=0
+
+if [[ -n "${WSL_DISTRO_NAME:-}" ]] \
+    || grep -qi microsoft /proc/sys/kernel/osrelease 2>/dev/null; then
+    IS_WSL=1
+fi
+
+if [[ "$IS_WSL" -eq 1 ]]; then
+    echo "Detected platform: WSL"
+
+    SSH_EXE=""
+
+    if command -v ssh.exe >/dev/null 2>&1; then
+        SSH_EXE="ssh.exe"
+    elif [[ -x /mnt/c/Windows/System32/OpenSSH/ssh.exe ]]; then
+        SSH_EXE="/mnt/c/Windows/System32/OpenSSH/ssh.exe"
+    fi
+
+    if [[ -z "$SSH_EXE" ]]; then
+        echo "ERROR: Windows OpenSSH was not found." >&2
+        exit 10
+    fi
+
+
+    SIGNER=""
+
+    if command -v op-ssh-sign-wsl.exe >/dev/null 2>&1; then
+        SIGNER="$(command -v op-ssh-sign-wsl.exe)"
+    else
+        CMD_EXE=""
+
+        if command -v cmd.exe >/dev/null 2>&1; then
+            CMD_EXE="$(command -v cmd.exe)"
+        elif [[ -x /mnt/c/Windows/System32/cmd.exe ]]; then
+            CMD_EXE="/mnt/c/Windows/System32/cmd.exe"
+        fi
+
+        if [[ -n "$CMD_EXE" ]]; then
+            WIN_PROFILE="$(
+                "$CMD_EXE" /d /c 'echo %USERPROFILE%' \
+                    2>/dev/null |
+                    tr -d '\r' |
+                    tail -n 1
+            )"
+
+            if [[ -n "$WIN_PROFILE" ]]; then
+                WSL_PROFILE="$(
+                    wslpath -u "$WIN_PROFILE" \
+                        2>/dev/null || true
+                )"
+
+                CANDIDATE="$WSL_PROFILE/AppData/Local/Microsoft/WindowsApps/op-ssh-sign-wsl.exe"
+
+                if [[ -f "$CANDIDATE" ]]; then
+                    SIGNER="$CANDIDATE"
+                fi
+            fi
+        fi
+    fi
+
+    if [[ -z "$SIGNER" ]]; then
+        echo "ERROR: 1Password WSL signing executable not found." >&2
+        exit 11
+    fi
+
+    git config \
+        -f "$TMP" \
+        gpg.ssh.program \
+        "$SIGNER"
+
+elif [[ "$OS" == "Darwin" ]]; then
+    echo "Detected platform: macOS"
+
+    SIGNER="/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+
+    if [[ ! -x "$SIGNER" ]]; then
+        echo "ERROR: macOS 1Password SSH signer not found." >&2
+        exit 12
+    fi
+
+    # Native macOS SSH continues to use the 1Password SSH agent.
+    git config \
+        -f "$TMP" \
+        gpg.ssh.program \
+        "$SIGNER"
+
+else
+    echo "Detected platform: Linux"
+
+    SIGNER=""
+
+    if command -v op-ssh-sign >/dev/null 2>&1; then
+        SIGNER="$(command -v op-ssh-sign)"
+    elif [[ -x /opt/1Password/op-ssh-sign ]]; then
+        SIGNER="/opt/1Password/op-ssh-sign"
+    fi
+
+    if [[ -n "$SIGNER" ]]; then
+        git config \
+            -f "$TMP" \
+            gpg.ssh.program \
+            "$SIGNER"
+    else
+        echo "WARN: no 1Password SSH signer detected."
+    fi
+fi
+
+chmod 600 "$TMP"
+mv "$TMP" "$CONFIG"
+
+trap - EXIT
+
+echo "Platform Git config generated."

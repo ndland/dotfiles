@@ -1,56 +1,98 @@
+# ===============================================================
+# Shared cross-platform Git configuration
+# ===============================================================
+
+# ---------------------------------------------------------------
+# Identity routing
+# ---------------------------------------------------------------
+
 [includeIf "gitdir:~/code/personal/"]
-  path = ~/.gitconfig-personal
+    path = ~/.gitconfig-personal
 
 [includeIf "gitdir:~/code/work/"]
-  path = ~/.gitconfig-work
+    path = ~/.gitconfig-work
+
+# Personal PC layout.
+[includeIf "gitdir:~/code/github.com/ndland/"]
+    path = ~/.gitconfig-personal
+
+# ---------------------------------------------------------------
+# Machine/platform behavior
+# ---------------------------------------------------------------
+
+[include]
+    path = ~/.gitconfig-platform
+
+[includeIf "gitdir:~/code/learning/"]
+  path = ~/.gitconfig-personal
 
 [core]
-  editor = nvim
-  pager = delta
+    editor = nvim
+    pager = delta
 
 [interactive]
-  diffFilter = delta --color-only --syntax-theme=Dracula
+    diffFilter = delta --color-only --syntax-theme=Dracula
 
 [gpg]
-  format = ssh
-
-[gpg "ssh"]
-  program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+    format = ssh
 
 [commit]
-  gpgSign = true
-
-[alias]
-  lg = log --graph --decorate --oneline --all --pretty=format:'%C(auto)%h %d %s %C(blue)<%an> %C(green)(%cr)'
+    gpgSign = true
 
 [tag]
-  forceSignAnnotated = false
+    forceSignAnnotated = false
+
+[alias]
+    lg = log --graph --decorate --oneline --all --pretty=format:'%C(auto)%h %d %s %C(blue)<%an> %C(green)(%cr)'
 
 [delta]
-  syntax-theme = Dracula
-  line-numbers = true
-  side-by-side = true
-  navigate = true
-  dark = true
+    syntax-theme = Dracula
+    line-numbers = true
+    side-by-side = true
+    navigate = true
+    dark = true
+
+# Neovim primary; Cursor remains explicitly available.
 
 [diff]
-  tool = cursor
+    tool = nvimdiff
 
 [difftool]
-  prompt = false
-  trustExitCode = true
+    prompt = false
+    trustExitCode = true
+
+[difftool "nvimdiff"]
+    cmd = nvim -d "$LOCAL" "$REMOTE"
 
 [difftool "cursor"]
-  cmd = cursor --wait --diff "$LOCAL" "$REMOTE"
+    cmd = cursor --wait --diff "$LOCAL" "$REMOTE"
 
 [merge]
-  tool = cursor
-  conflictstyle = zdiff3
+    tool = nvimdiff
+    conflictstyle = zdiff3
 
 [mergetool]
-  prompt = false
-  keepBackup = false
+    prompt = false
+    keepBackup = false
+
+[mergetool "nvimdiff"]
+    cmd = nvim -d "$LOCAL" "$MERGED" "$REMOTE" "$BASE"
+    trustExitCode = true
 
 [mergetool "cursor"]
-  cmd = cursor --wait --merge "$REMOTE" "$LOCAL" "$BASE" "$MERGED"
-  trustExitCode = true
+    cmd = cursor --wait --merge "$REMOTE" "$LOCAL" "$BASE" "$MERGED"
+    trustExitCode = true
+[user]
+	name = Nick Land
+	useConfigOnly = true
+[init]
+	defaultBranch = main
+
+# Role-aware SSH transport.
+# The wrapper uses the effective personal/work signing key as
+# the public-key selector while private keys remain in 1Password.
+[core]
+    sshCommand = ~/.local/bin/git-ssh-role
+
+[ssh]
+    variant = ssh
