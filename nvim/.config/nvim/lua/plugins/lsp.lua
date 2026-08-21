@@ -58,8 +58,6 @@ return {
 
 				callback = function(event)
 					local bufnr = event.buf
-					local client = vim.lsp.get_client_by_id(event.data.client_id)
-
 					local map = function(mode, lhs, rhs, desc)
 						vim.keymap.set(mode, lhs, rhs, {
 							buffer = bufnr,
@@ -81,18 +79,6 @@ return {
 					map("n", "[d", vim.diagnostic.goto_prev, "Prev diagnostic")
 					map("n", "]d", vim.diagnostic.goto_next, "Next diagnostic")
 
-					if client and client:supports_method("textDocument/formatting") then
-						vim.api.nvim_create_autocmd("BufWritePre", {
-							group = vim.api.nvim_create_augroup("user-lsp-format-" .. bufnr, { clear = true }),
-							buffer = bufnr,
-							callback = function()
-								vim.lsp.buf.format({
-									bufnr = bufnr,
-									id = client.id,
-								})
-							end,
-						})
-					end
 				end,
 			})
 
