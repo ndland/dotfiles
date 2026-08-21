@@ -17,6 +17,7 @@
 [tools]
 node = "24.19.0"
 neovim = "0.12.4"
+tree-sitter = "0.26.11"
 delta = "0.19.2"
 github-cli = "2.97.0"
 "github:anomalyco/opencode" = "1.18.19"
