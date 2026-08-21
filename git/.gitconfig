@@ -96,3 +96,5 @@
 
 [ssh]
     variant = ssh
+[gpg "ssh"]
+	allowedSignersFile = ~/.config/git/allowed_signers

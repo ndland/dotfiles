@@ -5,13 +5,88 @@ set -euo pipefail
 CONFIG="$HOME/.gitconfig-platform"
 TMP="${CONFIG}.tmp.$$"
 
+ALLOWED_DIR="$HOME/.config/git"
+ALLOWED_SIGNERS="$ALLOWED_DIR/allowed_signers"
+ALLOWED_TMP=""
+
+PERSONAL_CONFIG="$HOME/.gitconfig-personal"
+WORK_CONFIG="$HOME/.gitconfig-work"
+
 cleanup() {
     rm -f "$TMP"
+
+    if [[ -n "${ALLOWED_TMP}" ]]; then
+        rm -f "$ALLOWED_TMP"
+    fi
 }
 
 trap cleanup EXIT
 
 : > "$TMP"
+
+extract_signer() {
+    local role="$1"
+    local config="$2"
+
+    if [[ ! -f "$config" ]]; then
+        echo "ERROR: ${role} Git identity config not found: $config" >&2
+        return 20
+    fi
+
+    local email
+    local key
+    local core
+
+    email="$(
+        git config \
+            --file "$config" \
+            --get user.email
+    )"
+
+    key="$(
+        git config \
+            --file "$config" \
+            --get user.signingkey
+    )"
+
+    if [[ -z "$email" ]]; then
+        echo "ERROR: ${role} Git email is empty." >&2
+        return 21
+    fi
+
+    case "$key" in
+        key::*)
+            key="${key#key::}"
+            ;;
+
+        ssh-*|ecdsa-*|sk-*)
+            ;;
+
+        *)
+            echo "ERROR: ${role} signing key is not an inline SSH public key." >&2
+            return 22
+            ;;
+    esac
+
+    core="$(
+        printf '%s\n' "$key" |
+            awk '
+                NF >= 2 {
+                    print $1 " " $2
+                    exit
+                }
+            '
+    )"
+
+    if [[ -z "$core" ]]; then
+        echo "ERROR: ${role} SSH public key cannot be parsed." >&2
+        return 23
+    fi
+
+    printf '%s %s\n' \
+        "$email" \
+        "$core"
+}
 
 OS="$(uname -s)"
 
@@ -37,7 +112,6 @@ if [[ "$IS_WSL" -eq 1 ]]; then
         echo "ERROR: Windows OpenSSH was not found." >&2
         exit 10
     fi
-
 
     SIGNER=""
 
@@ -95,7 +169,6 @@ elif [[ "$OS" == "Darwin" ]]; then
         exit 12
     fi
 
-    # Native macOS SSH continues to use the 1Password SSH agent.
     git config \
         -f "$TMP" \
         gpg.ssh.program \
@@ -122,9 +195,57 @@ else
     fi
 fi
 
+mkdir -p "$ALLOWED_DIR"
+
+ALLOWED_TMP="$(
+    mktemp \
+        "$ALLOWED_DIR/.allowed_signers.tmp.XXXXXX"
+)"
+
+extract_signer \
+    "personal" \
+    "$PERSONAL_CONFIG" \
+    > "$ALLOWED_TMP"
+
+extract_signer \
+    "work" \
+    "$WORK_CONFIG" \
+    >> "$ALLOWED_TMP"
+
+ENTRY_COUNT="$(
+    awk \
+        'NF && $1 !~ /^#/ { count++ } END { print count+0 }' \
+        "$ALLOWED_TMP"
+)"
+
+if [[ "$ENTRY_COUNT" -ne 2 ]]; then
+    echo "ERROR: expected exactly two SSH verification principals." >&2
+    exit 24
+fi
+
+DUPLICATE_PRINCIPAL="$(
+    awk \
+        'NF && $1 !~ /^#/ { print $1 }' \
+        "$ALLOWED_TMP" |
+        sort |
+        uniq -d |
+        head -n 1
+)"
+
+if [[ -n "$DUPLICATE_PRINCIPAL" ]]; then
+    echo "ERROR: duplicate SSH verification principal: $DUPLICATE_PRINCIPAL" >&2
+    exit 25
+fi
+
 chmod 600 "$TMP"
+chmod 600 "$ALLOWED_TMP"
+
 mv "$TMP" "$CONFIG"
+mv "$ALLOWED_TMP" "$ALLOWED_SIGNERS"
+
+ALLOWED_TMP=""
 
 trap - EXIT
 
 echo "Platform Git config generated."
+echo "SSH verification trust store generated."
