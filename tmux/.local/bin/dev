@@ -2,16 +2,46 @@
 
 set -euo pipefail
 
+CONTEXT="$HOME/.local/bin/project-context"
+PROJECT_EXEC="$HOME/.local/bin/project-exec"
+
+usage() {
+    cat <<'EOF'
+Usage:
+  dev
+  dev QUERY
+  dev .
+  dev --describe [QUERY]
+
+Select a Git checkout beneath ~/code and enter its isolated
+tmux development session.
+
+Each checkout/worktree receives its own:
+  DEV_INSTANCE_ID
+  COMPOSE_PROJECT_NAME
+  tmux session
+
+Runtime migration is currently advisory. Projects with language
+manifests but no mise.toml are reported as not-yet-isolated.
+EOF
+}
+
 discover_repositories() {
     [[ -d "$HOME/code" ]] || return
 
-    find "$HOME/code" \
-        -mindepth 2 \
-        -maxdepth 8 \
-        -type d \
-        -name .git \
-        -printf '%h\n' \
+    if ! command -v fd >/dev/null 2>&1; then
+        echo "dev: fd is required for repository discovery." >&2
+        exit 1
+    fi
+
+    fd \
+        --hidden \
+        --no-ignore \
+        --max-depth 8 \
+        '^\.git$' \
+        "$HOME/code" \
         2>/dev/null |
+        sed -E 's#/?\.git/?$##' |
         sort -u
 }
 
@@ -24,7 +54,10 @@ select_repository() {
     fi
 
     if [[ -n "$query" && -d "$query" ]]; then
-        realpath "$query"
+        (
+            cd "$query"
+            pwd -P
+        )
         return
     fi
 
@@ -38,6 +71,7 @@ select_repository() {
 
     if [[ -n "$query" ]]; then
         local matches
+        local count
 
         matches="$(
             printf '%s\n' "$repositories" |
@@ -45,7 +79,6 @@ select_repository() {
                 true
         )"
 
-        local count
         count="$(
             printf '%s\n' "$matches" |
                 sed '/^$/d' |
@@ -74,63 +107,220 @@ select_repository() {
             --reverse
 }
 
+runtime_manifest_present() {
+    local root="$1"
+
+    local manifests=(
+        package.json
+        pyproject.toml
+        requirements.txt
+        Cargo.toml
+        go.mod
+        pom.xml
+        build.gradle
+        build.gradle.kts
+        Gemfile
+    )
+
+    local file
+
+    for file in "${manifests[@]}"; do
+        if [[ -f "$root/$file" ]]; then
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+preflight_project() {
+    if runtime_manifest_present "$DEV_PROJECT_ROOT" \
+        && [[ "$DEV_HAS_MISE" -eq 0 ]]; then
+
+        echo >&2
+        echo "dev: isolation advisory:" >&2
+        echo "  $DEV_PROJECT_ROOT" >&2
+        echo "  has a language/runtime manifest but no mise.toml." >&2
+        echo "  It remains usable during Phase 1E migration." >&2
+        echo >&2
+    fi
+
+    if [[ "$DEV_HAS_MISE" -eq 1 ]]; then
+        if ! command -v mise >/dev/null 2>&1; then
+            echo "dev: mise.toml exists but mise is unavailable." >&2
+            return 1
+        fi
+
+        local missing
+        local result
+
+        set +e
+
+        missing="$(
+            env \
+                MISE_PARANOID=1 \
+                mise \
+                --no-env \
+                --no-hooks \
+                -C "$DEV_PROJECT_ROOT" \
+                ls \
+                --missing \
+                --no-header \
+                2>&1
+        )"
+
+        result=$?
+
+        set -e
+
+        if [[ "$result" -ne 0 ]]; then
+            echo "dev: unable to validate project mise config:" >&2
+            printf '%s\n' "$missing" | sed 's/^/  /' >&2
+            echo >&2
+            echo "Review the project config first." >&2
+            echo "If it is trusted, authorize its current contents with:" >&2
+            echo "  mise trust '$DEV_PROJECT_ROOT/mise.toml'" >&2
+            return 1
+        fi
+
+        if [[ -n "$missing" ]]; then
+            echo "dev: project toolchain is not installed:" >&2
+            printf '%s\n' "$missing" | sed 's/^/  /' >&2
+            echo >&2
+            echo "Run from the reviewed project:" >&2
+            echo "  mise install" >&2
+            return 1
+        fi
+    fi
+
+    if [[ "$DEV_HAS_ENVRC" -eq 1 ]]; then
+        if ! command -v direnv >/dev/null 2>&1; then
+            echo "dev: .envrc exists but direnv is unavailable." >&2
+            return 1
+        fi
+
+        if ! direnv \
+            exec \
+            "$DEV_PROJECT_ROOT" \
+            true \
+            >/dev/null \
+            2>&1; then
+
+            echo "dev: project .envrc is not authorized or failed." >&2
+            echo >&2
+            echo "Review it, then explicitly authorize it with:" >&2
+            echo "  direnv allow '$DEV_PROJECT_ROOT'" >&2
+            return 1
+        fi
+    fi
+}
+
+DESCRIBE=0
+
+if [[ "${1:-}" == "--describe" ]]; then
+    DESCRIBE=1
+    shift
+elif [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+    usage
+    exit 0
+fi
+
 SELECTED="$(
     select_repository "${1:-}"
 )"
 
 [[ -n "$SELECTED" ]] || exit 0
 
-RELATIVE="${SELECTED#$HOME/}"
+if [[ ! -x "$CONTEXT" ]]; then
+    echo "dev: project-context is unavailable." >&2
+    exit 1
+fi
 
-SESSION="$(
-    printf '%s' "$RELATIVE" |
-        tr '/.' '__' |
-        tr -cd '[:alnum:]_-'
-)"
+eval "$("$CONTEXT" --shell "$SELECTED")"
 
-SESSION="${SESSION:0:80}"
-SESSION="${SESSION:-dev}"
+if [[ "$DESCRIBE" -eq 1 ]]; then
+    "$CONTEXT" "$DEV_PROJECT_ROOT"
 
-if ! tmux has-session \
-    -t "$SESSION" \
+    echo
+    echo "runtime_manifest=$(
+        if runtime_manifest_present "$DEV_PROJECT_ROOT"; then
+            echo 1
+        else
+            echo 0
+        fi
+    )"
+
+    exit 0
+fi
+
+preflight_project
+
+if tmux has-session \
+    -t "$DEV_TMUX_SESSION" \
     2>/dev/null; then
 
+    EXISTING_ROOT="$(
+        tmux \
+            show-environment \
+            -t "$DEV_TMUX_SESSION" \
+            DEV_PROJECT_ROOT \
+            2>/dev/null |
+            sed 's/^DEV_PROJECT_ROOT=//'
+    )"
+
+    if [[ "$EXISTING_ROOT" != "$DEV_PROJECT_ROOT" ]]; then
+        echo "dev: tmux session identity collision detected." >&2
+        echo "Expected: $DEV_PROJECT_ROOT" >&2
+        echo "Existing: $EXISTING_ROOT" >&2
+        exit 1
+    fi
+else
     tmux new-session \
         -d \
-        -s "$SESSION" \
-        -c "$SELECTED" \
-        -n code
+        -s "$DEV_TMUX_SESSION" \
+        -c "$DEV_PROJECT_ROOT" \
+        -n code \
+        -e "DEV_PROJECT_ROOT=$DEV_PROJECT_ROOT" \
+        -e "DEV_PROJECT_NAME=$DEV_PROJECT_NAME" \
+        -e "DEV_PROJECT_SLUG=$DEV_PROJECT_SLUG" \
+        -e "DEV_WORKTREE_HASH=$DEV_WORKTREE_HASH" \
+        -e "DEV_INSTANCE_ID=$DEV_INSTANCE_ID" \
+        -e "DEV_GIT_BRANCH=$DEV_GIT_BRANCH" \
+        -e "DEV_GIT_COMMON_DIR=$DEV_GIT_COMMON_DIR" \
+        -e "COMPOSE_PROJECT_NAME=$COMPOSE_PROJECT_NAME"
 
     tmux send-keys \
-        -t "$SESSION:code" \
-        'nvim .' \
+        -t "$DEV_TMUX_SESSION:code" \
+        "$PROJECT_EXEC '$DEV_PROJECT_ROOT' nvim ." \
         C-m
 
     tmux new-window \
         -d \
-        -t "$SESSION" \
+        -t "$DEV_TMUX_SESSION" \
         -n agent \
-        -c "$SELECTED"
+        -c "$DEV_PROJECT_ROOT"
 
     if command -v opencode >/dev/null 2>&1; then
         tmux send-keys \
-            -t "$SESSION:agent" \
-            'opencode' \
+            -t "$DEV_TMUX_SESSION:agent" \
+            "$PROJECT_EXEC '$DEV_PROJECT_ROOT' opencode" \
             C-m
     fi
 
     tmux new-window \
         -d \
-        -t "$SESSION" \
+        -t "$DEV_TMUX_SESSION" \
         -n run \
-        -c "$SELECTED"
+        -c "$DEV_PROJECT_ROOT"
 
     tmux select-window \
-        -t "$SESSION:code"
+        -t "$DEV_TMUX_SESSION:code"
 fi
 
 if [[ -n "${TMUX:-}" ]]; then
-    tmux switch-client -t "$SESSION"
+    tmux switch-client \
+        -t "$DEV_TMUX_SESSION"
 else
-    tmux attach-session -t "$SESSION"
+    tmux attach-session \
+        -t "$DEV_TMUX_SESSION"
 fi

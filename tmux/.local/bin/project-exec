@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if [[ "$#" -lt 2 ]]; then
+    echo "Usage: project-exec PROJECT COMMAND [ARGS...]" >&2
+    exit 2
+fi
+
+PROJECT="$1"
+shift
+
+CONTEXT="$HOME/.local/bin/project-context"
+
+if [[ ! -x "$CONTEXT" ]]; then
+    echo "project-exec: project-context unavailable" >&2
+    exit 1
+fi
+
+eval "$("$CONTEXT" --shell "$PROJECT")"
+
+cd "$DEV_PROJECT_ROOT"
+
+run_project_command() {
+    if [[ "$DEV_HAS_MISE" -eq 1 ]]; then
+        if ! command -v mise >/dev/null 2>&1; then
+            echo "project-exec: mise.toml exists but mise is unavailable" >&2
+            return 1
+        fi
+
+        # mise owns tool versions only.
+        #
+        # Paranoid mode requires explicit content-bound trust.
+        # --no-env prevents mise from becoming a second env manager.
+        # --no-hooks prevents project hooks from running implicitly.
+        env \
+            MISE_PARANOID=1 \
+            mise \
+            --no-env \
+            --no-hooks \
+            exec \
+            -- \
+            "$@"
+    else
+        "$@"
+    fi
+}
+
+if [[ "$DEV_HAS_ENVRC" -eq 1 && "${PROJECT_EXEC_DIRENV_ACTIVE:-0}" != 1 ]]; then
+    if ! command -v direnv >/dev/null 2>&1; then
+        echo "project-exec: .envrc exists but direnv is unavailable" >&2
+        exit 1
+    fi
+
+    # Re-enter once inside direnv. The marker prevents recursion.
+    exec direnv \
+        exec \
+        "$DEV_PROJECT_ROOT" \
+        env \
+        PROJECT_EXEC_DIRENV_ACTIVE=1 \
+        "$0" \
+        "$DEV_PROJECT_ROOT" \
+        "$@"
+fi
+
+run_project_command "$@"

@@ -1,0 +1,206 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+usage() {
+    cat <<'EOF'
+Usage:
+  project-context [--shell] [PATH]
+
+Reports deterministic, non-secret development context for a
+Git checkout/worktree.
+
+--shell emits Bash-safe export statements.
+EOF
+}
+
+hash_text() {
+    local value="$1"
+
+    if command -v sha256sum >/dev/null 2>&1; then
+        printf '%s' "$value" |
+            sha256sum |
+            awk '{print substr($1,1,10)}'
+        return
+    fi
+
+    if command -v shasum >/dev/null 2>&1; then
+        printf '%s' "$value" |
+            shasum -a 256 |
+            awk '{print substr($1,1,10)}'
+        return
+    fi
+
+    if command -v openssl >/dev/null 2>&1; then
+        printf '%s' "$value" |
+            openssl dgst -sha256 |
+            awk '{print substr($NF,1,10)}'
+        return
+    fi
+
+    echo "project-context: no SHA-256 implementation available" >&2
+    exit 1
+}
+
+canonical_dir() {
+    local target="$1"
+
+    (
+        cd "$target"
+        pwd -P
+    )
+}
+
+sanitize() {
+    local value="$1"
+    local result
+
+    result="$(
+        printf '%s' "$value" |
+            tr '[:upper:]' '[:lower:]' |
+            sed -E \
+                's/[^a-z0-9_-]+/-/g;
+                 s/^[^a-z0-9]+//;
+                 s/[-_]+$//'
+    )"
+
+    result="${result:0:36}"
+
+    if [[ -z "$result" ]]; then
+        result="project"
+    fi
+
+    if [[ ! "$result" =~ ^[a-z0-9] ]]; then
+        result="p-$result"
+    fi
+
+    printf '%s\n' "$result"
+}
+
+MODE="human"
+
+if [[ "${1:-}" == "--shell" ]]; then
+    MODE="shell"
+    shift
+elif [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+    usage
+    exit 0
+fi
+
+TARGET="${1:-.}"
+
+if [[ ! -d "$TARGET" ]]; then
+    echo "project-context: directory not found: $TARGET" >&2
+    exit 1
+fi
+
+TARGET="$(canonical_dir "$TARGET")"
+
+ROOT="$(
+    git -C "$TARGET" \
+        rev-parse \
+        --show-toplevel \
+        2>/dev/null
+)" || {
+    echo "project-context: not inside a Git checkout: $TARGET" >&2
+    exit 1
+}
+
+ROOT="$(canonical_dir "$ROOT")"
+
+NAME="$(basename "$ROOT")"
+SLUG="$(sanitize "$NAME")"
+HASH="$(hash_text "$ROOT")"
+
+INSTANCE="${SLUG}-${HASH}"
+COMPOSE="${INSTANCE}"
+SESSION="dev_${SLUG}_${HASH}"
+
+BRANCH="$(
+    git -C "$ROOT" \
+        branch \
+        --show-current \
+        2>/dev/null ||
+        true
+)"
+
+if [[ -z "$BRANCH" ]]; then
+    BRANCH="<detached>"
+fi
+
+COMMON_DIR="$(
+    git -C "$ROOT" \
+        rev-parse \
+        --git-common-dir
+)"
+
+case "$COMMON_DIR" in
+    /*)
+        ;;
+    *)
+        COMMON_DIR="$ROOT/$COMMON_DIR"
+        ;;
+esac
+
+COMMON_DIR="$(
+    cd "$(dirname "$COMMON_DIR")"
+    printf '%s/%s\n' \
+        "$(pwd -P)" \
+        "$(basename "$COMMON_DIR")"
+)"
+
+HAS_MISE=0
+HAS_ENVRC=0
+HAS_COMPOSE=0
+HAS_DEVCONTAINER=0
+
+[[ -f "$ROOT/mise.toml" ]] && HAS_MISE=1
+[[ -f "$ROOT/.envrc" ]] && HAS_ENVRC=1
+
+for file in \
+    compose.yaml \
+    compose.yml \
+    docker-compose.yaml \
+    docker-compose.yml
+do
+    if [[ -f "$ROOT/$file" ]]; then
+        HAS_COMPOSE=1
+        break
+    fi
+done
+
+[[ -f "$ROOT/.devcontainer/devcontainer.json" ]] &&
+    HAS_DEVCONTAINER=1
+
+if [[ "$MODE" == "shell" ]]; then
+    printf 'export DEV_PROJECT_ROOT=%q\n' "$ROOT"
+    printf 'export DEV_PROJECT_NAME=%q\n' "$NAME"
+    printf 'export DEV_PROJECT_SLUG=%q\n' "$SLUG"
+    printf 'export DEV_WORKTREE_HASH=%q\n' "$HASH"
+    printf 'export DEV_INSTANCE_ID=%q\n' "$INSTANCE"
+    printf 'export DEV_GIT_BRANCH=%q\n' "$BRANCH"
+    printf 'export DEV_GIT_COMMON_DIR=%q\n' "$COMMON_DIR"
+    printf 'export DEV_TMUX_SESSION=%q\n' "$SESSION"
+    printf 'export COMPOSE_PROJECT_NAME=%q\n' "$COMPOSE"
+    printf 'export DEV_HAS_MISE=%q\n' "$HAS_MISE"
+    printf 'export DEV_HAS_ENVRC=%q\n' "$HAS_ENVRC"
+    printf 'export DEV_HAS_COMPOSE=%q\n' "$HAS_COMPOSE"
+    printf 'export DEV_HAS_DEVCONTAINER=%q\n' "$HAS_DEVCONTAINER"
+    exit 0
+fi
+
+cat <<EOF
+project_root=$ROOT
+project_name=$NAME
+project_slug=$SLUG
+worktree_hash=$HASH
+instance_id=$INSTANCE
+git_branch=$BRANCH
+git_common_dir=$COMMON_DIR
+tmux_session=$SESSION
+compose_project_name=$COMPOSE
+mise=$HAS_MISE
+envrc=$HAS_ENVRC
+compose=$HAS_COMPOSE
+devcontainer=$HAS_DEVCONTAINER
+EOF
