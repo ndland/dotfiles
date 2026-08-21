@@ -84,10 +84,10 @@ return {
 				vim.cmd("startinsert!")
 				local opts = { buffer = term.bufnr, silent = true }
 				vim.keymap.set("t", "<Esc><Esc>", [[<C-\><C-n>]], opts)
-				vim.keymap.set("t", "<C-h>", [[<Cmd>wincmd h<CR>]], opts)
-				vim.keymap.set("t", "<C-j>", [[<Cmd>wincmd j<CR>]], opts)
-				vim.keymap.set("t", "<C-k>", [[<Cmd>wincmd k<CR>]], opts)
-				vim.keymap.set("t", "<C-l>", [[<Cmd>wincmd l<CR>]], opts)
+				vim.keymap.set("t", "<C-h>", [[<Cmd>TmuxNavigateLeft<CR>]], opts)
+				vim.keymap.set("t", "<C-j>", [[<Cmd>TmuxNavigateDown<CR>]], opts)
+				vim.keymap.set("t", "<C-k>", [[<Cmd>TmuxNavigateUp<CR>]], opts)
+				vim.keymap.set("t", "<C-l>", [[<Cmd>TmuxNavigateRight<CR>]], opts)
 			end,
 		},
 		config = function(_, opts)
