@@ -16,7 +16,9 @@ end
 --
 -- macOS/Linux:
 --   retain native local-domain behavior.
-if wezterm.target_triple:find("windows") then
+local is_windows = wezterm.target_triple:find("windows") ~= nil
+
+if is_windows then
 	local distro = os.getenv("WEZTERM_WSL_DISTRO") or "Ubuntu-24.04"
 	local wanted_domain = "WSL:" .. distro
 	local found = false
@@ -50,8 +52,8 @@ config.font = wezterm.font_with_fallback({
 	{ family = "IosevkaTerm Nerd Font Mono", weight = "Regular" },
 	{ family = "Iosevka Nerd Font Mono", weight = "Regular" },
 })
-config.font_size = 14.0
-config.line_height = 1.05
+config.font_size = is_windows and 12.5 or 14.0
+config.line_height = is_windows and 1.10 or 1.05
 config.harfbuzz_features = { "calt=1", "liga=1" }
 config.allow_square_glyphs_to_overflow_width = "WhenFollowedBySpace"
 config.use_cap_height_to_scale_fallback_fonts = true
