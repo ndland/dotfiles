@@ -17,24 +17,22 @@ end
 -- macOS/Linux:
 --   retain native local-domain behavior.
 if wezterm.target_triple:find("windows") then
-local distro = os.getenv("WEZTERM_WSL_DISTRO") or "Ubuntu-24.04"
-local wanted_domain = "WSL:" .. distro
-local found = false
+	local distro = os.getenv("WEZTERM_WSL_DISTRO") or "Ubuntu-24.04"
+	local wanted_domain = "WSL:" .. distro
+	local found = false
 
-for _, domain in ipairs(wezterm.default_wsl_domains()) do
-if domain.name == wanted_domain then
-found = true
-break
-end
-end
+	for _, domain in ipairs(wezterm.default_wsl_domains()) do
+		if domain.name == wanted_domain then
+			found = true
+			break
+		end
+	end
 
-if found then
-config.default_domain = wanted_domain
-else
-wezterm.log_error(
-"Requested WSL default domain is unavailable: " .. wanted_domain
-)
-end
+	if found then
+		config.default_domain = wanted_domain
+	else
+		wezterm.log_error("Requested WSL default domain is unavailable: " .. wanted_domain)
+	end
 end
 -- END HOST-SPECIFIC DEFAULT DOMAIN
 
@@ -127,10 +125,7 @@ config.adjust_window_size_when_changing_font_size = false
 local resurrect = nil
 
 if wezterm.plugin and wezterm.plugin.require then
-	local ok, result = pcall(
-		wezterm.plugin.require,
-		"https://github.com/StephenGemin/resurrect.wezterm"
-	)
+	local ok, result = pcall(wezterm.plugin.require, "https://github.com/StephenGemin/resurrect.wezterm")
 
 	if ok then
 		resurrect = result
