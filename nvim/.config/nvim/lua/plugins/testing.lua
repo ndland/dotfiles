@@ -20,21 +20,18 @@ end
 local function is_javascript_test_file(file_path)
   local path = normalize_path(file_path)
 
-  return path:match("%.test%.[tj]sx?$") ~= nil
-    or path:match("%.spec%.[tj]sx?$") ~= nil
+  return path:match("%.test%.[tj]sx?$") ~= nil or path:match("%.spec%.[tj]sx?$") ~= nil
 end
 
 local function is_e2e_test_file(file_path)
   local path = normalize_path(file_path)
-  local in_e2e_dir = path:match("^tests/e2e/") ~= nil
-  or path:find("/tests/e2e/", 1, true) ~= nil
+  local in_e2e_dir = path:match("^tests/e2e/") ~= nil or path:find("/tests/e2e/", 1, true) ~= nil
 
   return in_e2e_dir and is_javascript_test_file(path)
 end
 
 local function is_vitest_test_file(file_path)
-  return is_javascript_test_file(file_path)
-    and not is_e2e_test_file(file_path)
+  return is_javascript_test_file(file_path) and not is_e2e_test_file(file_path)
 end
 
 return {
