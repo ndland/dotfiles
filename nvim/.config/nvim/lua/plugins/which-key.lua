@@ -21,6 +21,7 @@ return {
 				{ "<leader>gh", group = "GitHub" },
 				{ "<leader>l", group = "LSP" },
 				{ "<leader>n", group = "Notes" },
+				{ "<leader>r", group = "Run / Test" },
 				{ "<leader>t", group = "Terminal" },
 				{ "<leader>x", group = "Problems" },
 			})
