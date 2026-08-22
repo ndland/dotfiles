@@ -12,6 +12,7 @@ return {
       wk.setup(opts)
 
       wk.add({
+        { "<leader>b", group = "Debug" },
         { "<leader>c", group = "Code" },
         { "<leader>e", group = "Explorer" },
         { "<leader>f", group = "Find" },
