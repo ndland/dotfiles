@@ -6,6 +6,13 @@ return {
     dependencies = {
       "nvim-lua/plenary.nvim",
       "esmuellert/codediff.nvim",
+      {
+        "m00qek/baleia.nvim",
+        commit = "710537ff5cd669c5a76c5f5b6a9169fd9b913d18",
+        config = function()
+          vim.g.baleia = require("baleia").setup({})
+        end,
+      },
     },
     keys = {
       {
@@ -20,6 +27,12 @@ return {
         diffview = false,
       },
       diff_viewer = "codediff",
+      log_pager = {
+        "delta",
+        "--no-gitconfig",
+        "--color-only",
+        "--syntax-theme=Dracula",
+      },
     },
   },
 }
