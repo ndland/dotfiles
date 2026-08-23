@@ -1,0 +1,973 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+export LC_ALL=C
+
+MODEL="ollama/qwen3-coder:30b-a3b-q4_K_M"
+MAX_REPAIRS=2
+
+REPO=""
+CONTRACT=""
+EVIDENCE=""
+
+declare -a EXPLICIT_ALLOWED=()
+
+usage() {
+    cat <<'EOF'
+Usage:
+  agent-loop --repo PATH --contract FILE [--allow PATH ...] [--evidence DIR]
+
+The repository must begin clean.
+
+Controller state machine:
+
+  Builder
+    -> deterministic format-check
+    -> deterministic lint
+    -> deterministic type-check
+    -> deterministic test
+    -> deterministic build
+    -> deterministic test:e2e
+    -> Reviewer
+    -> READY FOR USER REVIEW
+
+Any Tester failure:
+  Builder repair
+    -> restart ALL gates from format-check
+
+Any Reviewer request:
+  Builder repair
+    -> restart ALL gates from format-check
+    -> Reviewer again
+
+Maximum repair cycles:
+  2
+
+The controller never stages, commits, or pushes.
+EOF
+}
+
+while [[ "$#" -gt 0 ]]
+do
+    case "$1" in
+        --repo)
+            [[ "$#" -ge 2 ]] || {
+                usage >&2
+                exit 2
+            }
+
+            REPO="$2"
+            shift 2
+            ;;
+
+        --contract)
+            [[ "$#" -ge 2 ]] || {
+                usage >&2
+                exit 2
+            }
+
+            CONTRACT="$2"
+            shift 2
+            ;;
+
+        --allow)
+            [[ "$#" -ge 2 ]] || {
+                usage >&2
+                exit 2
+            }
+
+            EXPLICIT_ALLOWED+=("$2")
+            shift 2
+            ;;
+
+        --evidence)
+            [[ "$#" -ge 2 ]] || {
+                usage >&2
+                exit 2
+            }
+
+            EVIDENCE="$2"
+            shift 2
+            ;;
+
+        -h|--help)
+            usage
+            exit 0
+            ;;
+
+        *)
+            printf 'Unknown argument: %s\n' "$1" >&2
+            usage >&2
+            exit 2
+            ;;
+    esac
+done
+
+[[ -n "$REPO" ]] || {
+    printf 'ERROR: --repo is required\n' >&2
+    exit 2
+}
+
+[[ -n "$CONTRACT" ]] || {
+    printf 'ERROR: --contract is required\n' >&2
+    exit 2
+}
+
+REPO="$(
+    cd "$REPO"
+    git rev-parse --show-toplevel
+)"
+
+CONTRACT="$(
+    cd "$(dirname "$CONTRACT")"
+    printf '%s/%s\n' "$PWD" "$(basename "$CONTRACT")"
+)"
+
+[[ -f "$CONTRACT" ]] || {
+    printf 'ERROR: contract not found: %s\n' "$CONTRACT" >&2
+    exit 2
+}
+
+if [[ -z "$EVIDENCE" ]]
+then
+    stamp="$(date '+%Y%m%d-%H%M%S')"
+    EVIDENCE="$HOME/.local/state/agent-loop/$stamp"
+fi
+
+mkdir -p "$EVIDENCE"
+
+ALLOWED_FILE="$EVIDENCE/allowed-files.txt"
+CONTRACT_COPY="$EVIDENCE/contract.txt"
+
+cp "$CONTRACT" "$CONTRACT_COPY"
+
+if [[ "${#EXPLICIT_ALLOWED[@]}" -gt 0 ]]
+then
+    printf '%s\n' "${EXPLICIT_ALLOWED[@]}" \
+        > "$ALLOWED_FILE"
+else
+    python3 - "$CONTRACT" "$ALLOWED_FILE" <<'PY'
+from pathlib import Path
+import sys
+
+text = Path(sys.argv[1]).read_text(
+    encoding="utf-8"
+)
+
+allowed = []
+in_block = False
+
+for raw in text.splitlines():
+    line = raw.rstrip()
+
+    if line == "ALLOWED_FILES:":
+        in_block = True
+        continue
+
+    if not in_block:
+        continue
+
+    stripped = line.strip()
+
+    if not stripped:
+        continue
+
+    if stripped.startswith("- "):
+        allowed.append(
+            stripped[2:].strip()
+        )
+        continue
+
+    break
+
+if not allowed:
+    raise SystemExit(
+        "contract contains no ALLOWED_FILES entries"
+    )
+
+Path(sys.argv[2]).write_text(
+    "\n".join(allowed) + "\n",
+    encoding="utf-8",
+)
+PY
+fi
+
+python3 - "$ALLOWED_FILE" <<'PY'
+from pathlib import Path
+import fnmatch
+import sys
+
+paths = [
+    line.strip()
+    for line in Path(sys.argv[1])
+        .read_text(encoding="utf-8")
+        .splitlines()
+    if line.strip()
+]
+
+if not 1 <= len(paths) <= 20:
+    raise SystemExit(
+        f"expected 1-20 allowed files, got {len(paths)}"
+    )
+
+if len(paths) != len(set(paths)):
+    raise SystemExit(
+        "duplicate allowed paths"
+    )
+
+protected = (
+    "AGENTS.md",
+    ".github/workflows/*",
+    "*package.json",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml",
+    "*playwright.config.*",
+    "*vitest.config.*",
+    "*vite.config.*",
+    "*eslint.config.*",
+    "*.eslintrc*",
+    "*.prettierrc*",
+    "*prettier.config.*",
+    "*tsconfig*.json",
+)
+
+for path in paths:
+    candidate = Path(path)
+
+    if candidate.is_absolute():
+        raise SystemExit(
+            f"absolute path is not allowed: {path}"
+        )
+
+    if ".." in candidate.parts:
+        raise SystemExit(
+            f"path traversal is not allowed: {path}"
+        )
+
+    for pattern in protected:
+        if fnmatch.fnmatchcase(path, pattern):
+            raise SystemExit(
+                f"protected control-plane file cannot be allowed: {path}"
+            )
+
+print("ALLOWED_FILE_SCOPE_VALID=YES")
+
+for path in paths:
+    print(f"  {path}")
+PY
+
+OPENCODE="$(
+    mise which opencode 2>/dev/null ||
+    command -v opencode
+)"
+
+[[ -x "$OPENCODE" ]] || {
+    printf 'ERROR: OpenCode executable unavailable\n' >&2
+    exit 1
+}
+
+BASE_HEAD="$(git -C "$REPO" rev-parse HEAD)"
+
+if [[ -n "$(
+    git -C "$REPO" status \
+        --porcelain=v1 \
+        -uall
+)" ]]
+then
+    printf 'ERROR: repository must begin clean\n' >&2
+    git -C "$REPO" status --short -uall >&2
+    exit 1
+fi
+
+printf 'AGENT_LOOP\n'
+printf 'REPO=%s\n' "$REPO"
+printf 'BASE_HEAD=%s\n' "$BASE_HEAD"
+printf 'MODEL=%s\n' "$MODEL"
+printf 'MAX_REPAIRS=%s\n' "$MAX_REPAIRS"
+printf 'EVIDENCE=%s\n' "$EVIDENCE"
+
+candidate_digest() {
+    {
+        printf 'HEAD\n'
+        git -C "$REPO" rev-parse HEAD
+
+        printf 'STATUS\n'
+        git -C "$REPO" status \
+            --porcelain=v1 \
+            -uall
+
+        printf 'TRACKED_DIFF\n'
+        git -C "$REPO" diff --binary
+
+        printf 'ALLOWED_CONTENT_HASHES\n'
+
+        while IFS= read -r path
+        do
+            [[ -n "$path" ]] || continue
+
+            if [[ -f "$REPO/$path" ]]
+            then
+                sha256sum "$REPO/$path"
+            else
+                printf 'ABSENT  %s\n' "$path"
+            fi
+        done < "$ALLOWED_FILE"
+    } |
+        sha256sum |
+        awk '{print $1}'
+}
+
+validate_scope() {
+    git -C "$REPO" diff --cached --quiet || {
+        printf 'ERROR: staged/index changes detected\n' >&2
+        return 1
+    }
+
+    python3 - "$REPO" "$ALLOWED_FILE" <<'PY'
+from pathlib import Path
+import subprocess
+import sys
+
+repo = sys.argv[1]
+
+allowed = {
+    line.strip()
+    for line in Path(sys.argv[2])
+        .read_text(encoding="utf-8")
+        .splitlines()
+    if line.strip()
+}
+
+raw = subprocess.check_output(
+    [
+        "git",
+        "status",
+        "--porcelain=v1",
+        "-uall",
+    ],
+    cwd=repo,
+    text=True,
+)
+
+paths = set()
+
+for line in raw.splitlines():
+    if not line:
+        continue
+
+    if line[:2] != "??" and line[0] != " ":
+        raise SystemExit(
+            f"index/staged mutation detected: {line}"
+        )
+
+    path = line[3:]
+
+    if " -> " in path:
+        raise SystemExit(
+            f"rename not permitted: {line}"
+        )
+
+    paths.add(path)
+
+unexpected = paths - allowed
+
+if unexpected:
+    raise SystemExit(
+        "out-of-scope paths changed: "
+        + repr(sorted(unexpected))
+    )
+
+if not paths:
+    raise SystemExit(
+        "candidate contains no changed files"
+    )
+
+print("CHANGED_SCOPE_VALID=YES")
+
+for path in sorted(paths):
+    print(f"  {path}")
+PY
+}
+
+extract_session_id() {
+    python3 - "$1" <<'PY'
+import json
+import sys
+
+ids = set()
+
+with open(sys.argv[1], encoding="utf-8") as handle:
+    for raw in handle:
+        raw = raw.strip()
+
+        if not raw:
+            continue
+
+        try:
+            event = json.loads(raw)
+        except json.JSONDecodeError:
+            continue
+
+        session = event.get("sessionID")
+
+        if isinstance(session, str) and session:
+            ids.add(session)
+
+if len(ids) != 1:
+    raise SystemExit(
+        f"expected one session id, got {sorted(ids)}"
+    )
+
+print(next(iter(ids)))
+PY
+}
+
+extract_text() {
+    python3 - "$1" <<'PY'
+import json
+import sys
+
+texts = []
+
+with open(sys.argv[1], encoding="utf-8") as handle:
+    for raw in handle:
+        raw = raw.strip()
+
+        if not raw:
+            continue
+
+        try:
+            event = json.loads(raw)
+        except json.JSONDecodeError:
+            continue
+
+        if event.get("type") != "text":
+            continue
+
+        part = event.get("part") or {}
+        text = part.get("text")
+
+        if isinstance(text, str) and text.strip():
+            texts.append(text.strip())
+
+print("\n\n".join(texts))
+PY
+}
+
+allowed_block="$(
+    sed 's/^/- /' "$ALLOWED_FILE"
+)"
+
+contract_text="$(cat "$CONTRACT_COPY")"
+
+run_builder() {
+    local cycle="$1"
+    local feedback="${2:-}"
+    local outfile="$EVIDENCE/builder-${cycle}.jsonl"
+
+    local prompt
+
+    prompt="$(cat <<EOF
+DETERMINISTIC AGENT-LOOP BUILDER EXECUTION
+
+The frozen feature contract is:
+
+$contract_text
+
+Allowed files are exactly:
+
+$allowed_block
+
+Implement or repair only this contract.
+
+You MUST satisfy every ACCEPTANCE_CRITERIA item and every TEST_REQUIREMENTS
+item.
+
+If an allowed automated-test file is required by the contract and does not
+exist, create it.
+
+Follow the repository's existing implementation, test-framework, and formatting
+conventions.
+
+Do not broaden scope.
+Do not modify control-plane files.
+Do not call another agent.
+Do not stage, commit, push, merge, rebase, reset, stash, clean, create branches,
+or manipulate worktrees.
+
+Do not run the project's authoritative full quality-gate sequence. The
+deterministic controller owns validation.
+EOF
+)"
+
+    if [[ -n "$feedback" ]]
+    then
+        prompt+=$'\n\n'
+        prompt+="REPAIR FEEDBACK FROM THE DETERMINISTIC CONTROLLER:"
+        prompt+=$'\n\n'
+        prompt+="$feedback"
+        prompt+=$'\n\n'
+        prompt+="Fix the concrete failure while continuing to satisfy the entire frozen contract."
+    fi
+
+    local before
+    before="$(candidate_digest)"
+
+    printf '\n=================================================================\n'
+    printf 'BUILDER CYCLE %s\n' "$cycle"
+    printf '=================================================================\n'
+
+    local rc=0
+
+    if timeout 420 \
+        "$OPENCODE" run \
+        --auto \
+        --dir "$REPO" \
+        --agent builder \
+        --model "$MODEL" \
+        --format json \
+        "$prompt" \
+        > "$outfile" \
+        2> "$EVIDENCE/builder-${cycle}.stderr"
+    then
+        rc=0
+    else
+        rc=$?
+    fi
+
+    printf 'BUILDER_EXIT=%s\n' "$rc"
+
+    if [[ "$rc" -ne 0 ]]
+    then
+        printf 'ERROR: Builder failed or timed out\n' >&2
+        return 1
+    fi
+
+    local session
+    session="$(extract_session_id "$outfile")"
+
+    printf 'BUILDER_SESSION=%s\n' "$session"
+
+    validate_scope || return 1
+
+    local after
+    after="$(candidate_digest)"
+
+    if [[ "$before" == "$after" ]]
+    then
+        printf 'ERROR: Builder produced no candidate-state change\n' >&2
+        return 1
+    fi
+
+    printf 'BUILDER_CANDIDATE_DIGEST=%s\n' "$after"
+
+    return 0
+}
+
+LAST_GATE=""
+LAST_GATE_FILE=""
+
+run_gate() {
+    local cycle="$1"
+    local number="$2"
+    local label="$3"
+
+    shift 3
+
+    local outfile="$EVIDENCE/gates-${cycle}-${number}-${label}.txt"
+    local rc=0
+
+    LAST_GATE="$*"
+    LAST_GATE_FILE="$outfile"
+
+    printf '\n>>> %s. %s\n' "$number" "$*"
+
+    # IMPORTANT:
+    # This expected-failure boundary MUST NOT toggle global errexit.
+    # The pipeline lives in an if-condition, so Bash may return a
+    # nonzero command status without exiting the controller.
+    if (
+        cd "$REPO"
+        "$@"
+    ) 2>&1 | tee "$outfile"
+    then
+        rc=0
+    else
+        rc=${PIPESTATUS[0]}
+    fi
+
+    printf 'EXIT=%s\n' "$rc" |
+        tee -a "$outfile"
+
+    local now
+    now="$(candidate_digest)"
+
+    if [[ "$now" != "$GATE_EXPECTED_DIGEST" ]]
+    then
+        printf 'ERROR: quality gate mutated candidate state\n' >&2
+        return 2
+    fi
+
+    if [[ "$rc" -ne 0 ]]
+    then
+        printf 'GATE_RESULT=FAIL\n'
+        return 1
+    fi
+
+    printf 'GATE_RESULT=PASS\n'
+    return 0
+}
+
+run_all_gates() {
+    local cycle="$1"
+    local rc=0
+
+    printf '\n=================================================================\n'
+    printf 'DETERMINISTIC TESTER CYCLE %s\n' "$cycle"
+    printf '=================================================================\n'
+
+    validate_scope || return 2
+
+    GATE_EXPECTED_DIGEST="$(candidate_digest)"
+
+    if run_gate "$cycle" 1 FORMAT pnpm format-check
+    then
+        :
+    else
+        rc=$?
+        return "$rc"
+    fi
+
+    if run_gate "$cycle" 2 LINT pnpm lint
+    then
+        :
+    else
+        rc=$?
+        return "$rc"
+    fi
+
+    if run_gate "$cycle" 3 TYPECHECK pnpm type-check
+    then
+        :
+    else
+        rc=$?
+        return "$rc"
+    fi
+
+    if run_gate "$cycle" 4 TEST pnpm test
+    then
+        :
+    else
+        rc=$?
+        return "$rc"
+    fi
+
+    if run_gate "$cycle" 5 BUILD pnpm build
+    then
+        :
+    else
+        rc=$?
+        return "$rc"
+    fi
+
+    if run_gate "$cycle" 6 E2E pnpm test:e2e
+    then
+        :
+    else
+        rc=$?
+        return "$rc"
+    fi
+
+    printf 'TESTER_PASS=YES\n'
+    return 0
+}
+
+REVIEW_DECISION=""
+REVIEW_TEXT=""
+
+run_reviewer() {
+    local cycle="$1"
+    local outfile="$EVIDENCE/reviewer-${cycle}.jsonl"
+
+    local prompt
+
+    prompt="$(cat <<EOF
+DETERMINISTIC AGENT-LOOP REVIEW
+
+The frozen feature contract is:
+
+$contract_text
+
+Allowed files are exactly:
+
+$allowed_block
+
+The deterministic controller has already completed all six authoritative
+quality gates successfully for the CURRENT candidate.
+
+Review the complete current candidate against every acceptance criterion and
+every test requirement.
+
+Important:
+- allowed new files may be untracked, so read them directly;
+- do not rely only on git diff;
+- do not modify anything;
+- do not call another agent;
+- do not run the quality suite;
+- do not perform Git mutation.
+
+If there is any blocking problem, finish with exactly:
+
+REVIEWER REQUEST_CHANGES
+
+and concise actionable findings.
+
+Otherwise finish with exactly:
+
+REVIEWER APPROVE
+
+and a concise review summary and residual risk.
+EOF
+)"
+
+    local before
+    before="$(candidate_digest)"
+
+    printf '\n=================================================================\n'
+    printf 'REVIEWER CYCLE %s\n' "$cycle"
+    printf '=================================================================\n'
+
+    local rc=0
+
+    if timeout 420 \
+        "$OPENCODE" run \
+        --auto \
+        --dir "$REPO" \
+        --agent reviewer \
+        --model "$MODEL" \
+        --format json \
+        "$prompt" \
+        > "$outfile" \
+        2> "$EVIDENCE/reviewer-${cycle}.stderr"
+    then
+        rc=0
+    else
+        rc=$?
+    fi
+
+    printf 'REVIEWER_EXIT=%s\n' "$rc"
+
+    if [[ "$rc" -ne 0 ]]
+    then
+        printf 'ERROR: Reviewer failed or timed out\n' >&2
+        return 1
+    fi
+
+    local session
+    session="$(extract_session_id "$outfile")"
+
+    printf 'REVIEWER_SESSION=%s\n' "$session"
+
+    local after
+    after="$(candidate_digest)"
+
+    if [[ "$before" != "$after" ]]
+    then
+        printf 'ERROR: Reviewer mutated candidate state\n' >&2
+        return 1
+    fi
+
+    REVIEW_TEXT="$(extract_text "$outfile")"
+
+    printf '%s\n' "$REVIEW_TEXT" \
+        > "$EVIDENCE/reviewer-${cycle}-text.txt"
+
+    if grep -Fq \
+        'REVIEWER REQUEST_CHANGES' \
+        "$EVIDENCE/reviewer-${cycle}-text.txt"
+    then
+        if grep -Fq \
+            'REVIEWER APPROVE' \
+            "$EVIDENCE/reviewer-${cycle}-text.txt"
+        then
+            printf 'ERROR: Reviewer emitted conflicting decisions\n' >&2
+            return 1
+        fi
+
+        REVIEW_DECISION="REQUEST_CHANGES"
+        printf 'REVIEWER_DECISION=REQUEST_CHANGES\n'
+        return 0
+    fi
+
+    if grep -Fq \
+        'REVIEWER APPROVE' \
+        "$EVIDENCE/reviewer-${cycle}-text.txt"
+    then
+        REVIEW_DECISION="APPROVE"
+        printf 'REVIEWER_DECISION=APPROVE\n'
+        return 0
+    fi
+
+    printf 'ERROR: Reviewer emitted no terminal decision\n' >&2
+    return 1
+}
+
+repair_count=0
+cycle=1
+feedback=""
+
+run_builder "$cycle" "$feedback"
+
+while true
+do
+    gate_rc=0
+
+    if run_all_gates "$cycle"
+    then
+        gate_rc=0
+    else
+        gate_rc=$?
+    fi
+
+    printf 'TESTER_CYCLE_%s_EXIT=%s\n' \
+        "$cycle" "$gate_rc"
+
+    if [[ "$gate_rc" -eq 2 ]]
+    then
+        printf 'ERROR: deterministic Tester safety invariant failed\n' >&2
+        exit 1
+    fi
+
+    if [[ "$gate_rc" -ne 0 ]]
+    then
+        printf 'TESTER_FAIL=YES\n'
+
+        if [[ "$repair_count" -ge "$MAX_REPAIRS" ]]
+        then
+            printf 'ERROR: repair-cycle limit reached after Tester failure\n' >&2
+            exit 1
+        fi
+
+        repair_count=$((repair_count + 1))
+        cycle=$((cycle + 1))
+
+        failure_tail="$(
+            tail -c 12000 "$LAST_GATE_FILE"
+        )"
+
+        feedback="$(cat <<EOF
+DETERMINISTIC TESTER FAILURE
+
+Failed command:
+$LAST_GATE
+
+Failure output:
+$failure_tail
+
+After repairing this failure, you must still satisfy EVERY acceptance criterion
+and EVERY TEST_REQUIREMENTS item from the frozen contract.
+EOF
+)"
+
+        printf 'TRANSITION=TESTER_FAIL_TO_BUILDER_REPAIR\n'
+        printf 'REPAIR_CYCLE=%s\n' "$repair_count"
+
+        run_builder "$cycle" "$feedback"
+        continue
+    fi
+
+    printf 'TRANSITION=TESTER_PASS_TO_REVIEWER\n'
+
+    run_reviewer "$cycle"
+
+    if [[ "$REVIEW_DECISION" == "APPROVE" ]]
+    then
+        printf 'TRANSITION=REVIEWER_APPROVE_TO_READY\n'
+        break
+    fi
+
+    printf 'TRANSITION=REVIEWER_REQUEST_CHANGES_TO_BUILDER_REPAIR\n'
+
+    if [[ "$repair_count" -ge "$MAX_REPAIRS" ]]
+    then
+        printf 'ERROR: repair-cycle limit reached after Reviewer changes\n' >&2
+        exit 1
+    fi
+
+    repair_count=$((repair_count + 1))
+    cycle=$((cycle + 1))
+
+    feedback="$(cat <<EOF
+INDEPENDENT REVIEWER REQUESTED CHANGES
+
+$REVIEW_TEXT
+
+Repair the findings while continuing to satisfy the complete frozen contract.
+After this edit, all previous Tester/Reviewer approval is invalid.
+EOF
+)"
+
+    run_builder "$cycle" "$feedback"
+done
+
+validate_scope
+
+FINAL_DIGEST="$(candidate_digest)"
+
+git -C "$REPO" status \
+    --porcelain=v1 \
+    -uall \
+    > "$EVIDENCE/final-status.txt"
+
+git -C "$REPO" diff \
+    --binary \
+    > "$EVIDENCE/final-tracked.patch"
+
+{
+    printf 'BASE_HEAD=%s\n' "$BASE_HEAD"
+    printf 'FINAL_CANDIDATE_DIGEST=%s\n' "$FINAL_DIGEST"
+    printf 'REPAIR_CYCLES=%s\n' "$repair_count"
+
+    printf '\nALLOWED_FILES\n'
+    cat "$ALLOWED_FILE"
+
+    printf '\nSTATUS\n'
+    cat "$EVIDENCE/final-status.txt"
+
+    printf '\nTRACKED_DIFF\n'
+    cat "$EVIDENCE/final-tracked.patch"
+
+    printf '\nALLOWED_FILE_HASHES\n'
+
+    while IFS= read -r path
+    do
+        [[ -n "$path" ]] || continue
+
+        if [[ -f "$REPO/$path" ]]
+        then
+            sha256sum "$REPO/$path"
+        else
+            printf 'ABSENT  %s\n' "$path"
+        fi
+    done < "$ALLOWED_FILE"
+} > "$EVIDENCE/candidate-authority.txt"
+
+AUTHORITY_SHA="$(
+    sha256sum "$EVIDENCE/candidate-authority.txt" |
+    awk '{print $1}'
+)"
+
+printf '\n=================================================================\n'
+printf 'AGENT-LOOP RESULT\n'
+printf '=================================================================\n'
+
+printf 'STATUS: READY FOR USER REVIEW\n'
+printf 'BASE_HEAD=%s\n' "$BASE_HEAD"
+printf 'REPAIR_CYCLES=%s\n' "$repair_count"
+printf 'TESTER=format-check,lint,type-check,test,build,test:e2e PASS\n'
+printf 'REVIEWER=APPROVE\n'
+printf 'CANDIDATE_AUTHORITY_SHA256=%s\n' "$AUTHORITY_SHA"
+printf 'EVIDENCE=%s\n' "$EVIDENCE"
+
+printf '\nNO STAGE.\n'
+printf 'NO COMMIT.\n'
+printf 'NO PUSH.\n'
