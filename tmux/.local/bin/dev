@@ -291,7 +291,7 @@ else
 
     tmux send-keys \
         -t "$DEV_TMUX_SESSION:code" \
-        "$PROJECT_EXEC '$DEV_PROJECT_ROOT' nvim ." \
+        "$PROJECT_EXEC '$DEV_PROJECT_ROOT' nvim '+lua vim.defer_fn(function() require([[telescope.builtin]]).find_files() end, 50)'" \
         C-m
 
     tmux new-window \

@@ -16,6 +16,7 @@ return {
         { "<leader>c", group = "Code" },
         { "<leader>e", group = "Explorer" },
         { "<leader>f", group = "Find" },
+        { "<leader>a", group = "AI" },
         { "<leader>g", group = "Git" },
         { "<leader>gv", group = "Git View" },
         { "<leader>gd", group = "GitSigns diffthis" },
