@@ -303,7 +303,7 @@ else
     if command -v opencode >/dev/null 2>&1; then
         tmux send-keys \
             -t "$DEV_TMUX_SESSION:agent" \
-            "$PROJECT_EXEC '$DEV_PROJECT_ROOT' opencode" \
+            "$PROJECT_EXEC '$DEV_PROJECT_ROOT' opencode --agent orchestrator" \
             C-m
     fi
 
