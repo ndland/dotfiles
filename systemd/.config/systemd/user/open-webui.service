@@ -1,0 +1,39 @@
+[Unit]
+Description=Open WebUI - Local Ollama Interface
+Documentation=https://docs.openwebui.com/
+
+[Service]
+Type=simple
+
+# Phase 3.4 pinned runtime:
+#   Open WebUI 0.11.0
+#   Python 3.11.16 via uv
+#
+# Ollama remains independently managed by its system service and
+# remains bound only to 127.0.0.1:11434.
+
+WorkingDirectory=/home/ndland/.local/share/open-webui
+
+Environment="DATA_DIR=/home/ndland/.local/share/open-webui/data"
+Environment="OLLAMA_BASE_URL=http://127.0.0.1:11434"
+
+Environment="WEBUI_URL=http://127.0.0.1:8080"
+Environment="CORS_ALLOW_ORIGIN=http://127.0.0.1:8080;http://localhost:8080"
+
+Environment="WEBUI_AUTH=True"
+Environment="ENABLE_SIGNUP=False"
+Environment="ENABLE_OPENAI_API=False"
+Environment="ENABLE_VERSION_UPDATE_CHECK=False"
+
+Environment="UVICORN_WORKERS=1"
+Environment="ENV=prod"
+
+UMask=0077
+
+ExecStart=/home/ndland/.local/share/open-webui/runtime/bin/open-webui serve --host 127.0.0.1 --port 8080
+
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=default.target
