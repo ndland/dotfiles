@@ -71,53 +71,7 @@ config.window_padding = {
 	bottom = 6,
 }
 
-config.leader = { key = "a", mods = "CTRL", timeout_milliseconds = 2000 }
 
-config.keys = {
-	{
-		key = "\\",
-		mods = "LEADER",
-		action = act.SplitHorizontal({ domain = "CurrentPaneDomain" }),
-	},
-	{
-		key = "-",
-		mods = "LEADER",
-		action = act.SplitVertical({ domain = "CurrentPaneDomain" }),
-	},
-	{
-		key = "h",
-		mods = "LEADER",
-		action = act.ActivatePaneDirection("Left"),
-	},
-	{
-		key = "j",
-		mods = "LEADER",
-		action = act.ActivatePaneDirection("Down"),
-	},
-	{
-		key = "k",
-		mods = "LEADER",
-		action = act.ActivatePaneDirection("Up"),
-	},
-	{
-		key = "l",
-		mods = "LEADER",
-		action = act.ActivatePaneDirection("Right"),
-	},
-	{
-		key = "x",
-		mods = "LEADER",
-		action = act.CloseCurrentPane({ confirm = true }),
-	},
-	{ key = "c", mods = "LEADER", action = act.SpawnTab("CurrentPaneDomain") },
-	{ key = "n", mods = "LEADER", action = act.ActivateTabRelative(1) },
-	{ key = "p", mods = "LEADER", action = act.ActivateTabRelative(-1) },
-	{
-		key = "a",
-		mods = "LEADER|CTRL",
-		action = act.SendKey({ key = "a", mods = "CTRL" }),
-	},
-}
 
 config.audible_bell = "Disabled"
 config.adjust_window_size_when_changing_font_size = false
@@ -223,26 +177,6 @@ if resurrect then
 		)
 	end)
 
-	table.insert(config.keys, {
-		key = "w",
-		mods = "LEADER",
-		action = rename_workspace,
-	})
-	table.insert(config.keys, {
-		key = "s",
-		mods = "LEADER",
-		action = resurrect.workspace_state.save_workspace_action(),
-	})
-	table.insert(config.keys, {
-		key = "r",
-		mods = "LEADER",
-		action = restore_into_current_window,
-	})
-	table.insert(config.keys, {
-		key = "d",
-		mods = "LEADER",
-		action = resurrect.fuzzy_loader.delete_action(),
-	})
 end
 
 return config
