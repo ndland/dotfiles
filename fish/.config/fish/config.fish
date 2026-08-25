@@ -31,8 +31,7 @@ set -g fish_key_bindings fish_default_key_bindings
 # ---------------------------------------------------------------
 # Runtime manager
 #
-# mise is preferred.
-# fnm remains the compatibility fallback for existing Macs.
+# mise is the only language/runtime manager.
 # ---------------------------------------------------------------
 
 if test -x "$HOME/.local/bin/mise"
@@ -53,8 +52,6 @@ else if command -q mise
     if status is-interactive; and not set -q WSL_DISTRO_NAME
         mise activate fish | source
     end
-else if command -q fnm
-    fnm env --use-on-cd --shell fish | source
 end
 
 if status is-interactive

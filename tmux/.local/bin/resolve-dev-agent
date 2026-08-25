@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+PREF="${DEV_AGENT_PREFERENCE:-$HOME/.config/dev/agent}"
+
+die() {
+    printf 'resolve-dev-agent: %s\n' "$*" >&2
+    exit 1
+}
+
+[[ -f "$PREF" ]] ||
+    die "missing $PREF (write opencode or cursor-agent on one line)"
+
+CHOICE="$(
+    tr -d '[:space:]' < "$PREF"
+)"
+
+[[ -n "$CHOICE" ]] ||
+    die "empty preference file: $PREF"
+
+candidates=()
+
+case "$CHOICE" in
+    opencode)
+        candidates=(opencode)
+        ;;
+    cursor-agent|agent)
+        candidates=(cursor-agent agent)
+        ;;
+    *)
+        die "unknown agent '$CHOICE' (expected opencode, cursor-agent, or agent)"
+        ;;
+esac
+
+for name in "${candidates[@]}"; do
+    if command -v "$name" >/dev/null 2>&1; then
+        command -v "$name"
+        exit 0
+    fi
+done
+
+die "preferred agent '$CHOICE' is not installed"

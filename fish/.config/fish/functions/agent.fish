@@ -1,12 +1,6 @@
-function agent \
-    --description 'Launch preferred terminal coding agent'
+function agent --description 'Launch machine-local terminal coding agent'
+    set -l resolved (resolve-dev-agent)
+    or return $status
 
-    if command -q opencode
-        opencode $argv
-    else if command -q cursor-agent
-        cursor-agent $argv
-    else
-        echo "No terminal coding agent is installed." >&2
-        return 127
-    end
+    $resolved $argv
 end
