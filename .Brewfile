@@ -5,7 +5,6 @@
 brew "fish"
 brew "oh-my-posh"
 brew "direnv"
-brew "fnm"
 brew "zoxide"
 
 # Editor and file tools (y, lg, ls, bat, vale, zk)

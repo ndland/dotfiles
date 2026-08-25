@@ -255,6 +255,16 @@ fi
 
 preflight_project
 
+RESOLVER="${HOME}/.local/bin/resolve-dev-agent"
+if [[ ! -x "$RESOLVER" ]]; then
+    RESOLVER="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/resolve-dev-agent"
+fi
+[[ -x "$RESOLVER" ]] || {
+    echo "dev: resolve-dev-agent is unavailable." >&2
+    exit 1
+}
+RESOLVED_AGENT="$("$RESOLVER")" || exit 1
+
 if tmux has-session \
     -t "$DEV_TMUX_SESSION" \
     2>/dev/null; then
@@ -300,12 +310,10 @@ else
         -n agent \
         -c "$DEV_PROJECT_ROOT"
 
-    if command -v opencode >/dev/null 2>&1; then
-        tmux send-keys \
-            -t "$DEV_TMUX_SESSION:agent" \
-            "$PROJECT_EXEC '$DEV_PROJECT_ROOT' opencode" \
-            C-m
-    fi
+    tmux send-keys \
+        -t "$DEV_TMUX_SESSION:agent" \
+        "$PROJECT_EXEC '$DEV_PROJECT_ROOT' '$RESOLVED_AGENT'" \
+        C-m
 
     tmux new-window \
         -d \

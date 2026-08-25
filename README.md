@@ -28,6 +28,11 @@ GNU Stow links the packages into `$HOME`.
 
    - 1Password (SSH git signing)
    - `gh auth login` for the personal and work GitHub accounts
+   - Create `~/.config/dev/agent` with one line: `cursor-agent` on the work
+     Mac, `opencode` on the personal machine. `dev` and the `agent` fish
+     function both read this file. There is no repo default.
+   - On the work Mac, log the Cursor CLI into your work account
+     (`cursor-agent login` or `agent login`)
 
 On a machine that already has this repo, the same script is the update path:
 

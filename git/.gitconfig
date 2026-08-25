@@ -87,12 +87,3 @@
 	useConfigOnly = true
 [init]
 	defaultBranch = main
-
-# Role-aware SSH transport.
-# The wrapper uses the effective personal/work signing key as
-# the public-key selector while private keys remain in 1Password.
-[core]
-    sshCommand = ~/.local/bin/git-ssh-role
-
-[ssh]
-    variant = ssh

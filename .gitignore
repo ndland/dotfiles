@@ -125,3 +125,6 @@ config.local.fish
 
 # tmux runtime plugins must never live inside the Stow package.
 tmux/.config/tmux/plugins/
+
+# Local design notes and implementation plans.
+docs/

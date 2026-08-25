@@ -85,6 +85,11 @@ if [[ "$IS_WSL" -eq 1 ]]; then
         gpg.ssh.program \
         "$SIGNER"
 
+    git config \
+        -f "$TMP" \
+        core.sshCommand \
+        "$HOME/.local/bin/git-ssh-role"
+
 elif [[ "$OS" == "Darwin" ]]; then
     echo "Detected platform: macOS"
 
