@@ -151,6 +151,33 @@ preflight_project() {
             return 1
         fi
 
+        # DEV_OWNED_MISE_AUTO_TRUST_START
+        # Repositories in the user's own GitHub namespace are a local
+        # trust domain. Keep mise paranoid mode enabled, but trust the
+        # exact current contents of their project-local mise.toml.
+        #
+        # Third-party repositories remain explicitly human-gated.
+        if [[ -f "$DEV_PROJECT_ROOT/mise.toml" ]]; then
+            case "$DEV_PROJECT_ROOT" in
+                "$HOME/code/github.com/ndland/"*)
+                    local trust_output
+
+                    if ! trust_output="$(
+                        env \
+                            MISE_PARANOID=1 \
+                            mise \
+                            trust \
+                            "$DEV_PROJECT_ROOT/mise.toml" \
+                            2>&1
+                    )"; then
+                        echo "dev: unable to trust owned project mise config:" >&2
+                        printf '%s\n' "$trust_output" | sed 's/^/  /' >&2
+                        return 1
+                    fi
+                    ;;
+            esac
+        fi
+        # DEV_OWNED_MISE_AUTO_TRUST_END
         local missing
         local result
 
@@ -179,7 +206,7 @@ preflight_project() {
             echo >&2
             echo "Review the project config first." >&2
             echo "If it is trusted, authorize its current contents with:" >&2
-            echo "  mise trust '$DEV_PROJECT_ROOT/mise.toml'" >&2
+            echo "  MISE_PARANOID=1 mise trust '$DEV_PROJECT_ROOT/mise.toml'" >&2
             return 1
         fi
 

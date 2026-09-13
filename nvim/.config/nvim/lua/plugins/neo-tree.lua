@@ -39,15 +39,12 @@ return {
           with_markers = true,
           indent_marker = "│",
           last_indent_marker = "└",
-          expander_collapsed = "",
-          expander_expanded = "",
+          with_expanders = true,
         },
-        icon = {
-          folder_closed = "",
-          folder_open = "",
-          folder_empty = "",
-          default = "*",
+        name = {
+          trailing_slash = true,
         },
+
         git_status = {
           symbols = {
             added = "A",
@@ -72,6 +69,7 @@ return {
       },
 
       filesystem = {
+        bind_to_cwd = true,
         follow_current_file = {
           enabled = true,
         },
@@ -135,4 +133,3 @@ return {
     },
   },
 }
-

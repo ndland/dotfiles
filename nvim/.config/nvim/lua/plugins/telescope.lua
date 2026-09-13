@@ -14,21 +14,51 @@ return {
       {
         "<leader><leader>",
         function()
-          require("telescope.builtin").find_files()
+          require("telescope.builtin").find_files({
+            cwd = require("config.project-root").current(),
+            hidden = false,
+            no_ignore = false,
+          })
         end,
         desc = "Find files",
       },
       {
         "<leader>ff",
         function()
-          require("telescope.builtin").find_files()
+          require("telescope.builtin").find_files({
+            cwd = require("config.project-root").current(),
+            hidden = false,
+            no_ignore = false,
+          })
         end,
         desc = "Find files",
       },
       {
+        "<leader>f.",
+        function()
+          require("telescope.builtin").find_files({
+            cwd = require("config.project-root").current(),
+            hidden = true,
+            no_ignore = false,
+            file_ignore_patterns = {
+              "^%.git/",
+            },
+          })
+        end,
+        desc = "Find hidden files",
+      },
+      {
         "<leader>fg",
         function()
-          require("telescope.builtin").live_grep()
+          require("telescope.builtin").live_grep({
+            cwd = require("config.project-root").current(),
+            additional_args = function()
+              return {
+                "--glob",
+                "!**/.*",
+              }
+            end,
+          })
         end,
         desc = "Live grep",
       },
@@ -115,4 +145,3 @@ return {
     end,
   },
 }
-

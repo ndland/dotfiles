@@ -179,4 +179,16 @@ if resurrect then
 
 end
 
+-- OPENCODE_SHIFT_ENTER_START
+-- Give Shift+Enter a distinct CSI-u sequence so terminal TUIs
+-- such as OpenCode can distinguish it from normal Enter.
+config.keys = config.keys or {}
+
+table.insert(config.keys, {
+  key = "Enter",
+  mods = "SHIFT",
+  action = wezterm.action.SendString("\x1b[13;2u"),
+})
+-- OPENCODE_SHIFT_ENTER_END
+
 return config

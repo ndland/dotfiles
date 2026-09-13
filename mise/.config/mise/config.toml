@@ -15,18 +15,18 @@
 #   mise use java@...
 
 [tools]
-node = "24.19.0"
-neovim = "0.12.4"
-tree-sitter = "0.26.11"
+node = "26.8.2"
+neovim = "0.12.5"
+tree-sitter = "0.27.0"
 stylua = "2.5.2"
 delta = "0.19.2"
-github-cli = "2.97.0"
-"github:anomalyco/opencode" = "1.18.19"
+github-cli = "2.100.0"
+"github:anomalyco/opencode" = "1.18.30"
 
 bat = "0.26.1"
 eza = "0.23.5"
-fd = "10.4.2"
-lazygit = "0.64.1"
-uv = "0.12.5"
-yazi = "26.8.15"
+fd = "10.5.0"
+uv = "0.12.13"
+yazi = "26.9.1"
 zoxide = "0.10.0"
+"github:gastownhall/beads" = "latest"

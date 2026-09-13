@@ -13,3 +13,5 @@ require("config.keymaps")
 
 require("lazy").setup("plugins")
 
+
+require("config.project-root").setup()

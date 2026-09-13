@@ -1,6 +1,6 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "model": "ollama/gpt-oss:20b",
+  "model": "ollama/qwen3.8:27b",
   "subagent_depth": 1,
   "autoupdate": false,
   "share": "disabled",
@@ -24,6 +24,22 @@
           "limit": {
             "context": 64000,
             "output": 8192
+          }
+        },
+        "qwen3.8:27b": {
+          "name": "Qwen3.8 27B (local)",
+          "limit": {
+            "context": 64000,
+            "output": 8192
+          },
+          "modalities": {
+            "input": [
+              "text",
+              "image"
+            ],
+            "output": [
+              "text"
+            ]
           }
         }
       }
