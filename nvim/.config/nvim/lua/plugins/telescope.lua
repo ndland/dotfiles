@@ -3,6 +3,21 @@ return {
     "nvim-telescope/telescope.nvim",
     version = "*",
     cmd = "Telescope",
+    init = function()
+      vim.api.nvim_create_autocmd("VimEnter", {
+        group = vim.api.nvim_create_augroup("user-telescope-startup", { clear = true }),
+        nested = true,
+        callback = function()
+          if vim.fn.argc() ~= 0 then
+            return
+          end
+
+          vim.schedule(function()
+            vim.cmd("Telescope find_files")
+          end)
+        end,
+      })
+    end,
     dependencies = {
       "nvim-lua/plenary.nvim",
       {

@@ -21,6 +21,21 @@ return {
       enable_git_status = true,
       enable_diagnostics = true,
 
+      event_handlers = {
+        {
+          event = "file_moved",
+          handler = function(data)
+            require("snacks").rename.on_rename_file(data.source, data.destination)
+          end,
+        },
+        {
+          event = "file_renamed",
+          handler = function(data)
+            require("snacks").rename.on_rename_file(data.source, data.destination)
+          end,
+        },
+      },
+
       sources = {
         "filesystem",
         "buffers",

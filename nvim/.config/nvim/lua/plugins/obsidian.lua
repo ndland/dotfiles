@@ -1,6 +1,7 @@
 return {
 	{
 		"obsidian-nvim/obsidian.nvim",
+		enabled = false,
 		version = "*",
 		ft = "markdown",
 		cmd = { "Obsidian" },

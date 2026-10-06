@@ -17,7 +17,9 @@ return {
       lint.linters_by_ft = {
         javascript = { "eslint" },
         javascriptreact = { "eslint" },
+        bash = { "shellcheck" },
         markdown = { "vale" },
+        sh = { "shellcheck" },
         text = { "vale" },
         typescript = { "eslint" },
         typescriptreact = { "eslint" },
@@ -104,6 +106,16 @@ return {
         group = eslint_augroup,
         callback = function(args)
           try_eslint(args.buf)
+        end,
+      })
+
+      vim.api.nvim_create_autocmd({ "BufReadPost", "BufWritePost" }, {
+        group = vim.api.nvim_create_augroup("shellcheck_lint", { clear = true }),
+        callback = function(args)
+          local filetype = vim.bo[args.buf].filetype
+          if filetype == "sh" or filetype == "bash" then
+            lint.try_lint("shellcheck")
+          end
         end,
       })
     end,

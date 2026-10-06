@@ -24,6 +24,7 @@ return {
         "cssls",
         "eslint",
         "html",
+        "lua_ls",
         "tailwindcss",
         "ts_ls",
       },
@@ -101,6 +102,26 @@ return {
         capabilities = capabilities,
       })
 
+      vim.lsp.config("lua_ls", {
+        capabilities = capabilities,
+        settings = {
+          Lua = {
+            runtime = { version = "LuaJIT" },
+            workspace = {
+              library = vim.api.nvim_get_runtime_file("", true),
+              checkThirdParty = false,
+            },
+            format = { enable = false },
+            telemetry = { enable = false },
+          },
+        },
+      })
+
+      vim.lsp.config("bashls", {
+        capabilities = capabilities,
+        filetypes = { "sh", "bash" },
+      })
+
       vim.lsp.config("tailwindcss", {
         capabilities = capabilities,
         root_dir = function(bufnr, on_dir)
@@ -140,6 +161,8 @@ return {
       vim.lsp.enable("astro")
       vim.lsp.enable("eslint")
       vim.lsp.enable("tailwindcss")
+      vim.lsp.enable("lua_ls")
+      vim.lsp.enable("bashls")
     end,
   },
 }

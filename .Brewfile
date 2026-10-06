@@ -7,13 +7,15 @@ brew "oh-my-posh"
 brew "direnv"
 brew "zoxide"
 
-# Editor and file tools (y, lg, ls, bat, vale, zk)
+# Editor and file tools (y, ls, bat, vale, zk)
 brew "ffmpeg-full"
 brew "imagemagick-full"
 brew "poppler"
 brew "resvg"
 brew "sevenzip"
 brew "vale"
+brew "shellcheck"
+brew "bash-language-server"
 brew "zk"
 brew "buku"
 brew "btop"

@@ -35,9 +35,7 @@ set -g fish_key_bindings fish_default_key_bindings
 # ---------------------------------------------------------------
 
 if test -x "$HOME/.local/bin/mise"
-    if test -d "$HOME/.local/share/mise/shims"
-        fish_add_path -g "$HOME/.local/share/mise/shims"
-    end
+    fish_add_path -g "$HOME/.local/share/mise/shims"
 
     # WSL uses mise shims only to avoid expensive shell-hook startup.
     # macOS/Linux retain full interactive activation.
@@ -45,9 +43,7 @@ if test -x "$HOME/.local/bin/mise"
         "$HOME/.local/bin/mise" activate fish | source
     end
 else if command -q mise
-    if test -d "$HOME/.local/share/mise/shims"
-        fish_add_path -g "$HOME/.local/share/mise/shims"
-    end
+    fish_add_path -g "$HOME/.local/share/mise/shims"
 
     if status is-interactive; and not set -q WSL_DISTRO_NAME
         mise activate fish | source
@@ -102,10 +98,6 @@ if status is-interactive
 
         abbr -a tree \
             'eza --tree --group-directories-first'
-    end
-
-    if command -q lazygit
-        abbr -a lg lazygit
     end
 
     if command -q yazi

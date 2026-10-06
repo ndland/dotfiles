@@ -16,8 +16,6 @@ tooltips:
       tips:
         - git
         - g
-        - lg
-        - lazygit
       style: diamond
       leading_diamond: 
       trailing_diamond: 

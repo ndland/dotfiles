@@ -24,9 +24,9 @@ return {
 				map("n", "]h", gs.next_hunk, "Next hunk")
 				map("n", "[h", gs.prev_hunk, "Prev hunk")
 
-				map("n", "<leader>gs", gs.stage_hunk, "Stage hunk")
+				map("n", "<leader>ga", gs.stage_hunk, "Stage hunk")
 				map("n", "<leader>gr", gs.reset_hunk, "Reset hunk")
-				map("v", "<leader>gs", function()
+				map("v", "<leader>ga", function()
 					gs.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
 				end, "Stage hunk")
 				map("v", "<leader>gr", function()

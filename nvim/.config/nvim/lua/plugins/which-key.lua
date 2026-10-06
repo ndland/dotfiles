@@ -25,6 +25,7 @@ return {
         { "<leader>n", group = "Notes" },
         { "<leader>r", group = "Run / Test" },
         { "<leader>t", group = "Terminal" },
+        { "<leader>u", group = "UI" },
         { "<leader>x", group = "Problems" },
       })
     end,
