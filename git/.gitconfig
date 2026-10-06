@@ -20,11 +20,12 @@
 # Machine/platform behavior
 # ---------------------------------------------------------------
 
-[include]
-    path = ~/.gitconfig-platform
-
 [includeIf "gitdir:~/code/learning/"]
   path = ~/.gitconfig-personal
+
+# Platform overrides follow identity profiles (Windows SSH on WSL).
+[include]
+    path = ~/.gitconfig-platform
 
 [core]
     editor = nvim
@@ -89,3 +90,15 @@
 	defaultBranch = main
 [gpg "ssh"]
 	allowedSignersFile = ~/.config/git/allowed_signers
+[credential "https://origin.cursor.com/git"]
+	helper =
+	helper = !$HOME/.local/bin/origin credential-helper
+[credential "https://origin.cursor.com"]
+	helper =
+	helper = !$HOME/.local/bin/origin credential-helper
+[credential "https://github.com"]
+	helper =
+	helper = !gh auth git-credential
+[credential "https://gist.github.com"]
+	helper =
+	helper = !gh auth git-credential

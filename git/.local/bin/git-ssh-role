@@ -64,16 +64,16 @@ WORK_CONFIG="$HOME/.gitconfig-work"
 [[ -f "$PERSONAL_CONFIG" ]] ||
     die "missing $PERSONAL_CONFIG"
 
-[[ -f "$WORK_CONFIG" ]] ||
-    die "missing $WORK_CONFIG"
-
 PERSONAL_KEY="$(
     key_from_config "$PERSONAL_CONFIG"
 )" || die "personal signing key unavailable"
 
-WORK_KEY="$(
-    key_from_config "$WORK_CONFIG"
-)" || die "work signing key unavailable"
+WORK_KEY=""
+if [[ -f "$WORK_CONFIG" ]]; then
+    WORK_KEY="$(
+        key_from_config "$WORK_CONFIG"
+    )" || die "work signing key unavailable"
+fi
 
 SELECTED_KEY=""
 ROLE=""
@@ -121,6 +121,9 @@ else
             ;;
     esac
 fi
+
+[[ -n "$SELECTED_KEY" ]] ||
+    die "$ROLE signing key unavailable; configure ~/.gitconfig-$ROLE"
 
 if [[ "${1:-}" == "--workstation-diagnose" ]]; then
     printf 'role=%s\n' "$ROLE"

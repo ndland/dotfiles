@@ -8,6 +8,7 @@ TMP="${CONFIG}.tmp.$$"
 ALLOWED_DIR="$HOME/.config/git"
 ALLOWED_SIGNERS="$ALLOWED_DIR/allowed_signers"
 ALLOWED_TMP=""
+KEY_TMP=""
 
 PERSONAL_CONFIG="$HOME/.gitconfig-personal"
 WORK_CONFIG="$HOME/.gitconfig-work"
@@ -17,6 +18,10 @@ cleanup() {
 
     if [[ -n "${ALLOWED_TMP}" ]]; then
         rm -f "$ALLOWED_TMP"
+    fi
+
+    if [[ -n "${KEY_TMP}" ]]; then
+        rm -f "$KEY_TMP"
     fi
 }
 
@@ -86,6 +91,57 @@ extract_signer() {
     printf '%s %s\n' \
         "$email" \
         "$core"
+}
+
+export_public_key() {
+    local role="$1"
+    local config="$2"
+    local key
+    local key_dir="$HOME/.config/git/ssh"
+
+    key="$(
+        git config \
+            --file "$config" \
+            --get user.signingkey
+    )"
+
+    key="${key#key::}"
+
+    if [[ -f "$key" ]]; then
+        key="$(cat "$key")"
+    fi
+
+    key="$(
+        printf '%s\n' "$key" |
+            awk '
+                /^(ssh-|ecdsa-|sk-)/ && NF >= 2 {
+                    print $1 " " $2
+                    exit
+                }
+            '
+    )"
+
+    if [[ -z "$key" ]]; then
+        echo "ERROR: ${role} SSH public key cannot be parsed." >&2
+        return 26
+    fi
+
+    mkdir -p "$key_dir"
+
+    KEY_TMP="$(
+        mktemp "$key_dir/.${role}.pub.tmp.XXXXXX"
+    )"
+
+    printf '%s\n' "$key" > "$KEY_TMP"
+
+    if ! ssh-keygen -lf "$KEY_TMP" >/dev/null; then
+        echo "ERROR: ${role} SSH signing key is invalid." >&2
+        return 27
+    fi
+
+    chmod 600 "$KEY_TMP"
+    mv "$KEY_TMP" "$key_dir/$role.pub"
+    KEY_TMP=""
 }
 
 OS="$(uname -s)"
@@ -212,10 +268,17 @@ extract_signer \
     "$PERSONAL_CONFIG" \
     > "$ALLOWED_TMP"
 
-extract_signer \
-    "work" \
-    "$WORK_CONFIG" \
-    >> "$ALLOWED_TMP"
+export_public_key "personal" "$PERSONAL_CONFIG"
+
+if [[ -f "$WORK_CONFIG" ]]; then
+    extract_signer \
+        "work" \
+        "$WORK_CONFIG" \
+        >> "$ALLOWED_TMP"
+    export_public_key "work" "$WORK_CONFIG"
+else
+    echo "WARN: no ~/.gitconfig-work; work identity is not configured." >&2
+fi
 
 ENTRY_COUNT="$(
     awk \
@@ -223,8 +286,13 @@ ENTRY_COUNT="$(
         "$ALLOWED_TMP"
 )"
 
-if [[ "$ENTRY_COUNT" -ne 2 ]]; then
-    echo "ERROR: expected exactly two SSH verification principals." >&2
+EXPECTED_ENTRIES=1
+if [[ -f "$WORK_CONFIG" ]]; then
+    EXPECTED_ENTRIES=2
+fi
+
+if [[ "$ENTRY_COUNT" -ne "$EXPECTED_ENTRIES" ]]; then
+    echo "ERROR: expected $EXPECTED_ENTRIES SSH verification principal(s)." >&2
     exit 24
 fi
 

@@ -1,3 +1,5 @@
 [user]
 	email = land.d.nicholas@gmail.com
   signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIH5xxQeTOLHfGAaXpk7ATIff5v2tmsHcjSNr1tqS8CHT
+[core]
+    sshCommand = ssh -o IdentitiesOnly=yes -i ~/.config/git/ssh/personal.pub
