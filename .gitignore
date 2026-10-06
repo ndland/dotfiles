@@ -128,3 +128,10 @@ tmux/.config/tmux/plugins/
 
 # Local design notes and implementation plans.
 docs/
+
+# Per-machine dev settings are intentionally not shared in dotfiles.
+/tmux/.config/dev/agent
+/tmux/.config/dev/aliases
+
+# Local backups are not dotfile sources.
+/zsh/.*.bak-*

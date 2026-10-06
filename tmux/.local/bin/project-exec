@@ -17,33 +17,31 @@ if [[ ! -x "$CONTEXT" ]]; then
     exit 1
 fi
 
-eval "$("$CONTEXT" --shell "$PROJECT")"
+CONTEXT_ENV="$("$CONTEXT" --shell "$PROJECT")" || exit 1
+eval "$CONTEXT_ENV"
 
 cd "$DEV_PROJECT_ROOT"
 
 run_project_command() {
-    if [[ "$DEV_HAS_MISE" -eq 1 ]]; then
-        if ! command -v mise >/dev/null 2>&1; then
-            echo "project-exec: mise.toml exists but mise is unavailable" >&2
-            return 1
-        fi
-
-        # mise owns tool versions only.
-        #
-        # Paranoid mode requires explicit content-bound trust.
-        # --no-env prevents mise from becoming a second env manager.
-        # --no-hooks prevents project hooks from running implicitly.
-        env \
-            MISE_PARANOID=1 \
-            mise \
-            --no-env \
-            --no-hooks \
-            exec \
-            -- \
-            "$@"
-    else
-        "$@"
+    if ! command -v mise >/dev/null 2>&1; then
+        echo "project-exec: mise is unavailable" >&2
+        return 1
     fi
+
+    # Always exec through mise so global pins (node, neovim, ...) are on
+    # PATH. A project mise.toml overrides those versions when present.
+    #
+    # Paranoid mode requires explicit content-bound trust.
+    # --no-env prevents mise from becoming a second env manager.
+    # --no-hooks prevents project hooks from running implicitly.
+    env \
+        MISE_PARANOID=1 \
+        mise \
+        --no-env \
+        --no-hooks \
+        exec \
+        -- \
+        "$@"
 }
 
 if [[ "$DEV_HAS_ENVRC" -eq 1 && "${PROJECT_EXEC_DIRENV_ACTIVE:-0}" != 1 ]]; then

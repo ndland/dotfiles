@@ -4,6 +4,7 @@ set -euo pipefail
 
 CONTEXT="$HOME/.local/bin/project-context"
 PROJECT_EXEC="$HOME/.local/bin/project-exec"
+ALIASES_FILE="$HOME/.config/dev/aliases"
 
 usage() {
     cat <<'EOF'
@@ -13,8 +14,10 @@ Usage:
   dev .
   dev --describe [QUERY]
 
-Select a Git checkout beneath ~/code and enter its isolated
-tmux development session.
+Select a Git checkout beneath ~/code or a configured alias and enter
+its isolated tmux development session.
+
+Optional aliases live in ~/.config/dev/aliases (NAME=PATH, one per line).
 
 Each checkout/worktree receives its own:
   DEV_INSTANCE_ID
@@ -26,9 +29,9 @@ manifests but no mise.toml are reported as not-yet-isolated.
 EOF
 }
 
-discover_repositories() {
-    [[ -d "$HOME/code" ]] || return
-
+discover_from_root() {
+    local root="$1"
+    [[ -d "$root" ]] || return
     if ! command -v fd >/dev/null 2>&1; then
         echo "dev: fd is required for repository discovery." >&2
         exit 1
@@ -39,10 +42,57 @@ discover_repositories() {
         --no-ignore \
         --max-depth 8 \
         '^\.git$' \
-        "$HOME/code" \
+        "$root" \
         2>/dev/null |
-        sed -E 's#/?\.git/?$##' |
-        sort -u
+        sed -E 's#/?\.git/?$##'
+}
+
+alias_target() {
+    local query="$1"
+    [[ -f "$ALIASES_FILE" ]] || return 1
+
+    local line name path normalized_query normalized_name
+    normalized_query="$(printf '%s' "$query" | tr '[:upper:]' '[:lower:]')"
+
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        [[ "$line" =~ ^[[:space:]]*# ]] && continue
+        [[ -z "${line//[[:space:]]/}" ]] && continue
+        [[ "$line" == *=* ]] || continue
+
+        name="${line%%=*}"
+        path="${line#*=}"
+        path="${path/#\~/$HOME}"
+        normalized_name="$(printf '%s' "$name" | tr '[:upper:]' '[:lower:]')"
+
+        if [[ "$normalized_name" == "$normalized_query" ]]; then
+            printf '%s\n' "$path"
+            return 0
+        fi
+    done < "$ALIASES_FILE"
+
+    return 1
+}
+
+alias_paths() {
+    [[ -f "$ALIASES_FILE" ]] || return 0
+
+    local line path
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        [[ "$line" =~ ^[[:space:]]*# ]] && continue
+        [[ -z "${line//[[:space:]]/}" ]] && continue
+        [[ "$line" == *=* ]] || continue
+
+        path="${line#*=}"
+        path="${path/#\~/$HOME}"
+        [[ -d "$path" ]] && printf '%s\n' "$path"
+    done < "$ALIASES_FILE"
+}
+
+discover_repositories() {
+    {
+        discover_from_root "$HOME/code"
+        alias_paths
+    } | sed '/^$/d' | sort -u
 }
 
 select_repository() {
@@ -51,6 +101,25 @@ select_repository() {
     if [[ "$query" == "." ]]; then
         git rev-parse --show-toplevel 2>/dev/null || pwd
         return
+    fi
+
+    if [[ -n "$query" ]]; then
+        local aliased
+        aliased="$(alias_target "$query" || true)"
+
+        if [[ -n "$aliased" ]]; then
+            if [[ ! -d "$aliased" ]]; then
+                echo "dev: alias '$query' points at a missing path:" >&2
+                echo "  $aliased" >&2
+                exit 1
+            fi
+
+            (
+                cd "$aliased"
+                pwd -P
+            )
+            return
+        fi
     fi
 
     if [[ -n "$query" && -d "$query" ]]; then
@@ -145,45 +214,44 @@ preflight_project() {
         echo >&2
     fi
 
-    if [[ "$DEV_HAS_MISE" -eq 1 ]]; then
-        if ! command -v mise >/dev/null 2>&1; then
-            echo "dev: mise.toml exists but mise is unavailable." >&2
-            return 1
-        fi
+    if ! command -v mise >/dev/null 2>&1; then
+        echo "dev: mise is unavailable." >&2
+        return 1
+    fi
 
-        # DEV_OWNED_MISE_AUTO_TRUST_START
-        # Repositories in the user's own GitHub namespace are a local
-        # trust domain. Keep mise paranoid mode enabled, but trust the
-        # exact current contents of their project-local mise.toml.
-        #
-        # Third-party repositories remain explicitly human-gated.
-        if [[ -f "$DEV_PROJECT_ROOT/mise.toml" ]]; then
-            case "$DEV_PROJECT_ROOT" in
-                "$HOME/code/github.com/ndland/"*)
-                    local trust_output
+    # DEV_OWNED_MISE_AUTO_TRUST_START
+    # Repositories in the user's own GitHub namespace are a local
+    # trust domain. Keep mise paranoid mode enabled, but trust the
+    # exact current contents of their project-local mise.toml.
+    #
+    # Third-party repositories remain explicitly human-gated.
+    if [[ -f "$DEV_PROJECT_ROOT/mise.toml" ]]; then
+        case "$DEV_PROJECT_ROOT" in
+            "$HOME/code/github.com/ndland/"*)
+                local trust_output
 
-                    if ! trust_output="$(
-                        env \
-                            MISE_PARANOID=1 \
-                            mise \
-                            trust \
-                            "$DEV_PROJECT_ROOT/mise.toml" \
-                            2>&1
-                    )"; then
-                        echo "dev: unable to trust owned project mise config:" >&2
-                        printf '%s\n' "$trust_output" | sed 's/^/  /' >&2
-                        return 1
-                    fi
-                    ;;
-            esac
-        fi
-        # DEV_OWNED_MISE_AUTO_TRUST_END
-        local missing
-        local result
+                if ! trust_output="$(
+                    env \
+                        MISE_PARANOID=1 \
+                        mise \
+                        trust \
+                        "$DEV_PROJECT_ROOT/mise.toml" \
+                        2>&1
+                )"; then
+                    echo "dev: unable to trust owned project mise config:" >&2
+                    printf '%s\n' "$trust_output" | sed 's/^/  /' >&2
+                    return 1
+                fi
+                ;;
+        esac
+    fi
+    # DEV_OWNED_MISE_AUTO_TRUST_END
+    local missing
+    local result
 
-        set +e
+    set +e
 
-        missing="$(
+    missing="$(
             env \
                 MISE_PARANOID=1 \
                 mise \
@@ -196,28 +264,29 @@ preflight_project() {
                 2>&1
         )"
 
-        result=$?
+    result=$?
 
-        set -e
+    set -e
 
-        if [[ "$result" -ne 0 ]]; then
-            echo "dev: unable to validate project mise config:" >&2
-            printf '%s\n' "$missing" | sed 's/^/  /' >&2
-            echo >&2
-            echo "Review the project config first." >&2
-            echo "If it is trusted, authorize its current contents with:" >&2
+    if [[ "$result" -ne 0 ]]; then
+        echo "dev: unable to validate mise toolchain:" >&2
+        printf '%s\n' "$missing" | sed 's/^/  /' >&2
+        echo >&2
+        echo "Review the project config first." >&2
+        if [[ "$DEV_HAS_MISE" -eq 1 ]]; then
+            echo "If the project file is trusted, authorize it with:" >&2
             echo "  MISE_PARANOID=1 mise trust '$DEV_PROJECT_ROOT/mise.toml'" >&2
-            return 1
         fi
+        return 1
+    fi
 
-        if [[ -n "$missing" ]]; then
-            echo "dev: project toolchain is not installed:" >&2
-            printf '%s\n' "$missing" | sed 's/^/  /' >&2
-            echo >&2
-            echo "Run from the reviewed project:" >&2
-            echo "  mise install" >&2
-            return 1
-        fi
+    if [[ -n "$missing" ]]; then
+        echo "dev: toolchain is not installed:" >&2
+        printf '%s\n' "$missing" | sed 's/^/  /' >&2
+        echo >&2
+        echo "Install the pinned tools with:" >&2
+        echo "  mise install" >&2
+        return 1
     fi
 
     if [[ "$DEV_HAS_ENVRC" -eq 1 ]]; then
@@ -263,7 +332,8 @@ if [[ ! -x "$CONTEXT" ]]; then
     exit 1
 fi
 
-eval "$("$CONTEXT" --shell "$SELECTED")"
+CONTEXT_ENV="$("$CONTEXT" --shell "$SELECTED")" || exit 1
+eval "$CONTEXT_ENV"
 
 if [[ "$DESCRIBE" -eq 1 ]]; then
     "$CONTEXT" "$DEV_PROJECT_ROOT"

@@ -8,7 +8,8 @@ Usage:
   project-context [--shell] [PATH]
 
 Reports deterministic, non-secret development context for a
-Git checkout/worktree.
+Git checkout/worktree, or for any directory. Outside a checkout
+the branch is reported as <none> and the common dir is empty.
 
 --shell emits Bash-safe export statements.
 EOF
@@ -96,14 +97,19 @@ fi
 
 TARGET="$(canonical_dir "$TARGET")"
 
+IS_GIT=1
+
 ROOT="$(
     git -C "$TARGET" \
         rev-parse \
         --show-toplevel \
         2>/dev/null
 )" || {
-    echo "project-context: not inside a Git checkout: $TARGET" >&2
-    exit 1
+    # Not every directory worth a dev session is a checkout; synced note
+    # vaults and scratch dirs qualify too. Identity then comes from the
+    # directory itself, which is all the hash and slug actually need.
+    IS_GIT=0
+    ROOT="$TARGET"
 }
 
 ROOT="$(canonical_dir "$ROOT")"
@@ -116,38 +122,43 @@ INSTANCE="${SLUG}-${HASH}"
 COMPOSE="${INSTANCE}"
 SESSION="dev_${SLUG}_${HASH}"
 
-BRANCH="$(
-    git -C "$ROOT" \
-        branch \
-        --show-current \
-        2>/dev/null ||
-        true
-)"
+BRANCH="<none>"
+COMMON_DIR=""
 
-if [[ -z "$BRANCH" ]]; then
-    BRANCH="<detached>"
+if [[ "$IS_GIT" -eq 1 ]]; then
+    BRANCH="$(
+        git -C "$ROOT" \
+            branch \
+            --show-current \
+            2>/dev/null ||
+            true
+    )"
+
+    if [[ -z "$BRANCH" ]]; then
+        BRANCH="<detached>"
+    fi
+
+    COMMON_DIR="$(
+        git -C "$ROOT" \
+            rev-parse \
+            --git-common-dir
+    )"
+
+    case "$COMMON_DIR" in
+        /*)
+            ;;
+        *)
+            COMMON_DIR="$ROOT/$COMMON_DIR"
+            ;;
+    esac
+
+    COMMON_DIR="$(
+        cd "$(dirname "$COMMON_DIR")"
+        printf '%s/%s\n' \
+            "$(pwd -P)" \
+            "$(basename "$COMMON_DIR")"
+    )"
 fi
-
-COMMON_DIR="$(
-    git -C "$ROOT" \
-        rev-parse \
-        --git-common-dir
-)"
-
-case "$COMMON_DIR" in
-    /*)
-        ;;
-    *)
-        COMMON_DIR="$ROOT/$COMMON_DIR"
-        ;;
-esac
-
-COMMON_DIR="$(
-    cd "$(dirname "$COMMON_DIR")"
-    printf '%s/%s\n' \
-        "$(pwd -P)" \
-        "$(basename "$COMMON_DIR")"
-)"
 
 HAS_MISE=0
 HAS_ENVRC=0
