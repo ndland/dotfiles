@@ -71,7 +71,10 @@ config.window_padding = {
 	bottom = 6,
 }
 
-
+-- Do not set a WezTerm leader on Ctrl+a. tmux already uses C-a as prefix
+-- (unbind C-b); a WezTerm leader swallows the key so tmux never sees it.
+-- Pane/tab mux belongs to tmux (`dev` sessions). Resurrect bindings use CTRL|SHIFT.
+config.keys = {}
 
 config.audible_bell = "Disabled"
 config.adjust_window_size_when_changing_font_size = false
@@ -97,10 +100,6 @@ if resurrect then
 		save_windows = false,
 		save_tabs = false,
 	})
-
-	if resurrect.pane_tree.add_safe_restore_processes then
-		resurrect.pane_tree.add_safe_restore_processes({ "lazygit" })
-	end
 
 	-- Restore into THIS window. Do not call restore_workspace(): it no-ops when
 	-- the saved workspace is already live, which is the usual case after launch.
@@ -177,6 +176,26 @@ if resurrect then
 		)
 	end)
 
+	table.insert(config.keys, {
+		key = "w",
+		mods = "CTRL|SHIFT",
+		action = rename_workspace,
+	})
+	table.insert(config.keys, {
+		key = "s",
+		mods = "CTRL|SHIFT",
+		action = resurrect.workspace_state.save_workspace_action(),
+	})
+	table.insert(config.keys, {
+		key = "r",
+		mods = "CTRL|SHIFT",
+		action = restore_into_current_window,
+	})
+	table.insert(config.keys, {
+		key = "d",
+		mods = "CTRL|SHIFT",
+		action = resurrect.fuzzy_loader.delete_action(),
+	})
 end
 
 -- OPENCODE_SHIFT_ENTER_START
